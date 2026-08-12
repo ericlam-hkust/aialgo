@@ -67,7 +67,7 @@ function BillingPage() {
   };
 
   return (
-    <AppShell>
+    <>
       <PaymentTestModeBanner />
       <div className="space-y-6 p-6">
         <header className="flex flex-wrap items-center justify-between gap-3">
@@ -152,6 +152,6 @@ function BillingPage() {
         }}
         currentTier={tier}
       />
-    </AppShell>
+    </>
   );
 }
