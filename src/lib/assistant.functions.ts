@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { assertQuota, incrementUsage } from "./entitlements.server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { NODE_CATALOG, type StrategyGraph } from "./strategy-graph";
 import { GLOSSARY, SYMBOLS } from "./market";
@@ -41,7 +42,8 @@ export const aiAssistantChat = createServerFn({ method: "POST" })
     if (last.content.length > 2000) throw new Error("Please keep your message under 2000 characters.");
     return { messages };
   })
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    await assertQuota(context.supabase, context.userId, "ai");
     const apiKey = process.env["LOVABLE_API_KEY"];
     if (!apiKey) throw new Error("AI is not configured for this project yet.");
 
@@ -80,6 +82,8 @@ export const aiAssistantChat = createServerFn({ method: "POST" })
             graph,
           }
         : null;
+
+    await incrementUsage(context.userId, "ai_calls");
 
     return { reply: parsed.reply?.trim() || "Here you go.", strategy };
   });
