@@ -305,6 +305,59 @@ export type Database = {
           },
         ]
       }
+      creator_payouts: {
+        Row: {
+          created_at: string
+          creator_id: string
+          currency: string
+          fee_amount: number
+          fee_rate: number
+          gross_amount: number
+          id: string
+          net_amount: number
+          status: string
+          strategy_id: string | null
+          strategy_name: string | null
+          subscriber_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          currency?: string
+          fee_amount?: number
+          fee_rate?: number
+          gross_amount?: number
+          id?: string
+          net_amount?: number
+          status?: string
+          strategy_id?: string | null
+          strategy_name?: string | null
+          subscriber_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          currency?: string
+          fee_amount?: number
+          fee_rate?: number
+          gross_amount?: number
+          id?: string
+          net_amount?: number
+          status?: string
+          strategy_id?: string | null
+          strategy_name?: string | null
+          subscriber_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_payouts_strategy_id_fkey"
+            columns: ["strategy_id"]
+            isOneToOne: false
+            referencedRelation: "strategies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       data_source_connections: {
         Row: {
           api_key_encrypted: string | null
@@ -914,6 +967,78 @@ export type Database = {
           },
         ]
       }
+      subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          environment: string
+          id: string
+          price_id: string | null
+          product_id: string | null
+          status: string
+          stripe_customer_id: string
+          stripe_subscription_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          environment?: string
+          id?: string
+          price_id?: string | null
+          product_id?: string | null
+          status?: string
+          stripe_customer_id: string
+          stripe_subscription_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          environment?: string
+          id?: string
+          price_id?: string | null
+          product_id?: string | null
+          status?: string
+          stripe_customer_id?: string
+          stripe_subscription_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      usage_counters: {
+        Row: {
+          ai_calls: number
+          backtests_run: number
+          period: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_calls?: number
+          backtests_run?: number
+          period: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_calls?: number
+          backtests_run?: number
+          period?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -940,6 +1065,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      current_plan_tier: {
+        Args: { _env?: string; _user_id: string }
+        Returns: Database["public"]["Enums"]["plan_tier"]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -950,6 +1079,7 @@ export type Database = {
     }
     Enums: {
       app_role: "free" | "pro" | "admin"
+      plan_tier: "free" | "pro" | "elite"
       risk_tolerance: "conservative" | "moderate" | "aggressive"
     }
     CompositeTypes: {
@@ -1079,6 +1209,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["free", "pro", "admin"],
+      plan_tier: ["free", "pro", "elite"],
       risk_tolerance: ["conservative", "moderate", "aggressive"],
     },
   },
