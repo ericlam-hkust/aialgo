@@ -1065,16 +1065,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      current_plan_tier: {
-        Args: { _env?: string; _user_id: string }
-        Returns: Database["public"]["Enums"]["plan_tier"]
-      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      my_plan_tier: {
+        Args: { _env?: string }
+        Returns: Database["public"]["Enums"]["plan_tier"]
       }
     }
     Enums: {
