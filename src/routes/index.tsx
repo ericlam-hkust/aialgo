@@ -222,9 +222,9 @@ function Landing() {
       </section>
 
       <section className="border-y border-border/60 bg-card/30">
-        <div className="mx-auto max-w-4xl px-4 py-20">
+        <div className="mx-auto max-w-6xl px-4 py-20">
           <h2 className="text-center text-2xl font-semibold tracking-tight md:text-3xl">Simple pricing</h2>
-          <div className="mt-10 grid gap-5 md:grid-cols-2">
+          <div className="mt-10 grid gap-5 md:grid-cols-3">
             {PRICING.map((p) => (
               <Card
                 key={p.name}
