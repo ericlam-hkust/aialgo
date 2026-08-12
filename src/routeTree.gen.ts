@@ -19,6 +19,7 @@ import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthRegisterRouteImport } from './routes/auth.register'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardStrategiesIndexRouteImport } from './routes/_authenticated/dashboard.strategies.index'
+import { Route as AuthenticatedDashboardStrategiesTemplatesRouteImport } from './routes/_authenticated/dashboard.strategies.templates'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -71,6 +72,12 @@ const AuthenticatedDashboardStrategiesIndexRoute =
     path: '/strategies/',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardStrategiesTemplatesRoute =
+  AuthenticatedDashboardStrategiesTemplatesRouteImport.update({
+    id: '/strategies/templates',
+    path: '/strategies/templates',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -81,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/auth/register': typeof AuthRegisterRoute
   '/auth/': typeof AuthIndexRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
   '/dashboard/strategies/': typeof AuthenticatedDashboardStrategiesIndexRoute
 }
 export interface FileRoutesByTo {
@@ -90,6 +98,7 @@ export interface FileRoutesByTo {
   '/auth/register': typeof AuthRegisterRoute
   '/auth': typeof AuthIndexRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
   '/dashboard/strategies': typeof AuthenticatedDashboardStrategiesIndexRoute
 }
 export interface FileRoutesById {
@@ -103,6 +112,7 @@ export interface FileRoutesById {
   '/auth/register': typeof AuthRegisterRoute
   '/auth/': typeof AuthIndexRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/_authenticated/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
   '/_authenticated/dashboard/strategies/': typeof AuthenticatedDashboardStrategiesIndexRoute
 }
 export interface FileRouteTypes {
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth/'
     | '/dashboard/'
+    | '/dashboard/strategies/templates'
     | '/dashboard/strategies/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -125,6 +136,7 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth'
     | '/dashboard'
+    | '/dashboard/strategies/templates'
     | '/dashboard/strategies'
   id:
     | '__root__'
@@ -137,6 +149,7 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth/'
     | '/_authenticated/dashboard/'
+    | '/_authenticated/dashboard/strategies/templates'
     | '/_authenticated/dashboard/strategies/'
   fileRoutesById: FileRoutesById
 }
@@ -218,17 +231,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardStrategiesIndexRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/strategies/templates': {
+      id: '/_authenticated/dashboard/strategies/templates'
+      path: '/strategies/templates'
+      fullPath: '/dashboard/strategies/templates'
+      preLoaderRoute: typeof AuthenticatedDashboardStrategiesTemplatesRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
   }
 }
 
 interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
+  AuthenticatedDashboardStrategiesTemplatesRoute: typeof AuthenticatedDashboardStrategiesTemplatesRoute
   AuthenticatedDashboardStrategiesIndexRoute: typeof AuthenticatedDashboardStrategiesIndexRoute
 }
 
 const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
   {
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
+    AuthenticatedDashboardStrategiesTemplatesRoute:
+      AuthenticatedDashboardStrategiesTemplatesRoute,
     AuthenticatedDashboardStrategiesIndexRoute:
       AuthenticatedDashboardStrategiesIndexRoute,
   }
