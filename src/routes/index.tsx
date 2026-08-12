@@ -119,7 +119,15 @@ const FAQS = [
 ];
 
 function Landing() {
+  const navigate = useNavigate();
+  const { session, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading && session) navigate({ to: "/dashboard", replace: true });
+  }, [loading, session, navigate]);
+
   return (
+
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-30 border-b border-border/60 bg-background/80 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
