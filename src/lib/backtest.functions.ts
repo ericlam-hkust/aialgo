@@ -27,20 +27,8 @@ export const runBacktestFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
-    // Rate limit: free tier gets 10 backtests per hour.
-    const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-    const [{ count }, { data: roles }] = await Promise.all([
-      supabase
-        .from("backtests")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", userId)
-        .gte("created_at", since),
-      supabase.from("user_roles").select("role").eq("user_id", userId),
-    ]);
-    const isPro = (roles ?? []).some((r) => r.role === "pro" || r.role === "admin");
-    if (!isPro && (count ?? 0) >= 10) {
-      throw new Error("Free tier is limited to 10 backtests per hour. Upgrade to Pro for unlimited runs.");
-    }
+    // Plan quota: monthly backtest allowance per subscription tier.
+    await assertQuota(supabase, userId, "backtest");
 
     const { data: rows, error } = await supabase
       .from("market_data_daily")
