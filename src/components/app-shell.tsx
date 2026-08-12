@@ -28,6 +28,9 @@ import { useMarketStore } from "@/store/market-store";
 import { useLiveMarket } from "@/hooks/use-live-market";
 import { hkSession, usSession } from "@/lib/market-hours";
 import { AiAssistant } from "@/components/ai-assistant";
+import { UpgradeDialog } from "@/components/upgrade-dialog";
+import { useEntitlements } from "@/hooks/use-entitlements";
+import { UPGRADE_EVENT } from "@/lib/upgrade-events";
 
 import { cn } from "@/lib/utils";
 
@@ -57,8 +60,18 @@ export function AppShell({ children }: { children: ReactNode }) {
   const tickCount = useMarketStore((s) => Object.keys(s.ticks).length);
   const [clock, setClock] = useState("--:--:--");
   const [sessions, setSessions] = useState("");
+  const [upgradeReason, setUpgradeReason] = useState<string | null>(null);
+  const { tier } = useEntitlements();
 
   useLiveMarket();
+
+  useEffect(() => {
+    const onUpgrade = (event: Event) => {
+      setUpgradeReason((event as CustomEvent<string>).detail || "Upgrade to unlock this feature.");
+    };
+    window.addEventListener(UPGRADE_EVENT, onUpgrade);
+    return () => window.removeEventListener(UPGRADE_EVENT, onUpgrade);
+  }, []);
 
   useEffect(() => {
     const refresh = () => {
@@ -157,6 +170,12 @@ export function AppShell({ children }: { children: ReactNode }) {
         <main className="min-w-0 flex-1 p-4 pb-14 md:p-6 md:pb-14">{children}</main>
 
         <AiAssistant />
+      <UpgradeDialog
+        open={upgradeReason !== null}
+        onOpenChange={(next) => !next && setUpgradeReason(null)}
+        reason={upgradeReason ?? undefined}
+        currentTier={tier}
+      />
 
 
         <div className="fixed inset-x-0 bottom-0 z-20 flex h-8 items-center justify-between border-t border-border bg-card/95 px-4 text-[11px] text-muted-foreground backdrop-blur">
