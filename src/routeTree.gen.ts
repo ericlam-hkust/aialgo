@@ -24,6 +24,7 @@ import { Route as AuthenticatedDashboardMarketplaceRouteImport } from './routes/
 import { Route as AuthenticatedDashboardPaperTradingRouteImport } from './routes/_authenticated/dashboard.paper-trading'
 import { Route as AuthenticatedDashboardRiskRouteImport } from './routes/_authenticated/dashboard.risk'
 import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
+import { Route as ApiPublicSyncRouteImport } from './routes/api/public/sync'
 import { Route as AuthenticatedDashboardStrategiesIndexRouteImport } from './routes/_authenticated/dashboard.strategies.index'
 import { Route as AuthenticatedDashboardStrategiesBacktestRouteImport } from './routes/_authenticated/dashboard.strategies.backtest'
 import { Route as AuthenticatedDashboardStrategiesBuilderRouteImport } from './routes/_authenticated/dashboard.strategies.builder'
@@ -110,6 +111,11 @@ const AuthenticatedDashboardSettingsRoute =
     path: '/settings',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const ApiPublicSyncRoute = ApiPublicSyncRouteImport.update({
+  id: '/api/public/sync',
+  path: '/api/public/sync',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedDashboardStrategiesIndexRoute =
   AuthenticatedDashboardStrategiesIndexRouteImport.update({
     id: '/strategies/',
@@ -149,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/paper-trading': typeof AuthenticatedDashboardPaperTradingRoute
   '/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
+  '/api/public/sync': typeof ApiPublicSyncRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/strategies/backtest': typeof AuthenticatedDashboardStrategiesBacktestRoute
   '/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
@@ -167,6 +174,7 @@ export interface FileRoutesByTo {
   '/dashboard/paper-trading': typeof AuthenticatedDashboardPaperTradingRoute
   '/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
+  '/api/public/sync': typeof ApiPublicSyncRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/strategies/backtest': typeof AuthenticatedDashboardStrategiesBacktestRoute
   '/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
@@ -189,6 +197,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/paper-trading': typeof AuthenticatedDashboardPaperTradingRoute
   '/_authenticated/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
   '/_authenticated/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
+  '/api/public/sync': typeof ApiPublicSyncRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/strategies/backtest': typeof AuthenticatedDashboardStrategiesBacktestRoute
   '/_authenticated/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
@@ -211,6 +220,7 @@ export interface FileRouteTypes {
     | '/dashboard/paper-trading'
     | '/dashboard/risk'
     | '/dashboard/settings'
+    | '/api/public/sync'
     | '/dashboard/'
     | '/dashboard/strategies/backtest'
     | '/dashboard/strategies/builder'
@@ -229,6 +239,7 @@ export interface FileRouteTypes {
     | '/dashboard/paper-trading'
     | '/dashboard/risk'
     | '/dashboard/settings'
+    | '/api/public/sync'
     | '/dashboard'
     | '/dashboard/strategies/backtest'
     | '/dashboard/strategies/builder'
@@ -250,6 +261,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/paper-trading'
     | '/_authenticated/dashboard/risk'
     | '/_authenticated/dashboard/settings'
+    | '/api/public/sync'
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/strategies/backtest'
     | '/_authenticated/dashboard/strategies/builder'
@@ -261,6 +273,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
+  ApiPublicSyncRoute: typeof ApiPublicSyncRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -370,6 +383,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardSettingsRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/api/public/sync': {
+      id: '/api/public/sync'
+      path: '/api/public/sync'
+      fullPath: '/api/public/sync'
+      preLoaderRoute: typeof ApiPublicSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/dashboard/strategies/': {
       id: '/_authenticated/dashboard/strategies/'
       path: '/strategies'
@@ -473,6 +493,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
+  ApiPublicSyncRoute: ApiPublicSyncRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
