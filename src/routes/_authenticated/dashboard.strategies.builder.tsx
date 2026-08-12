@@ -46,9 +46,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 export const Route = createFileRoute("/_authenticated/dashboard/strategies/builder")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    id: typeof search["id"] === "string" ? search["id"] : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { id?: string } =>
+    typeof search["id"] === "string" ? { id: search["id"] } : {},
   component: () => (
     <ReactFlowProvider>
       <Builder />

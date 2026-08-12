@@ -19,6 +19,7 @@ import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthRegisterRouteImport } from './routes/auth.register'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardStrategiesIndexRouteImport } from './routes/_authenticated/dashboard.strategies.index'
+import { Route as AuthenticatedDashboardStrategiesBuilderRouteImport } from './routes/_authenticated/dashboard.strategies.builder'
 import { Route as AuthenticatedDashboardStrategiesTemplatesRouteImport } from './routes/_authenticated/dashboard.strategies.templates'
 
 const IndexRoute = IndexRouteImport.update({
@@ -72,6 +73,12 @@ const AuthenticatedDashboardStrategiesIndexRoute =
     path: '/strategies/',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardStrategiesBuilderRoute =
+  AuthenticatedDashboardStrategiesBuilderRouteImport.update({
+    id: '/strategies/builder',
+    path: '/strategies/builder',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardStrategiesTemplatesRoute =
   AuthenticatedDashboardStrategiesTemplatesRouteImport.update({
     id: '/strategies/templates',
@@ -88,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/auth/register': typeof AuthRegisterRoute
   '/auth/': typeof AuthIndexRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
   '/dashboard/strategies/': typeof AuthenticatedDashboardStrategiesIndexRoute
 }
@@ -98,6 +106,7 @@ export interface FileRoutesByTo {
   '/auth/register': typeof AuthRegisterRoute
   '/auth': typeof AuthIndexRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
   '/dashboard/strategies': typeof AuthenticatedDashboardStrategiesIndexRoute
 }
@@ -112,6 +121,7 @@ export interface FileRoutesById {
   '/auth/register': typeof AuthRegisterRoute
   '/auth/': typeof AuthIndexRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/_authenticated/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/_authenticated/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
   '/_authenticated/dashboard/strategies/': typeof AuthenticatedDashboardStrategiesIndexRoute
 }
@@ -126,6 +136,7 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth/'
     | '/dashboard/'
+    | '/dashboard/strategies/builder'
     | '/dashboard/strategies/templates'
     | '/dashboard/strategies/'
   fileRoutesByTo: FileRoutesByTo
@@ -136,6 +147,7 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth'
     | '/dashboard'
+    | '/dashboard/strategies/builder'
     | '/dashboard/strategies/templates'
     | '/dashboard/strategies'
   id:
@@ -149,6 +161,7 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth/'
     | '/_authenticated/dashboard/'
+    | '/_authenticated/dashboard/strategies/builder'
     | '/_authenticated/dashboard/strategies/templates'
     | '/_authenticated/dashboard/strategies/'
   fileRoutesById: FileRoutesById
@@ -231,6 +244,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardStrategiesIndexRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/strategies/builder': {
+      id: '/_authenticated/dashboard/strategies/builder'
+      path: '/strategies/builder'
+      fullPath: '/dashboard/strategies/builder'
+      preLoaderRoute: typeof AuthenticatedDashboardStrategiesBuilderRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/strategies/templates': {
       id: '/_authenticated/dashboard/strategies/templates'
       path: '/strategies/templates'
@@ -243,6 +263,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
+  AuthenticatedDashboardStrategiesBuilderRoute: typeof AuthenticatedDashboardStrategiesBuilderRoute
   AuthenticatedDashboardStrategiesTemplatesRoute: typeof AuthenticatedDashboardStrategiesTemplatesRoute
   AuthenticatedDashboardStrategiesIndexRoute: typeof AuthenticatedDashboardStrategiesIndexRoute
 }
@@ -250,6 +271,8 @@ interface AuthenticatedDashboardRouteChildren {
 const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
   {
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
+    AuthenticatedDashboardStrategiesBuilderRoute:
+      AuthenticatedDashboardStrategiesBuilderRoute,
     AuthenticatedDashboardStrategiesTemplatesRoute:
       AuthenticatedDashboardStrategiesTemplatesRoute,
     AuthenticatedDashboardStrategiesIndexRoute:
