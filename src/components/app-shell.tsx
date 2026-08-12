@@ -35,18 +35,18 @@ import { UPGRADE_EVENT } from "@/lib/upgrade-events";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { to: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
-  { to: "/dashboard/strategies", label: "Strategies", icon: Boxes, exact: false },
-  { to: "/dashboard/strategies/builder", label: "Builder", icon: LineChart, exact: true },
-  { to: "/dashboard/strategies/templates", label: "Templates", icon: BarChart3, exact: true },
-  { to: "/dashboard/strategies/backtest", label: "Backtest", icon: TrendingUp, exact: true },
-  { to: "/dashboard/paper-trading", label: "Paper Trading", icon: Activity, exact: true },
-  { to: "/dashboard/marketplace", label: "Marketplace", icon: Store, exact: false },
-  { to: "/dashboard/risk", label: "Risk Center", icon: ShieldAlert, exact: true },
-  { to: "/dashboard/brokers", label: "Brokers", icon: PlugZap, exact: true },
-  { to: "/dashboard/data-sources", label: "Data Sources", icon: Database, exact: true },
-  { to: "/dashboard/billing", label: "Billing", icon: CreditCard, exact: true },
-  { to: "/dashboard/settings", label: "Settings", icon: Settings, exact: true },
+  { to: "/dashboard", key: "nav.overview", icon: LayoutDashboard, exact: true },
+  { to: "/dashboard/strategies", key: "nav.strategies", icon: Boxes, exact: false },
+  { to: "/dashboard/strategies/builder", key: "nav.builder", icon: LineChart, exact: true },
+  { to: "/dashboard/strategies/templates", key: "nav.templates", icon: BarChart3, exact: true },
+  { to: "/dashboard/strategies/backtest", key: "nav.backtest", icon: TrendingUp, exact: true },
+  { to: "/dashboard/paper-trading", key: "nav.paperTrading", icon: Activity, exact: true },
+  { to: "/dashboard/marketplace", key: "nav.marketplace", icon: Store, exact: false },
+  { to: "/dashboard/risk", key: "nav.risk", icon: ShieldAlert, exact: true },
+  { to: "/dashboard/brokers", key: "nav.brokers", icon: PlugZap, exact: true },
+  { to: "/dashboard/data-sources", key: "nav.dataSources", icon: Database, exact: true },
+  { to: "/dashboard/billing", key: "nav.billing", icon: CreditCard, exact: true },
+  { to: "/dashboard/settings", key: "nav.settings", icon: Settings, exact: true },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
