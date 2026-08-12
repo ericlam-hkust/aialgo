@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { assertQuota, incrementUsage } from "./entitlements.server";
 import { NODE_CATALOG, type StrategyGraph } from "./strategy-graph";
 
 const SYSTEM = `You are AlgoForge's strategy compiler. Convert a retail trader's plain-English description into a visual strategy graph.
@@ -24,7 +25,8 @@ export const aiStrategyAssist = createServerFn({ method: "POST" })
     if (prompt.length > 1200) throw new Error("Please keep the description under 1200 characters.");
     return { prompt };
   })
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    await assertQuota(context.supabase, context.userId, "ai");
     const apiKey = process.env["LOVABLE_API_KEY"];
     if (!apiKey) throw new Error("AI is not configured for this project yet.");
 
@@ -54,6 +56,8 @@ export const aiStrategyAssist = createServerFn({ method: "POST" })
       throw new Error("The AI returned an unexpected response. Try rephrasing your strategy.");
     }
     if (!parsed.graph?.nodes?.length) throw new Error("The AI could not build a graph from that description.");
+
+    await incrementUsage(context.userId, "ai_calls");
 
     return {
       explanation: parsed.explanation ?? "Suggested strategy graph.",
