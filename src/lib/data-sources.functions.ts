@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getPlanTier, requireFeature } from "./entitlements.server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
@@ -56,6 +57,7 @@ export const saveDataSource = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
+    requireFeature(await getPlanTier(context.supabase, context.userId), "liveDataSources", "Connecting live market data providers");
     const provider = data.provider as ProviderId;
     let keyToTest: string | null = null;
 
@@ -242,6 +244,7 @@ export const syncIntraday = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
+    requireFeature(await getPlanTier(context.supabase, context.userId), "intradaySync", "Intraday data sync");
     const rows = await loadConnections(context.supabase);
     const results: { symbol: string; rows: number; provider: string | null; error: string | null }[] = [];
 

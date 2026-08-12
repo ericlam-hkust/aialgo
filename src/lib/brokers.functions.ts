@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getPlanTier, requireFeature } from "./entitlements.server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { fetchBrokerSnapshot, type BrokerId } from "@/lib/brokers.server";
@@ -46,6 +47,7 @@ export const saveBrokerConnection = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
+    requireFeature(await getPlanTier(context.supabase, context.userId), "brokerConnections", "Broker connections");
     const config: Record<string, string> = {
       accountId: data.accountId,
       currency: data.currency,
@@ -99,6 +101,7 @@ export const syncBroker = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
+    requireFeature(await getPlanTier(context.supabase, context.userId), "brokerConnections", "Broker connections");
     const started = Date.now();
     const { data: conn, error } = await context.supabase
       .from("broker_connections")
