@@ -114,7 +114,6 @@ export function AppShell({ children }: { children: ReactNode }) {
         </nav>
         <div className="border-t border-sidebar-border p-2" />
       </aside>
-      </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-20 flex h-14 items-center justify-between gap-4 border-b border-border bg-background/85 px-4 backdrop-blur">
