@@ -131,10 +131,10 @@ export function AppShell({ children }: { children: ReactNode }) {
                     ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
                     : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
                 )}
-                title={item.label}
+                title={t(item.key)}
               >
                 <Icon className="h-4 w-4 shrink-0" aria-hidden />
-                {!collapsed ? <span className="truncate">{item.label}</span> : null}
+                {!collapsed ? <span className="truncate">{t(item.key)}</span> : null}
               </Link>
             );
           })}
