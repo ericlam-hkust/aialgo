@@ -73,11 +73,24 @@ export function AppShell({ children }: { children: ReactNode }) {
           collapsed ? "w-16" : "w-60",
         )}
       >
-        <div className="flex h-14 items-center gap-2 border-b border-sidebar-border px-4">
-          <Wallet className="h-5 w-5 shrink-0 text-primary" aria-hidden />
-          {!collapsed ? <span className="text-sm font-semibold tracking-tight">AlgoForge</span> : null}
+        <div className="flex h-14 items-center justify-between gap-2 border-b border-sidebar-border px-4">
+          <div className="flex items-center gap-2 overflow-hidden">
+            <Wallet className="h-5 w-5 shrink-0 text-primary" aria-hidden />
+            {!collapsed ? <span className="text-sm font-semibold tracking-tight">AlgoForge</span> : null}
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 shrink-0"
+            onClick={() => setCollapsed((c) => !c)}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-controls="main-navigation"
+            aria-expanded={!collapsed}
+          >
+            <ChevronLeft className={cn("h-4 w-4 transition-transform", collapsed && "rotate-180")} aria-hidden />
+          </Button>
         </div>
-        <nav className="flex-1 space-y-0.5 overflow-y-auto p-2" aria-label="Main navigation">
+        <nav id="main-navigation" className="flex-1 space-y-0.5 overflow-y-auto p-2" aria-label="Main navigation">
           {NAV.map((item) => {
             const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
             const Icon = item.icon;
@@ -99,18 +112,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             );
           })}
         </nav>
-        <div className="border-t border-sidebar-border p-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-full justify-start gap-2"
-            onClick={() => setCollapsed((c) => !c)}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            <ChevronLeft className={cn("h-4 w-4 transition-transform", collapsed && "rotate-180")} aria-hidden />
-            {!collapsed ? "Collapse" : null}
-          </Button>
-        </div>
+        <div className="border-t border-sidebar-border p-2" />
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
