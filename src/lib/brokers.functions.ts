@@ -46,7 +46,7 @@ export const saveBrokerConnection = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    const config: Record<string, unknown> = {
+    const config: Record<string, string> = {
       accountId: data.accountId,
       currency: data.currency,
     };
@@ -71,7 +71,7 @@ export const saveBrokerConnection = createServerFn({ method: "POST" })
       status: data.mode === "simulation" ? "simulated" : "connected",
       account_id: data.accountId || null,
       currency: data.currency,
-      config,
+      config: config as Record<string, string>,
       credentials_encrypted: credentials,
       auto_sync_minutes: data.autoSyncMinutes,
       last_error: null,
