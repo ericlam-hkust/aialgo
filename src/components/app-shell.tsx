@@ -6,6 +6,7 @@ import {
   BarChart3,
   Boxes,
   ChevronLeft,
+  CreditCard,
   Database,
   LayoutDashboard,
   LineChart,
