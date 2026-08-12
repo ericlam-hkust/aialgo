@@ -41,6 +41,7 @@ const NAV = [
   { to: "/dashboard/risk", label: "Risk Center", icon: ShieldAlert, exact: true },
   { to: "/dashboard/brokers", label: "Brokers", icon: PlugZap, exact: true },
   { to: "/dashboard/data-sources", label: "Data Sources", icon: Database, exact: true },
+  { to: "/dashboard/billing", label: "Billing", icon: CreditCard, exact: true },
   { to: "/dashboard/settings", label: "Settings", icon: Settings, exact: true },
 ] as const;
 
