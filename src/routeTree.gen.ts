@@ -29,6 +29,7 @@ import { Route as AuthenticatedDashboardStrategiesIndexRouteImport } from './rou
 import { Route as AuthenticatedDashboardStrategiesBacktestRouteImport } from './routes/_authenticated/dashboard.strategies.backtest'
 import { Route as AuthenticatedDashboardStrategiesBuilderRouteImport } from './routes/_authenticated/dashboard.strategies.builder'
 import { Route as AuthenticatedDashboardStrategiesTemplatesRouteImport } from './routes/_authenticated/dashboard.strategies.templates'
+import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -140,6 +141,12 @@ const AuthenticatedDashboardStrategiesTemplatesRoute =
     path: '/strategies/templates',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const ApiPublicPaymentsWebhookRoute =
+  ApiPublicPaymentsWebhookRouteImport.update({
+    id: '/api/public/payments/webhook',
+    path: '/api/public/payments/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -160,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/strategies/backtest': typeof AuthenticatedDashboardStrategiesBacktestRoute
   '/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/dashboard/strategies/': typeof AuthenticatedDashboardStrategiesIndexRoute
 }
 export interface FileRoutesByTo {
@@ -179,6 +187,7 @@ export interface FileRoutesByTo {
   '/dashboard/strategies/backtest': typeof AuthenticatedDashboardStrategiesBacktestRoute
   '/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/dashboard/strategies': typeof AuthenticatedDashboardStrategiesIndexRoute
 }
 export interface FileRoutesById {
@@ -202,6 +211,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/strategies/backtest': typeof AuthenticatedDashboardStrategiesBacktestRoute
   '/_authenticated/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/_authenticated/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/_authenticated/dashboard/strategies/': typeof AuthenticatedDashboardStrategiesIndexRoute
 }
 export interface FileRouteTypes {
@@ -225,6 +235,7 @@ export interface FileRouteTypes {
     | '/dashboard/strategies/backtest'
     | '/dashboard/strategies/builder'
     | '/dashboard/strategies/templates'
+    | '/api/public/payments/webhook'
     | '/dashboard/strategies/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -244,6 +255,7 @@ export interface FileRouteTypes {
     | '/dashboard/strategies/backtest'
     | '/dashboard/strategies/builder'
     | '/dashboard/strategies/templates'
+    | '/api/public/payments/webhook'
     | '/dashboard/strategies'
   id:
     | '__root__'
@@ -266,6 +278,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/strategies/backtest'
     | '/_authenticated/dashboard/strategies/builder'
     | '/_authenticated/dashboard/strategies/templates'
+    | '/api/public/payments/webhook'
     | '/_authenticated/dashboard/strategies/'
   fileRoutesById: FileRoutesById
 }
@@ -274,6 +287,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
   ApiPublicSyncRoute: typeof ApiPublicSyncRoute
+  ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -418,6 +432,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardStrategiesTemplatesRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/api/public/payments/webhook': {
+      id: '/api/public/payments/webhook'
+      path: '/api/public/payments/webhook'
+      fullPath: '/api/public/payments/webhook'
+      preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -494,6 +515,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
   ApiPublicSyncRoute: ApiPublicSyncRoute,
+  ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
