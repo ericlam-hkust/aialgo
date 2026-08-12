@@ -23,6 +23,8 @@ import { useTheme } from "@/hooks/use-theme";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useMarketStore } from "@/store/market-store";
+import { AiAssistant } from "@/components/ai-assistant";
+
 import { cn } from "@/lib/utils";
 
 const NAV = [
