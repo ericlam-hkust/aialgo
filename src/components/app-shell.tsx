@@ -23,6 +23,8 @@ import { useTheme } from "@/hooks/use-theme";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useMarketStore } from "@/store/market-store";
+import { AiAssistant } from "@/components/ai-assistant";
+
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -141,6 +143,9 @@ export function AppShell({ children }: { children: ReactNode }) {
         </header>
 
         <main className="min-w-0 flex-1 p-4 pb-14 md:p-6 md:pb-14">{children}</main>
+
+        <AiAssistant />
+
 
         <div className="fixed inset-x-0 bottom-0 z-20 flex h-8 items-center justify-between border-t border-border bg-card/95 px-4 text-[11px] text-muted-foreground backdrop-blur">
           <span className="flex items-center gap-1.5">
