@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { handleActionError } from "@/lib/upgrade-events";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -107,7 +108,7 @@ function Brokers() {
       toast.success("Broker connection saved.");
       invalidate();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => handleActionError(e),
   });
 
   const syncMutation = useMutation({
@@ -116,7 +117,7 @@ function Brokers() {
       toast[res.ok ? "success" : "error"](res.message ?? "Synced.");
       invalidate();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => handleActionError(e),
   });
 
   return (

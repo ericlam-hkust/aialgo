@@ -81,23 +81,35 @@ const PRICING = [
     name: "Free",
     price: "HK$0",
     period: "forever",
-    features: ["Visual builder", "10 backtests / hour", "Paper trading", "5 strategy templates"],
+    features: ["1 strategy", "5 backtests / month", "5 AI requests / month", "Visual builder & templates"],
     cta: "Start free",
     highlight: false,
   },
   {
     name: "Pro",
-    price: "HK$288",
+    price: "HK$299",
     period: "per month",
     features: [
-      "Unlimited backtests",
-      "AI strategy assist priority",
-      "Marketplace publishing & earnings",
-      "Advanced risk analytics",
-      "Broker connections",
+      "25 strategies, 500 backtests / month",
+      "Live market data providers",
+      "Paper trading deployments",
+      "Marketplace publishing (20% fee)",
     ],
     cta: "Go Pro",
     highlight: true,
+  },
+  {
+    name: "Elite",
+    price: "HK$799",
+    period: "per month",
+    features: [
+      "Unlimited strategies & backtests",
+      "Broker connections (IBKR, Futu, Tiger)",
+      "Intraday data sync",
+      "0% marketplace commission",
+    ],
+    cta: "Go Elite",
+    highlight: false,
   },
 ];
 
@@ -210,9 +222,9 @@ function Landing() {
       </section>
 
       <section className="border-y border-border/60 bg-card/30">
-        <div className="mx-auto max-w-4xl px-4 py-20">
+        <div className="mx-auto max-w-6xl px-4 py-20">
           <h2 className="text-center text-2xl font-semibold tracking-tight md:text-3xl">Simple pricing</h2>
-          <div className="mt-10 grid gap-5 md:grid-cols-2">
+          <div className="mt-10 grid gap-5 md:grid-cols-3">
             {PRICING.map((p) => (
               <Card
                 key={p.name}

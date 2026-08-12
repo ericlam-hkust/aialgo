@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { assertQuota, incrementUsage } from "./entitlements.server";
 import { runBacktest } from "./backtest-engine";
 import type { Bar } from "./indicators";
 import { isStrategyGraph, type StrategyGraph } from "./strategy-graph";
@@ -27,20 +28,8 @@ export const runBacktestFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
-    // Rate limit: free tier gets 10 backtests per hour.
-    const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-    const [{ count }, { data: roles }] = await Promise.all([
-      supabase
-        .from("backtests")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", userId)
-        .gte("created_at", since),
-      supabase.from("user_roles").select("role").eq("user_id", userId),
-    ]);
-    const isPro = (roles ?? []).some((r) => r.role === "pro" || r.role === "admin");
-    if (!isPro && (count ?? 0) >= 10) {
-      throw new Error("Free tier is limited to 10 backtests per hour. Upgrade to Pro for unlimited runs.");
-    }
+    // Plan quota: monthly backtest allowance per subscription tier.
+    await assertQuota(supabase, userId, "backtest");
 
     const { data: rows, error } = await supabase
       .from("market_data_daily")
@@ -104,6 +93,8 @@ export const runBacktestFn = createServerFn({ method: "POST" })
       entity_id: saved.id,
       metadata: { symbol: data.symbol, strategy: data.strategyName },
     });
+
+    await incrementUsage(userId, "backtests_run");
 
     return { id: saved.id as string, ...result };
   });

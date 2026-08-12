@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { handleActionError } from "@/lib/upgrade-events";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   addEdge,
@@ -228,7 +229,7 @@ function Builder() {
       setPrompt("");
       toast.success("Strategy drafted", { description: result.explanation });
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "AI assist failed");
+      handleActionError(e, "AI assist failed");
     } finally {
       setAiBusy(false);
     }

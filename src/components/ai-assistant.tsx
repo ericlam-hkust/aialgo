@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { handleActionError } from "@/lib/upgrade-events";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Bot, Loader2, Send, Sparkles, Wand2, X } from "lucide-react";
@@ -88,7 +89,7 @@ export function AiAssistant() {
       setOpen(false);
       void navigate({ to: "/dashboard/strategies/builder", search: { id: data.id } });
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Could not create the strategy");
+      handleActionError(e, "Could not create the strategy");
     } finally {
       setCreating(false);
     }
