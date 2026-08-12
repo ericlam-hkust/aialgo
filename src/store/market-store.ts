@@ -1,53 +1,56 @@
 import { create } from "zustand";
-import { SYMBOLS } from "@/lib/market";
 
-export type Tick = { symbol: string; price: number; prevClose: number; changePct: number };
-
-const SEED: Record<string, number> = {
-  "0700.HK": 372.4,
-  "9988.HK": 84.15,
-  "3690.HK": 118.6,
-  "2318.HK": 47.35,
-  "0005.HK": 63.8,
-  AAPL: 214.32,
-  TSLA: 248.9,
-  SPY: 552.1,
-  QQQ: 468.4,
+export type Tick = {
+  symbol: string;
+  price: number;
+  prevClose: number;
+  changePct: number;
+  provider: string | null;
+  quotedAt: string;
 };
+
+export type FeedStatus = "idle" | "connecting" | "live" | "stale" | "error" | "unconfigured";
 
 type MarketState = {
   ticks: Record<string, Tick>;
-  running: boolean;
-  step: () => void;
-  setRunning: (v: boolean) => void;
+  status: FeedStatus;
+  lastUpdated: string | null;
+  errors: Record<string, string>;
+  setQuotes: (
+    quotes: Record<
+      string,
+      { price: number; prevClose: number | null; changePct: number; provider: string | null; quotedAt: string }
+    >,
+    errors: Record<string, string>,
+  ) => void;
+  setStatus: (status: FeedStatus) => void;
 };
 
-const initial = (): Record<string, Tick> =>
-  Object.fromEntries(
-    SYMBOLS.map((s) => {
-      const price = SEED[s.symbol] ?? 100;
-      return [s.symbol, { symbol: s.symbol, price, prevClose: price, changePct: 0 }];
-    }),
-  );
-
 export const useMarketStore = create<MarketState>((set) => ({
-  ticks: initial(),
-  running: true,
-  setRunning: (v) => set({ running: v }),
-  step: () =>
+  ticks: {},
+  status: "idle",
+  lastUpdated: null,
+  errors: {},
+  setStatus: (status) => set({ status }),
+  setQuotes: (quotes, errors) =>
     set((state) => {
-      const next: Record<string, Tick> = {};
-      for (const [symbol, tick] of Object.entries(state.ticks)) {
-        const vol = symbol === "TSLA" ? 0.006 : symbol.endsWith(".HK") ? 0.0035 : 0.0025;
-        const drift = (Math.random() - 0.49) * 2 * vol;
-        const price = Math.max(0.5, tick.price * (1 + drift));
+      const next: Record<string, Tick> = { ...state.ticks };
+      for (const [symbol, q] of Object.entries(quotes)) {
         next[symbol] = {
           symbol,
-          price,
-          prevClose: tick.prevClose,
-          changePct: ((price - tick.prevClose) / tick.prevClose) * 100,
+          price: q.price,
+          prevClose: q.prevClose ?? q.price,
+          changePct: q.changePct,
+          provider: q.provider,
+          quotedAt: q.quotedAt,
         };
       }
-      return { ticks: next };
+      const hasQuotes = Object.keys(next).length > 0;
+      return {
+        ticks: next,
+        errors,
+        lastUpdated: new Date().toISOString(),
+        status: hasQuotes ? "live" : Object.keys(errors).length > 0 ? "unconfigured" : "idle",
+      };
     }),
 }));

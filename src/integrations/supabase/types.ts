@@ -136,36 +136,268 @@ export type Database = {
       broker_connections: {
         Row: {
           account_balance: number
+          account_id: string | null
+          auto_sync_minutes: number
           broker_name: string
           buying_power: number
+          config: Json
           created_at: string
           credentials: Json | null
+          credentials_encrypted: string | null
+          currency: string
           id: string
+          last_error: string | null
           last_synced_at: string | null
+          mode: string
           status: string
           user_id: string
         }
         Insert: {
           account_balance?: number
+          account_id?: string | null
+          auto_sync_minutes?: number
           broker_name: string
           buying_power?: number
+          config?: Json
           created_at?: string
           credentials?: Json | null
+          credentials_encrypted?: string | null
+          currency?: string
           id?: string
+          last_error?: string | null
           last_synced_at?: string | null
+          mode?: string
           status?: string
           user_id: string
         }
         Update: {
           account_balance?: number
+          account_id?: string | null
+          auto_sync_minutes?: number
           broker_name?: string
           buying_power?: number
+          config?: Json
           created_at?: string
           credentials?: Json | null
+          credentials_encrypted?: string | null
+          currency?: string
           id?: string
+          last_error?: string | null
           last_synced_at?: string | null
+          mode?: string
           status?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      broker_orders: {
+        Row: {
+          account_id: string | null
+          avg_fill_price: number | null
+          broker_connection_id: string
+          broker_order_id: string
+          filled_quantity: number
+          id: string
+          limit_price: number | null
+          order_type: string | null
+          placed_at: string | null
+          quantity: number
+          side: string
+          status: string
+          symbol: string
+          synced_at: string
+          user_id: string
+        }
+        Insert: {
+          account_id?: string | null
+          avg_fill_price?: number | null
+          broker_connection_id: string
+          broker_order_id: string
+          filled_quantity?: number
+          id?: string
+          limit_price?: number | null
+          order_type?: string | null
+          placed_at?: string | null
+          quantity?: number
+          side: string
+          status?: string
+          symbol: string
+          synced_at?: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string | null
+          avg_fill_price?: number | null
+          broker_connection_id?: string
+          broker_order_id?: string
+          filled_quantity?: number
+          id?: string
+          limit_price?: number | null
+          order_type?: string | null
+          placed_at?: string | null
+          quantity?: number
+          side?: string
+          status?: string
+          symbol?: string
+          synced_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "broker_orders_broker_connection_id_fkey"
+            columns: ["broker_connection_id"]
+            isOneToOne: false
+            referencedRelation: "broker_connections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      broker_positions: {
+        Row: {
+          account_id: string | null
+          avg_cost: number
+          broker_connection_id: string
+          currency: string | null
+          id: string
+          market_price: number
+          market_value: number
+          quantity: number
+          symbol: string
+          synced_at: string
+          unrealized_pnl: number
+          user_id: string
+        }
+        Insert: {
+          account_id?: string | null
+          avg_cost?: number
+          broker_connection_id: string
+          currency?: string | null
+          id?: string
+          market_price?: number
+          market_value?: number
+          quantity: number
+          symbol: string
+          synced_at?: string
+          unrealized_pnl?: number
+          user_id: string
+        }
+        Update: {
+          account_id?: string | null
+          avg_cost?: number
+          broker_connection_id?: string
+          currency?: string | null
+          id?: string
+          market_price?: number
+          market_value?: number
+          quantity?: number
+          symbol?: string
+          synced_at?: string
+          unrealized_pnl?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "broker_positions_broker_connection_id_fkey"
+            columns: ["broker_connection_id"]
+            isOneToOne: false
+            referencedRelation: "broker_connections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      data_source_connections: {
+        Row: {
+          api_key_encrypted: string | null
+          created_at: string
+          enabled: boolean
+          id: string
+          key_suffix: string | null
+          label: string | null
+          last_checked_at: string | null
+          priority: number
+          provider: string
+          status: string
+          status_message: string | null
+          updated_at: string
+          use_platform_key: boolean
+          user_id: string
+        }
+        Insert: {
+          api_key_encrypted?: string | null
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          key_suffix?: string | null
+          label?: string | null
+          last_checked_at?: string | null
+          priority?: number
+          provider: string
+          status?: string
+          status_message?: string | null
+          updated_at?: string
+          use_platform_key?: boolean
+          user_id: string
+        }
+        Update: {
+          api_key_encrypted?: string | null
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          key_suffix?: string | null
+          label?: string | null
+          last_checked_at?: string | null
+          priority?: number
+          provider?: string
+          status?: string
+          status_message?: string | null
+          updated_at?: string
+          use_platform_key?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
+      data_sync_runs: {
+        Row: {
+          created_at: string
+          duration_ms: number
+          error: string | null
+          id: string
+          kind: string
+          provider: string
+          range_end: string | null
+          range_start: string | null
+          rows_written: number
+          status: string
+          symbol: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          duration_ms?: number
+          error?: string | null
+          id?: string
+          kind: string
+          provider: string
+          range_end?: string | null
+          range_start?: string | null
+          rows_written?: number
+          status?: string
+          symbol?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          duration_ms?: number
+          error?: string | null
+          id?: string
+          kind?: string
+          provider?: string
+          range_end?: string | null
+          range_start?: string | null
+          rows_written?: number
+          status?: string
+          symbol?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -202,6 +434,90 @@ export type Database = {
           open?: number
           symbol?: string
           volume?: number
+        }
+        Relationships: []
+      }
+      market_data_intraday: {
+        Row: {
+          close: number
+          high: number
+          id: number
+          interval: string
+          low: number
+          open: number
+          provider: string | null
+          symbol: string
+          ts: string
+          volume: number
+        }
+        Insert: {
+          close: number
+          high: number
+          id?: number
+          interval: string
+          low: number
+          open: number
+          provider?: string | null
+          symbol: string
+          ts: string
+          volume?: number
+        }
+        Update: {
+          close?: number
+          high?: number
+          id?: number
+          interval?: string
+          low?: number
+          open?: number
+          provider?: string | null
+          symbol?: string
+          ts?: string
+          volume?: number
+        }
+        Relationships: []
+      }
+      market_quotes: {
+        Row: {
+          change_pct: number | null
+          currency: string | null
+          day_high: number | null
+          day_low: number | null
+          day_open: number | null
+          prev_close: number | null
+          price: number
+          provider: string | null
+          quoted_at: string
+          symbol: string
+          updated_at: string
+          volume: number | null
+        }
+        Insert: {
+          change_pct?: number | null
+          currency?: string | null
+          day_high?: number | null
+          day_low?: number | null
+          day_open?: number | null
+          prev_close?: number | null
+          price: number
+          provider?: string | null
+          quoted_at?: string
+          symbol: string
+          updated_at?: string
+          volume?: number | null
+        }
+        Update: {
+          change_pct?: number | null
+          currency?: string | null
+          day_high?: number | null
+          day_low?: number | null
+          day_open?: number | null
+          prev_close?: number | null
+          price?: number
+          provider?: string | null
+          quoted_at?: string
+          symbol?: string
+          updated_at?: string
+          volume?: number | null
         }
         Relationships: []
       }

@@ -6,6 +6,7 @@ import {
   BarChart3,
   Boxes,
   ChevronLeft,
+  Database,
   LayoutDashboard,
   LineChart,
   LogOut,
@@ -23,6 +24,8 @@ import { useTheme } from "@/hooks/use-theme";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useMarketStore } from "@/store/market-store";
+import { useLiveMarket } from "@/hooks/use-live-market";
+import { hkSession, usSession } from "@/lib/market-hours";
 import { AiAssistant } from "@/components/ai-assistant";
 
 import { cn } from "@/lib/utils";
@@ -37,6 +40,7 @@ const NAV = [
   { to: "/dashboard/marketplace", label: "Marketplace", icon: Store, exact: false },
   { to: "/dashboard/risk", label: "Risk Center", icon: ShieldAlert, exact: true },
   { to: "/dashboard/brokers", label: "Brokers", icon: PlugZap, exact: true },
+  { to: "/dashboard/data-sources", label: "Data Sources", icon: Database, exact: true },
   { to: "/dashboard/settings", label: "Settings", icon: Settings, exact: true },
 ] as const;
 
@@ -46,17 +50,23 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const step = useMarketStore((s) => s.step);
+  const feedStatus = useMarketStore((s) => s.status);
+  const lastUpdated = useMarketStore((s) => s.lastUpdated);
+  const tickCount = useMarketStore((s) => Object.keys(s.ticks).length);
   const [clock, setClock] = useState("--:--:--");
+  const [sessions, setSessions] = useState("");
+
+  useLiveMarket();
 
   useEffect(() => {
-    const id = setInterval(() => {
-      step();
+    const refresh = () => {
       setClock(new Date().toLocaleTimeString("en-GB"));
-    }, 5000);
-    setClock(new Date().toLocaleTimeString("en-GB"));
+      setSessions(`${hkSession().label} · ${usSession().label}`);
+    };
+    refresh();
+    const id = setInterval(refresh, 1000);
     return () => clearInterval(id);
-  }, [step]);
+  }, []);
 
   const crumbs = pathname.split("/").filter(Boolean);
 
@@ -149,11 +159,29 @@ export function AppShell({ children }: { children: ReactNode }) {
 
         <div className="fixed inset-x-0 bottom-0 z-20 flex h-8 items-center justify-between border-t border-border bg-card/95 px-4 text-[11px] text-muted-foreground backdrop-blur">
           <span className="flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-profit" aria-hidden />
-            Market data feed: simulated · connected
+            <span
+              className={cn(
+                "h-1.5 w-1.5 rounded-full",
+                feedStatus === "live" ? "animate-pulse bg-profit" : feedStatus === "connecting" ? "bg-muted-foreground" : "bg-loss",
+              )}
+              aria-hidden
+            />
+            {feedStatus === "live"
+              ? `Live feed · ${tickCount} symbols`
+              : feedStatus === "connecting"
+                ? "Live feed · connecting"
+                : feedStatus === "unconfigured"
+                  ? "No data provider connected"
+                  : feedStatus === "error"
+                    ? "Live feed unavailable"
+                    : "Live feed · idle"}
           </span>
           <Separator orientation="vertical" className="mx-2 hidden h-4 sm:block" />
-          <span className="mono">Last tick {clock} HKT</span>
+          <span className="hidden sm:inline">{sessions}</span>
+          <Separator orientation="vertical" className="mx-2 hidden h-4 sm:block" />
+          <span className="mono">
+            {lastUpdated ? `Last quote ${new Date(lastUpdated).toLocaleTimeString("en-GB")}` : clock} HKT
+          </span>
         </div>
       </div>
     </div>
