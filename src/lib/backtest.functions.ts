@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { assertQuota, incrementUsage } from "./entitlements.server";
 import { runBacktest } from "./backtest-engine";
 import type { Bar } from "./indicators";
 import { isStrategyGraph, type StrategyGraph } from "./strategy-graph";
