@@ -2,7 +2,6 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { CreditCard, ExternalLink, Sparkles } from "lucide-react";
-import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +12,7 @@ import { useEntitlements } from "@/hooks/use-entitlements";
 import { createPortalSession } from "@/lib/payments.functions";
 import { getStripeEnvironmentSafe } from "@/lib/stripe";
 import { PLAN_LABEL, formatLimit } from "@/lib/entitlements";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard/billing")({
   head: () => ({
