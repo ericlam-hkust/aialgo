@@ -85,7 +85,13 @@ export const saveDataSource = createServerFn({ method: "POST" })
       message = result.message;
     }
 
-    const row: Record<string, unknown> = {
+    const keyFields: { api_key_encrypted?: string | null; key_suffix?: string | null } = data.usePlatformKey
+      ? { api_key_encrypted: null, key_suffix: "platform" }
+      : data.apiKey
+        ? { api_key_encrypted: await encryptSecret(data.apiKey), key_suffix: maskSuffix(data.apiKey) }
+        : {};
+
+    const row = {
       user_id: context.userId,
       provider,
       label: data.label ?? null,
@@ -95,14 +101,8 @@ export const saveDataSource = createServerFn({ method: "POST" })
       status,
       status_message: message,
       last_checked_at: new Date().toISOString(),
+      ...keyFields,
     };
-    if (data.usePlatformKey) {
-      row["api_key_encrypted"] = null;
-      row["key_suffix"] = "platform";
-    } else if (data.apiKey) {
-      row["api_key_encrypted"] = await encryptSecret(data.apiKey);
-      row["key_suffix"] = maskSuffix(data.apiKey);
-    }
 
     const { error } = await context.supabase
       .from("data_source_connections")
