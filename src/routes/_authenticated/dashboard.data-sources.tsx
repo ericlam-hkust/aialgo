@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { handleActionError } from "@/lib/upgrade-events";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -86,7 +87,7 @@ function DataSources() {
       else toast.error(res.message);
       invalidate();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => handleActionError(e),
   });
 
   const historyMutation = useMutation({
@@ -101,7 +102,7 @@ function DataSources() {
       );
       invalidate();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => handleActionError(e),
   });
 
   const intradayMutation = useMutation({
@@ -113,7 +114,7 @@ function DataSources() {
       );
       invalidate();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => handleActionError(e),
   });
 
   return (

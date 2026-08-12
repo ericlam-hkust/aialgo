@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { handleActionError } from "@/lib/upgrade-events";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -105,7 +106,7 @@ function BacktestPage() {
       setResult(res);
       toast.success("Backtest complete");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Backtest failed");
+      handleActionError(e, "Backtest failed");
     } finally {
       setBusy(false);
     }
