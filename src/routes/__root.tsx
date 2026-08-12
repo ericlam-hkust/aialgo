@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
+import { I18nProvider } from "@/lib/i18n";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
@@ -121,11 +122,13 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider delayDuration={200}>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-        <Toaster position="top-right" richColors />
-      </TooltipProvider>
+      <I18nProvider>
+        <TooltipProvider delayDuration={200}>
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+          <Toaster position="top-right" richColors />
+        </TooltipProvider>
+      </I18nProvider>
     </QueryClientProvider>
   );
 }

@@ -31,22 +31,24 @@ import { AiAssistant } from "@/components/ai-assistant";
 import { UpgradeDialog } from "@/components/upgrade-dialog";
 import { useEntitlements } from "@/hooks/use-entitlements";
 import { UPGRADE_EVENT } from "@/lib/upgrade-events";
+import { useI18n } from "@/lib/i18n";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { to: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
-  { to: "/dashboard/strategies", label: "Strategies", icon: Boxes, exact: false },
-  { to: "/dashboard/strategies/builder", label: "Builder", icon: LineChart, exact: true },
-  { to: "/dashboard/strategies/templates", label: "Templates", icon: BarChart3, exact: true },
-  { to: "/dashboard/strategies/backtest", label: "Backtest", icon: TrendingUp, exact: true },
-  { to: "/dashboard/paper-trading", label: "Paper Trading", icon: Activity, exact: true },
-  { to: "/dashboard/marketplace", label: "Marketplace", icon: Store, exact: false },
-  { to: "/dashboard/risk", label: "Risk Center", icon: ShieldAlert, exact: true },
-  { to: "/dashboard/brokers", label: "Brokers", icon: PlugZap, exact: true },
-  { to: "/dashboard/data-sources", label: "Data Sources", icon: Database, exact: true },
-  { to: "/dashboard/billing", label: "Billing", icon: CreditCard, exact: true },
-  { to: "/dashboard/settings", label: "Settings", icon: Settings, exact: true },
+  { to: "/dashboard", key: "nav.overview", icon: LayoutDashboard, exact: true },
+  { to: "/dashboard/strategies", key: "nav.strategies", icon: Boxes, exact: false },
+  { to: "/dashboard/strategies/builder", key: "nav.builder", icon: LineChart, exact: true },
+  { to: "/dashboard/strategies/templates", key: "nav.templates", icon: BarChart3, exact: true },
+  { to: "/dashboard/strategies/backtest", key: "nav.backtest", icon: TrendingUp, exact: true },
+  { to: "/dashboard/paper-trading", key: "nav.paperTrading", icon: Activity, exact: true },
+  { to: "/dashboard/marketplace", key: "nav.marketplace", icon: Store, exact: false },
+  { to: "/dashboard/risk", key: "nav.risk", icon: ShieldAlert, exact: true },
+  { to: "/dashboard/brokers", key: "nav.brokers", icon: PlugZap, exact: true },
+  { to: "/dashboard/data-sources", key: "nav.dataSources", icon: Database, exact: true },
+  { to: "/dashboard/billing", key: "nav.billing", icon: CreditCard, exact: true },
+  { to: "/dashboard/settings", key: "nav.settings", icon: Settings, exact: true },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -62,6 +64,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [sessions, setSessions] = useState("");
   const [upgradeReason, setUpgradeReason] = useState<string | null>(null);
   const { tier } = useEntitlements();
+  const { t } = useI18n();
 
   useLiveMarket();
 
@@ -110,14 +113,14 @@ export function AppShell({ children }: { children: ReactNode }) {
             size="icon"
             className="h-7 w-7 shrink-0"
             onClick={() => setCollapsed((c) => !c)}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={collapsed ? t("shell.expandSidebar") : t("shell.collapseSidebar")}
             aria-controls="main-navigation"
             aria-expanded={!collapsed}
           >
             <ChevronLeft className={cn("h-4 w-4 transition-transform", collapsed && "rotate-180")} aria-hidden />
           </Button>
         </div>
-        <nav id="main-navigation" className="flex-1 space-y-0.5 overflow-y-auto p-2" aria-label="Main navigation">
+        <nav id="main-navigation" className="flex-1 space-y-0.5 overflow-y-auto p-2" aria-label={t("shell.mainNavigation")}>
           {NAV.map((item) => {
             const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
             const Icon = item.icon;
@@ -131,10 +134,10 @@ export function AppShell({ children }: { children: ReactNode }) {
                     ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
                     : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
                 )}
-                title={item.label}
+                title={t(item.key)}
               >
                 <Icon className="h-4 w-4 shrink-0" aria-hidden />
-                {!collapsed ? <span className="truncate">{item.label}</span> : null}
+                {!collapsed ? <span className="truncate">{t(item.key)}</span> : null}
               </Link>
             );
           })}
@@ -144,7 +147,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-20 flex h-14 items-center justify-between gap-4 border-b border-border bg-background/85 px-4 backdrop-blur">
-          <nav aria-label="Breadcrumb" className="flex min-w-0 items-center gap-1.5 text-sm">
+          <nav aria-label={t("shell.breadcrumb")} className="flex min-w-0 items-center gap-1.5 text-sm">
             <Link to="/dashboard" className="text-muted-foreground hover:text-foreground">
               AlgoForge
             </Link>
@@ -158,10 +161,11 @@ export function AppShell({ children }: { children: ReactNode }) {
             ))}
           </nav>
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" onClick={toggle} aria-label="Toggle colour theme">
+            <LanguageSwitcher />
+            <Button variant="ghost" size="icon" onClick={toggle} aria-label={t("shell.toggleTheme")}>
               {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
-            <Button variant="ghost" size="icon" onClick={signOut} aria-label="Sign out">
+            <Button variant="ghost" size="icon" onClick={signOut} aria-label={t("shell.signOut")}>
               <LogOut className="h-4 w-4" />
             </Button>
           </div>
@@ -188,20 +192,20 @@ export function AppShell({ children }: { children: ReactNode }) {
               aria-hidden
             />
             {feedStatus === "live"
-              ? `Live feed · ${tickCount} symbols`
+              ? t("shell.feedLive", { count: tickCount })
               : feedStatus === "connecting"
-                ? "Live feed · connecting"
+                ? t("shell.feedConnecting")
                 : feedStatus === "unconfigured"
-                  ? "No data provider connected"
+                  ? t("shell.feedUnconfigured")
                   : feedStatus === "error"
-                    ? "Live feed unavailable"
-                    : "Live feed · idle"}
+                    ? t("shell.feedError")
+                    : t("shell.feedIdle")}
           </span>
           <Separator orientation="vertical" className="mx-2 hidden h-4 sm:block" />
           <span className="hidden sm:inline">{sessions}</span>
           <Separator orientation="vertical" className="mx-2 hidden h-4 sm:block" />
           <span className="mono">
-            {lastUpdated ? `Last quote ${new Date(lastUpdated).toLocaleTimeString("en-GB")}` : clock} HKT
+            {lastUpdated ? t("shell.lastQuote", { time: new Date(lastUpdated).toLocaleTimeString("en-GB") }) : clock} HKT
           </span>
         </div>
       </div>
