@@ -94,5 +94,7 @@ export const runBacktestFn = createServerFn({ method: "POST" })
       metadata: { symbol: data.symbol, strategy: data.strategyName },
     });
 
+    await incrementUsage(userId, "backtests_run");
+
     return { id: saved.id as string, ...result };
   });
