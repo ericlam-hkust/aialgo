@@ -20,17 +20,21 @@ export type Database = {
           api_auth_encrypted: string | null
           api_endpoint: string | null
           asset_class: Database["public"]["Enums"]["asset_class"]
+          backtest_config: Json
           cagr: number
           contributor_id: string
           created_at: string
           currency: string
           description: string
+          divergence_flagged: boolean
           executions: number
           id: string
+          last_validated_at: string | null
           listed_at: string | null
           live_return_30d: number
           max_drawdown: number
           name: string
+          next_revalidation_at: string | null
           package_kind: string
           package_path: string | null
           parameters: Json
@@ -40,6 +44,7 @@ export type Database = {
           rating_count: number
           risk_disclosure: string | null
           risk_level: Database["public"]["Enums"]["model_risk_level"]
+          sandbox_runs_used: number
           sharpe: number
           slug: string
           status: Database["public"]["Enums"]["model_listing_status"]
@@ -49,6 +54,7 @@ export type Database = {
           timeframe: string
           updated_at: string
           user_id: string | null
+          validation_job_id: string | null
           win_rate: number
         }
         Insert: {
@@ -56,17 +62,21 @@ export type Database = {
           api_auth_encrypted?: string | null
           api_endpoint?: string | null
           asset_class?: Database["public"]["Enums"]["asset_class"]
+          backtest_config?: Json
           cagr?: number
           contributor_id: string
           created_at?: string
           currency?: string
           description?: string
+          divergence_flagged?: boolean
           executions?: number
           id?: string
+          last_validated_at?: string | null
           listed_at?: string | null
           live_return_30d?: number
           max_drawdown?: number
           name: string
+          next_revalidation_at?: string | null
           package_kind?: string
           package_path?: string | null
           parameters?: Json
@@ -76,6 +86,7 @@ export type Database = {
           rating_count?: number
           risk_disclosure?: string | null
           risk_level?: Database["public"]["Enums"]["model_risk_level"]
+          sandbox_runs_used?: number
           sharpe?: number
           slug: string
           status?: Database["public"]["Enums"]["model_listing_status"]
@@ -85,6 +96,7 @@ export type Database = {
           timeframe?: string
           updated_at?: string
           user_id?: string | null
+          validation_job_id?: string | null
           win_rate?: number
         }
         Update: {
@@ -92,17 +104,21 @@ export type Database = {
           api_auth_encrypted?: string | null
           api_endpoint?: string | null
           asset_class?: Database["public"]["Enums"]["asset_class"]
+          backtest_config?: Json
           cagr?: number
           contributor_id?: string
           created_at?: string
           currency?: string
           description?: string
+          divergence_flagged?: boolean
           executions?: number
           id?: string
+          last_validated_at?: string | null
           listed_at?: string | null
           live_return_30d?: number
           max_drawdown?: number
           name?: string
+          next_revalidation_at?: string | null
           package_kind?: string
           package_path?: string | null
           parameters?: Json
@@ -112,6 +128,7 @@ export type Database = {
           rating_count?: number
           risk_disclosure?: string | null
           risk_level?: Database["public"]["Enums"]["model_risk_level"]
+          sandbox_runs_used?: number
           sharpe?: number
           slug?: string
           status?: Database["public"]["Enums"]["model_listing_status"]
@@ -121,6 +138,7 @@ export type Database = {
           timeframe?: string
           updated_at?: string
           user_id?: string | null
+          validation_job_id?: string | null
           win_rate?: number
         }
         Relationships: [
@@ -162,6 +180,80 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      backtest_jobs: {
+        Row: {
+          completed_at: string | null
+          config: Json
+          created_at: string
+          eta_seconds: number
+          failure_code: string | null
+          failure_reason: string | null
+          id: string
+          kind: string
+          model_id: string | null
+          model_version: string
+          progress: number
+          protocol: Json
+          results: Json | null
+          stage: string
+          stage_message: string | null
+          started_at: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          config?: Json
+          created_at?: string
+          eta_seconds?: number
+          failure_code?: string | null
+          failure_reason?: string | null
+          id?: string
+          kind?: string
+          model_id?: string | null
+          model_version?: string
+          progress?: number
+          protocol?: Json
+          results?: Json | null
+          stage?: string
+          stage_message?: string | null
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          config?: Json
+          created_at?: string
+          eta_seconds?: number
+          failure_code?: string | null
+          failure_reason?: string | null
+          id?: string
+          kind?: string
+          model_id?: string | null
+          model_version?: string
+          progress?: number
+          protocol?: Json
+          results?: Json | null
+          stage?: string
+          stage_message?: string | null
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "backtest_jobs_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "ai_models"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       backtests: {
         Row: {
@@ -534,6 +626,99 @@ export type Database = {
           },
         ]
       }
+      data_catalog: {
+        Row: {
+          asset_class: Database["public"]["Enums"]["asset_class"]
+          coverage_end: string
+          coverage_start: string
+          created_at: string
+          display_name: string
+          fields: string[]
+          id: string
+          market: string
+          notes: string | null
+          provider: string
+          row_count: number
+          symbol: string
+          timeframes: string[]
+          update_frequency: string
+        }
+        Insert: {
+          asset_class: Database["public"]["Enums"]["asset_class"]
+          coverage_end: string
+          coverage_start: string
+          created_at?: string
+          display_name: string
+          fields?: string[]
+          id?: string
+          market: string
+          notes?: string | null
+          provider?: string
+          row_count?: number
+          symbol: string
+          timeframes?: string[]
+          update_frequency?: string
+        }
+        Update: {
+          asset_class?: Database["public"]["Enums"]["asset_class"]
+          coverage_end?: string
+          coverage_start?: string
+          created_at?: string
+          display_name?: string
+          fields?: string[]
+          id?: string
+          market?: string
+          notes?: string | null
+          provider?: string
+          row_count?: number
+          symbol?: string
+          timeframes?: string[]
+          update_frequency?: string
+        }
+        Relationships: []
+      }
+      data_requests: {
+        Row: {
+          admin_notes: string | null
+          asset_class: Database["public"]["Enums"]["asset_class"]
+          created_at: string
+          id: string
+          provider_hint: string | null
+          reason: string | null
+          status: string
+          symbol: string
+          timeframe: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          asset_class: Database["public"]["Enums"]["asset_class"]
+          created_at?: string
+          id?: string
+          provider_hint?: string | null
+          reason?: string | null
+          status?: string
+          symbol: string
+          timeframe: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          asset_class?: Database["public"]["Enums"]["asset_class"]
+          created_at?: string
+          id?: string
+          provider_hint?: string | null
+          reason?: string | null
+          status?: string
+          symbol?: string
+          timeframe?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       data_source_connections: {
         Row: {
           api_key_encrypted: string | null
@@ -878,6 +1063,57 @@ export type Database = {
             columns: ["purchase_id"]
             isOneToOne: false
             referencedRelation: "model_purchases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      model_appeals: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          id: string
+          job_id: string | null
+          message: string
+          model_id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          id?: string
+          job_id?: string | null
+          message: string
+          model_id: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          id?: string
+          job_id?: string | null
+          message?: string
+          model_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "model_appeals_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "backtest_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "model_appeals_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "ai_models"
             referencedColumns: ["id"]
           },
         ]
