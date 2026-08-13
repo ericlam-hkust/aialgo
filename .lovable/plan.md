@@ -37,13 +37,26 @@ When the upload wizard runs in derivative mode, the feature schema and output co
 
 New docs page `/marketplace/docs/fine-tuning`: how base models were trained (high level), frozen-vs-trainable contract, local SDK walkthrough, cloud walkthrough, recommended data windows, pitfalls (short-window overfitting, linked to the walk-forward consistency score), and a publish checklist. Linked from docs index and every base model page.
 
-## 7. Demo flow (mock data)
+## 7. Multi-model pipeline bundles
+
+Extend the upload system so one listing can package several cooperating models.
+
+- **Package structure**: an `artifacts/` folder holding multiple model files, plus a `pipeline` block in the manifest: `type` (ensemble / sequential / regime_router / meta_labeling / custom), per-artifact `role` (e.g. regime detector, signal generator, meta filter), execution order, and an architecture description.
+- **Resources block**: `memory_mb`, `max_inference_ms`, `requires_gpu`. Declared in the manifest and enforced as a gate at the start of backtest validation. Exceeding a limit fails the job with a specific error and remediation guidance (e.g. "Bundle requests 8192 MB; validation tier allows 4096 MB — prune artifacts, quantise weights, or merge the regime router into the signal model"), shown in the run report and the wizard.
+- **Pipeline diagram**: the model detail page renders a visual flow of the internal models and their roles (stage boxes, arrows, per-artifact role and type), so consumers see what they are subscribing to.
+- **Atomic versioning**: any artifact change bumps the bundle to a new version and invalidates prior verification — the new version must pass its own backtest before it can be listed. The wizard and version list state this explicitly.
+- **Wizard path**: an "Advanced: Multi-Model Pipeline" option in the upload wizard with a pipeline builder preview (add artifacts, assign roles, choose pipeline type, live diagram preview) and the note: "Multi-stage pipelines carry higher overfitting risk — your model will receive extra walk-forward scrutiny during validation." Pipeline bundles get more walk-forward windows and a tighter consistency threshold in validation.
+- **Demo**: an oversized bundle run that is rejected at the resource gate with the clear error and remediation steps, alongside a passing bundle.
+
+## 8. Demo flow (mock data)
 
 End-to-end simulated path: open Base Model Library → `meanrev-gbm-base` → Cloud Fine-Tune on ETH/USDT + SOL/USDT 1h → animated training with loss curve → auto backtest report → publish with a 15% per-trade fee → new model appears in the catalog with lineage badge, verified backtest badge, and fee; the base model's derivatives tree includes it.
+
 
 ## Technical notes
 
 - Backend: migration adding `base_models` table (seeded with the three bases via literal INSERTs, public read for anon/authenticated) and lineage columns on `ai_models` (`base_model_id`, `base_version`, `finetune_method`), plus a `fine_tune_jobs` table for cloud runs. GRANTs + RLS on all new tables.
 - Server functions in `src/lib/base-models.functions.ts` (public list/detail + derivatives tree) and `src/lib/fine-tune.functions.ts` (start job, poll progress, publish derivative), reusing `submitForValidation` from `backtest-validation.functions.ts` so derivatives hit the same pipeline.
 - Training is simulated server-side (staged progress + synthetic loss curve), matching how the existing sandbox backtests work.
+- Pipeline bundles extend the interface manifest with `pipeline` and `resources` blocks, add a resource gate at the head of the validation job, and apply stricter walk-forward settings for multi-stage types.
 - Reuses existing marketplace card, trust badge, backtest report, and fee components; no changes to fee/watermark/trust-tier logic.
