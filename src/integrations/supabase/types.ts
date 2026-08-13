@@ -30,6 +30,7 @@ export type Database = {
           divergence_flagged: boolean
           executions: number
           id: string
+          interface_manifest: Json
           last_validated_at: string | null
           listed_at: string | null
           live_return_30d: number
@@ -74,6 +75,7 @@ export type Database = {
           divergence_flagged?: boolean
           executions?: number
           id?: string
+          interface_manifest?: Json
           last_validated_at?: string | null
           listed_at?: string | null
           live_return_30d?: number
@@ -118,6 +120,7 @@ export type Database = {
           divergence_flagged?: boolean
           executions?: number
           id?: string
+          interface_manifest?: Json
           last_validated_at?: string | null
           listed_at?: string | null
           live_return_30d?: number
@@ -363,9 +366,11 @@ export type Database = {
           credentials_encrypted: string | null
           currency: string
           id: string
+          is_default: boolean
           last_error: string | null
           last_synced_at: string | null
           mode: string
+          nickname: string | null
           status: string
           user_id: string
         }
@@ -381,9 +386,11 @@ export type Database = {
           credentials_encrypted?: string | null
           currency?: string
           id?: string
+          is_default?: boolean
           last_error?: string | null
           last_synced_at?: string | null
           mode?: string
+          nickname?: string | null
           status?: string
           user_id: string
         }
@@ -399,9 +406,11 @@ export type Database = {
           credentials_encrypted?: string | null
           currency?: string
           id?: string
+          is_default?: boolean
           last_error?: string | null
           last_synced_at?: string | null
           mode?: string
+          nickname?: string | null
           status?: string
           user_id?: string
         }
@@ -821,6 +830,139 @@ export type Database = {
         }
         Relationships: []
       }
+      execution_orders: {
+        Row: {
+          activation_id: string
+          broker_connection_id: string | null
+          created_at: string
+          id: string
+          notional: number
+          price: number
+          quantity: number
+          realized_pnl: number
+          side: string
+          signal_id: string | null
+          status: string
+          symbol: string
+          user_id: string
+        }
+        Insert: {
+          activation_id: string
+          broker_connection_id?: string | null
+          created_at?: string
+          id?: string
+          notional?: number
+          price?: number
+          quantity?: number
+          realized_pnl?: number
+          side: string
+          signal_id?: string | null
+          status?: string
+          symbol: string
+          user_id: string
+        }
+        Update: {
+          activation_id?: string
+          broker_connection_id?: string | null
+          created_at?: string
+          id?: string
+          notional?: number
+          price?: number
+          quantity?: number
+          realized_pnl?: number
+          side?: string
+          signal_id?: string | null
+          status?: string
+          symbol?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "execution_orders_activation_id_fkey"
+            columns: ["activation_id"]
+            isOneToOne: false
+            referencedRelation: "model_activations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "execution_orders_broker_connection_id_fkey"
+            columns: ["broker_connection_id"]
+            isOneToOne: false
+            referencedRelation: "broker_connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "execution_orders_signal_id_fkey"
+            columns: ["signal_id"]
+            isOneToOne: false
+            referencedRelation: "execution_signals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      execution_signals: {
+        Row: {
+          action: string
+          activation_id: string
+          block_reason: string | null
+          confidence: number
+          created_at: string
+          id: string
+          model_id: string | null
+          position_size_pct: number
+          status: string
+          stop_loss: number | null
+          symbol: string
+          take_profit: number | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          activation_id: string
+          block_reason?: string | null
+          confidence?: number
+          created_at?: string
+          id?: string
+          model_id?: string | null
+          position_size_pct?: number
+          status?: string
+          stop_loss?: number | null
+          symbol: string
+          take_profit?: number | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          activation_id?: string
+          block_reason?: string | null
+          confidence?: number
+          created_at?: string
+          id?: string
+          model_id?: string | null
+          position_size_pct?: number
+          status?: string
+          stop_loss?: number | null
+          symbol?: string
+          take_profit?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "execution_signals_activation_id_fkey"
+            columns: ["activation_id"]
+            isOneToOne: false
+            referencedRelation: "model_activations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "execution_signals_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "ai_models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       market_data_daily: {
         Row: {
           close: number
@@ -983,8 +1125,11 @@ export type Database = {
           broker_connection_id: string | null
           capital_allocation: number
           daily_loss_limit_pct: number
+          executions_count: number
           id: string
           kill_switch_drawdown_pct: number
+          last_signal_at: string | null
+          max_open_positions: number
           max_position_size_pct: number
           mode: string
           model_id: string
@@ -996,6 +1141,7 @@ export type Database = {
           pnl: number
           pnl_pct: number
           purchase_id: string | null
+          signals_consumed: number
           status: string
           stop_loss_pct: number
           updated_at: string
@@ -1007,8 +1153,11 @@ export type Database = {
           broker_connection_id?: string | null
           capital_allocation?: number
           daily_loss_limit_pct?: number
+          executions_count?: number
           id?: string
           kill_switch_drawdown_pct?: number
+          last_signal_at?: string | null
+          max_open_positions?: number
           max_position_size_pct?: number
           mode?: string
           model_id: string
@@ -1020,6 +1169,7 @@ export type Database = {
           pnl?: number
           pnl_pct?: number
           purchase_id?: string | null
+          signals_consumed?: number
           status?: string
           stop_loss_pct?: number
           updated_at?: string
@@ -1031,8 +1181,11 @@ export type Database = {
           broker_connection_id?: string | null
           capital_allocation?: number
           daily_loss_limit_pct?: number
+          executions_count?: number
           id?: string
           kill_switch_drawdown_pct?: number
+          last_signal_at?: string | null
+          max_open_positions?: number
           max_position_size_pct?: number
           mode?: string
           model_id?: string
@@ -1044,6 +1197,7 @@ export type Database = {
           pnl?: number
           pnl_pct?: number
           purchase_id?: string | null
+          signals_consumed?: number
           status?: string
           stop_loss_pct?: number
           updated_at?: string
