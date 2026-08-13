@@ -84,7 +84,17 @@ function ModelDetail() {
   const [applyOpen, setApplyOpen] = useState(false);
   const currentVersion = data?.versions.find((v) => v.is_current)?.version ?? data?.versions[0]?.version ?? "";
   const [selectedVersion, setSelectedVersion] = useState(currentVersion);
+  const versionReports = (data?.versionReports ?? []).map((v) => ({
+    version: v.version,
+    report: (v.job.results as unknown as BacktestReport | null) ?? null,
+    completedAt: v.job.completed_at,
+  }));
+  const [reportVersion, setReportVersion] = useState(versionReports[0]?.version ?? "");
+  const activeReport =
+    versionReports.find((v) => v.version === reportVersion)?.report ?? versionReports[0]?.report ?? null;
+  const latestWalkForward = versionReports[0]?.report?.walkForward ?? null;
   if (!data) return <ModelNotFound />;
+
 
   const badges = modelBadges({
     hasBacktest: Boolean(data.backtest),
