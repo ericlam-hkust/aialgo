@@ -236,6 +236,16 @@ export const advanceBacktestJob = createServerFn({ method: "POST" })
     if (job.kind !== "sandbox" && job.model_id) {
       const nextRevalidation = new Date();
       nextRevalidation.setMonth(nextRevalidation.getMonth() + (protocol.revalidationMonths || 3));
+      const pricing = suggestPricing({
+        sharpe: report.metrics.sharpe,
+        maxDrawdown: report.metrics.maxDrawdown,
+        winRate: report.metrics.winRate,
+        profitFactor: report.metrics.profitFactor,
+        consistencyScore: report.walkForward?.consistencyScore ?? 0,
+        trades: report.metrics.trades,
+        overfittingRisk: Boolean(report.walkForward?.overfittingRisk),
+        cagr: report.metrics.cagr,
+      });
       await supabase
         .from("ai_models")
         .update({
