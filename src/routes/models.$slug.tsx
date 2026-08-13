@@ -268,6 +268,79 @@ function ModelDetail() {
 
 
             <TabsContent value="versions" className="mt-4 space-y-3">
+              {versionReports.length ? (
+                <Card className="border-border/70">
+                  <CardHeader>
+                    <CardTitle className="text-base">Performance evolution across versions</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="h-[240px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart
+                          data={[...versionReports]
+                            .reverse()
+                            .map((v) => ({
+                              version: `v${v.version}`,
+                              cagr: v.report?.metrics.cagr ?? 0,
+                              sharpe: v.report?.metrics.sharpe ?? 0,
+                            }))}
+                          margin={{ left: 4, right: 8, top: 8, bottom: 0 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
+                          <XAxis dataKey="version" tick={{ fontSize: 11 }} stroke="var(--color-muted-foreground)" />
+                          <YAxis yAxisId="l" tick={{ fontSize: 11 }} stroke="var(--color-muted-foreground)" width={48} />
+                          <YAxis yAxisId="r" orientation="right" tick={{ fontSize: 11 }} stroke="var(--color-muted-foreground)" width={40} />
+                          <ReTooltip
+                            contentStyle={{
+                              background: "var(--color-card)",
+                              border: "1px solid var(--color-border)",
+                              borderRadius: 8,
+                              fontSize: 12,
+                            }}
+                          />
+                          <Legend wrapperStyle={{ fontSize: 12 }} />
+                          <Bar yAxisId="l" dataKey="cagr" name="CAGR %" fill="var(--color-primary)" radius={[4, 4, 0, 0]} />
+                          <Bar yAxisId="r" dataKey="sharpe" name="Sharpe" fill="var(--color-muted-foreground)" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Version</TableHead>
+                          <TableHead className="text-right">CAGR</TableHead>
+                          <TableHead className="text-right">Sharpe</TableHead>
+                          <TableHead className="text-right">Max DD</TableHead>
+                          <TableHead className="text-right">Consistency</TableHead>
+                          <TableHead className="text-right">Verified</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {versionReports.map((v) => (
+                          <TableRow key={v.version}>
+                            <TableCell className="mono">v{v.version}</TableCell>
+                            <TableCell className={`mono text-right ${pnlClass(v.report?.metrics.cagr ?? 0)}`}>
+                              {v.report ? `${fmtNum(v.report.metrics.cagr, 1)}%` : "—"}
+                            </TableCell>
+                            <TableCell className="mono text-right">
+                              {v.report ? fmtNum(v.report.metrics.sharpe, 2) : "—"}
+                            </TableCell>
+                            <TableCell className="mono text-right text-loss">
+                              {v.report ? `-${fmtNum(v.report.metrics.maxDrawdown, 1)}%` : "—"}
+                            </TableCell>
+                            <TableCell className="mono text-right">
+                              {v.report?.walkForward ? `${fmtNum(v.report.walkForward.consistencyScore, 0)}/100` : "—"}
+                            </TableCell>
+                            <TableCell className="mono text-right text-xs text-muted-foreground">
+                              {v.completedAt ? fmtDate(v.completedAt) : "—"}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+              ) : null}
               {data.versions.length > 1 ? (
                 <div className="flex items-center gap-3">
                   <span className="text-sm text-muted-foreground">Viewing changelog for</span>
@@ -286,6 +359,7 @@ function ModelDetail() {
                   </Select>
                 </div>
               ) : null}
+
               {data.versions.map((v) => (
                 <Card
                   key={v.id}
