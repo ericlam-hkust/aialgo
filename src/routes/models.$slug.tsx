@@ -135,7 +135,23 @@ function ModelDetail() {
                   {data.last_validated_at ? ` · ${new Date(data.last_validated_at).toISOString().slice(0, 10)}` : ""}
                 </span>
               ) : null}
+              {data.overfitting_risk || latestWalkForward?.overfittingRisk ? (
+                <span
+                  title="Results vary widely across walk-forward test windows"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-warning/50 bg-warning/10 px-2.5 py-1 text-xs font-medium text-warning"
+                >
+                  <TriangleAlert className="h-3.5 w-3.5" aria-hidden />
+                  Overfitting Risk
+                  {latestWalkForward ? ` · consistency ${fmtNum(latestWalkForward.consistencyScore, 0)}/100` : ""}
+                </span>
+              ) : latestWalkForward ? (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-profit/40 bg-profit/10 px-2.5 py-1 text-xs font-medium text-profit">
+                  <BadgeCheck className="h-3.5 w-3.5" aria-hidden />
+                  Walk-forward consistency {fmtNum(latestWalkForward.consistencyScore, 0)}/100
+                </span>
+              ) : null}
             </div>
+
             {badges.length ? (
               <div className="mt-3 flex flex-wrap gap-2">
 
