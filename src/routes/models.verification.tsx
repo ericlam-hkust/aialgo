@@ -52,11 +52,11 @@ function VerificationPage() {
         <Card className="border-border/70">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
-              <Radio className="h-4 w-4 text-primary" aria-hidden /> Tier 2 — Remote via Signal Gateway
+              <Radio className="h-4 w-4 text-primary" aria-hidden /> Tier 2 — Remote execution
             </CardTitle>
             <CardDescription>
-              Latency-sensitive strategies stay on the contributor's own infrastructure and push signals to our gateway.
-              We timestamp every signal on receipt, so the track record is built from data the contributor cannot
+              Latency-sensitive strategies stay on the contributor's own infrastructure and stream signals to us. We
+              timestamp every signal on receipt, so the track record is built from data the contributor cannot
               backdate. After {LIVE_VERIFIED_DAYS} days it becomes <strong>Live Verified</strong>.
             </CardDescription>
           </CardHeader>
@@ -81,7 +81,7 @@ function VerificationPage() {
         <h2 className="text-lg font-semibold">Trading frequency classification</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           Contributors declare a frequency at submission. We verify it against the model's measured signal rate and
-          average holding period, and the HFT-Ready label additionally requires sub-100ms measured gateway latency.
+          average holding period, and the HFT-Ready label additionally requires sub-100ms measured signal latency.
         </p>
         <Card className="mt-3 border-border/70">
           <CardContent className="p-0">

@@ -1,9 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Cpu, Gift, Loader2, TrendingUp } from "lucide-react";
+import { Banknote, Gift, Loader2, TrendingUp } from "lucide-react";
 import { getContributorBilling } from "@/lib/compute.functions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -15,26 +14,25 @@ import {
   usd,
 } from "@/lib/monetization";
 
-export const Route = createFileRoute("/_authenticated/dashboard/compute")({
-  component: ComputeBillingPage,
+export const Route = createFileRoute("/_authenticated/dashboard/earnings")({
+  component: EarningsPage,
   head: () => ({
     meta: [
-      { title: "Compute & earnings — AlgoForge" },
+      { title: "Earnings — AlgoForge" },
       {
         name: "description",
-        content: "Contributor cost console: hosted compute plans, GPU metering, commission split and payout history.",
+        content: "Contributor earnings console: gross sales, commission split, Pro Creator status and payout history.",
       },
-      { property: "og:title", content: "Compute & earnings — AlgoForge" },
-      { property: "og:description", content: "See exactly what you pay to run models and what you keep from sales." },
+      { property: "og:title", content: "Earnings — AlgoForge" },
+      { property: "og:description", content: "See exactly what you keep from every fee your models and algos collect." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
 });
 
-function ComputeBillingPage() {
+function EarningsPage() {
   const q = useQuery({ queryKey: ["contributor-billing"], queryFn: () => getContributorBilling() });
-
 
   const data = q.data;
   const txns = (data?.transactions ?? []) as any[];
@@ -44,17 +42,15 @@ function ComputeBillingPage() {
     .reduce((s, t) => s + Number(t.gross_amount ?? 0), 0);
   const split = splitFor(monthGross, monthGross);
   const progress = proCreatorProgress(monthGross);
-  const computeRows = (data?.compute ?? []) as any[];
 
   return (
     <div className="space-y-6">
       <header>
         <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
-          <Cpu className="h-5 w-5 text-primary" aria-hidden /> Compute &amp; earnings
+          <Banknote className="h-5 w-5 text-primary" aria-hidden /> Earnings
         </h1>
         <p className="text-sm text-muted-foreground">
-          Hosted compute is free for every contributor. This console shows your usage and what you keep from
-          performance fees.
+          Everything you keep from performance fees collected by your models and algos. Contributing is always free.
         </p>
       </header>
 
@@ -64,10 +60,9 @@ function ComputeBillingPage() {
         </div>
       ) : null}
 
-      <div className="grid gap-4 md:grid-cols-4">
-        <Stat label="Gross sales this month" value={usd(monthGross)} />
+      <div className="grid gap-4 md:grid-cols-3">
+        <Stat label="Gross fees this month" value={usd(monthGross)} />
         <Stat label="Platform commission" value={usd(split.commission)} hint={`${Math.round(split.rate * 100)}% rate`} />
-        <Stat label="Compute cost" value="$0.00" hint="Free for all contributors" />
         <Stat label="Net to you" value={usd(split.net)} tone="profit" />
       </div>
 
@@ -97,8 +92,8 @@ function ComputeBillingPage() {
             <Gift className="h-4 w-4 text-profit" aria-hidden /> Free for creators, forever
           </CardTitle>
           <CardDescription>
-            No listing fees, no compute fees, no gateway fees — for AI models and algo strategies alike. The platform
-            earns only when you earn.
+            No listing fees, no hosting fees — for AI models and algo strategies alike. The platform earns only when you
+            earn.
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -118,33 +113,31 @@ function ComputeBillingPage() {
 
       <Card className="border-border/70">
         <CardHeader>
-          <CardTitle className="text-base">Usage history</CardTitle>
+          <CardTitle className="text-base">Recent fee transactions</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Period</TableHead>
-                <TableHead>CPU hours</TableHead>
-                <TableHead>GPU hours</TableHead>
-                <TableHead>Plan cost</TableHead>
-                <TableHead className="text-right">GPU cost</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Listing</TableHead>
+                <TableHead>Gross</TableHead>
+                <TableHead className="text-right">Net to you</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {computeRows.map((r, i) => (
-                <TableRow key={`${r.period}-${r.model_id ?? i}`}>
-                  <TableCell className="mono">{r.period}</TableCell>
-                  <TableCell className="mono">{Number(r.cpu_hours ?? 0).toFixed(1)}</TableCell>
-                  <TableCell className="mono">{Number(r.gpu_hours ?? 0).toFixed(1)}</TableCell>
-                  <TableCell className="mono">{usd(Number(r.plan_cost ?? 0))}</TableCell>
-                  <TableCell className="mono text-right">{usd(Number(r.gpu_cost ?? 0))}</TableCell>
+              {txns.slice(0, 12).map((t) => (
+                <TableRow key={t.id}>
+                  <TableCell className="mono">{new Date(t.created_at).toLocaleDateString()}</TableCell>
+                  <TableCell>{t.model_name ?? "—"}</TableCell>
+                  <TableCell className="mono">{usd(Number(t.gross_amount ?? 0))}</TableCell>
+                  <TableCell className="mono text-right text-profit">{usd(Number(t.net_amount ?? 0))}</TableCell>
                 </TableRow>
               ))}
-              {computeRows.length === 0 ? (
+              {txns.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="py-8 text-center text-sm text-muted-foreground">
-                    No compute usage recorded yet.
+                  <TableCell colSpan={4} className="py-8 text-center text-sm text-muted-foreground">
+                    No fees collected yet.
                   </TableCell>
                 </TableRow>
               ) : null}
@@ -156,7 +149,7 @@ function ComputeBillingPage() {
       <Card className="border-border/70">
         <CardHeader>
           <CardTitle className="text-base">Payout history</CardTitle>
-          <CardDescription>Payouts settle automatically via Stripe Connect, net of commission and costs.</CardDescription>
+          <CardDescription>Payouts settle automatically via Stripe Connect, net of commission.</CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           <Table>

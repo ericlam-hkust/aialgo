@@ -33,10 +33,9 @@ import { Route as AuthenticatedDashboardAccountsRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated/dashboard.admin'
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
 import { Route as AuthenticatedDashboardBrokersRouteImport } from './routes/_authenticated/dashboard.brokers'
-import { Route as AuthenticatedDashboardComputeRouteImport } from './routes/_authenticated/dashboard.compute'
 import { Route as AuthenticatedDashboardDataSourcesRouteImport } from './routes/_authenticated/dashboard.data-sources'
+import { Route as AuthenticatedDashboardEarningsRouteImport } from './routes/_authenticated/dashboard.earnings'
 import { Route as AuthenticatedDashboardExecutionRouteImport } from './routes/_authenticated/dashboard.execution'
-import { Route as AuthenticatedDashboardGatewayRouteImport } from './routes/_authenticated/dashboard.gateway'
 import { Route as AuthenticatedDashboardMarketplaceRouteImport } from './routes/_authenticated/dashboard.marketplace'
 import { Route as AuthenticatedDashboardMyModelsRouteImport } from './routes/_authenticated/dashboard.my-models'
 import { Route as AuthenticatedDashboardPaperTradingRouteImport } from './routes/_authenticated/dashboard.paper-trading'
@@ -59,7 +58,6 @@ import { Route as AuthenticatedDashboardTeamsIndexRouteImport } from './routes/_
 import { Route as AuthenticatedDashboardTeamsSlugRouteImport } from './routes/_authenticated/dashboard.teams.$slug'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicV1ModelsRouteImport } from './routes/api/public/v1/models'
-import { Route as ApiPublicV1SignalsRouteImport } from './routes/api/public/v1/signals'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -185,28 +183,22 @@ const AuthenticatedDashboardBrokersRoute =
     path: '/brokers',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
-const AuthenticatedDashboardComputeRoute =
-  AuthenticatedDashboardComputeRouteImport.update({
-    id: '/compute',
-    path: '/compute',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
 const AuthenticatedDashboardDataSourcesRoute =
   AuthenticatedDashboardDataSourcesRouteImport.update({
     id: '/data-sources',
     path: '/data-sources',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardEarningsRoute =
+  AuthenticatedDashboardEarningsRouteImport.update({
+    id: '/earnings',
+    path: '/earnings',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardExecutionRoute =
   AuthenticatedDashboardExecutionRouteImport.update({
     id: '/execution',
     path: '/execution',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
-const AuthenticatedDashboardGatewayRoute =
-  AuthenticatedDashboardGatewayRouteImport.update({
-    id: '/gateway',
-    path: '/gateway',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardMarketplaceRoute =
@@ -339,11 +331,6 @@ const ApiPublicV1ModelsRoute = ApiPublicV1ModelsRouteImport.update({
   path: '/api/public/v1/models',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicV1SignalsRoute = ApiPublicV1SignalsRouteImport.update({
-  id: '/api/public/v1/signals',
-  path: '/api/public/v1/signals',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -368,10 +355,9 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
-  '/dashboard/compute': typeof AuthenticatedDashboardComputeRoute
   '/dashboard/data-sources': typeof AuthenticatedDashboardDataSourcesRoute
+  '/dashboard/earnings': typeof AuthenticatedDashboardEarningsRoute
   '/dashboard/execution': typeof AuthenticatedDashboardExecutionRoute
-  '/dashboard/gateway': typeof AuthenticatedDashboardGatewayRoute
   '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
   '/dashboard/my-models': typeof AuthenticatedDashboardMyModelsRoute
   '/dashboard/paper-trading': typeof AuthenticatedDashboardPaperTradingRoute
@@ -392,7 +378,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/teams/$slug': typeof AuthenticatedDashboardTeamsSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/v1/models': typeof ApiPublicV1ModelsRoute
-  '/api/public/v1/signals': typeof ApiPublicV1SignalsRoute
   '/dashboard/models/': typeof AuthenticatedDashboardModelsIndexRoute
   '/dashboard/strategies/': typeof AuthenticatedDashboardStrategiesIndexRoute
   '/dashboard/teams/': typeof AuthenticatedDashboardTeamsIndexRoute
@@ -417,10 +402,9 @@ export interface FileRoutesByTo {
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
-  '/dashboard/compute': typeof AuthenticatedDashboardComputeRoute
   '/dashboard/data-sources': typeof AuthenticatedDashboardDataSourcesRoute
+  '/dashboard/earnings': typeof AuthenticatedDashboardEarningsRoute
   '/dashboard/execution': typeof AuthenticatedDashboardExecutionRoute
-  '/dashboard/gateway': typeof AuthenticatedDashboardGatewayRoute
   '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
   '/dashboard/my-models': typeof AuthenticatedDashboardMyModelsRoute
   '/dashboard/paper-trading': typeof AuthenticatedDashboardPaperTradingRoute
@@ -441,7 +425,6 @@ export interface FileRoutesByTo {
   '/dashboard/teams/$slug': typeof AuthenticatedDashboardTeamsSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/v1/models': typeof ApiPublicV1ModelsRoute
-  '/api/public/v1/signals': typeof ApiPublicV1SignalsRoute
   '/dashboard/models': typeof AuthenticatedDashboardModelsIndexRoute
   '/dashboard/strategies': typeof AuthenticatedDashboardStrategiesIndexRoute
   '/dashboard/teams': typeof AuthenticatedDashboardTeamsIndexRoute
@@ -471,10 +454,9 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/_authenticated/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
-  '/_authenticated/dashboard/compute': typeof AuthenticatedDashboardComputeRoute
   '/_authenticated/dashboard/data-sources': typeof AuthenticatedDashboardDataSourcesRoute
+  '/_authenticated/dashboard/earnings': typeof AuthenticatedDashboardEarningsRoute
   '/_authenticated/dashboard/execution': typeof AuthenticatedDashboardExecutionRoute
-  '/_authenticated/dashboard/gateway': typeof AuthenticatedDashboardGatewayRoute
   '/_authenticated/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
   '/_authenticated/dashboard/my-models': typeof AuthenticatedDashboardMyModelsRoute
   '/_authenticated/dashboard/paper-trading': typeof AuthenticatedDashboardPaperTradingRoute
@@ -495,7 +477,6 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/teams/$slug': typeof AuthenticatedDashboardTeamsSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/v1/models': typeof ApiPublicV1ModelsRoute
-  '/api/public/v1/signals': typeof ApiPublicV1SignalsRoute
   '/_authenticated/dashboard/models/': typeof AuthenticatedDashboardModelsIndexRoute
   '/_authenticated/dashboard/strategies/': typeof AuthenticatedDashboardStrategiesIndexRoute
   '/_authenticated/dashboard/teams/': typeof AuthenticatedDashboardTeamsIndexRoute
@@ -525,10 +506,9 @@ export interface FileRouteTypes {
     | '/dashboard/admin'
     | '/dashboard/billing'
     | '/dashboard/brokers'
-    | '/dashboard/compute'
     | '/dashboard/data-sources'
+    | '/dashboard/earnings'
     | '/dashboard/execution'
-    | '/dashboard/gateway'
     | '/dashboard/marketplace'
     | '/dashboard/my-models'
     | '/dashboard/paper-trading'
@@ -549,7 +529,6 @@ export interface FileRouteTypes {
     | '/dashboard/teams/$slug'
     | '/api/public/payments/webhook'
     | '/api/public/v1/models'
-    | '/api/public/v1/signals'
     | '/dashboard/models/'
     | '/dashboard/strategies/'
     | '/dashboard/teams/'
@@ -574,10 +553,9 @@ export interface FileRouteTypes {
     | '/dashboard/admin'
     | '/dashboard/billing'
     | '/dashboard/brokers'
-    | '/dashboard/compute'
     | '/dashboard/data-sources'
+    | '/dashboard/earnings'
     | '/dashboard/execution'
-    | '/dashboard/gateway'
     | '/dashboard/marketplace'
     | '/dashboard/my-models'
     | '/dashboard/paper-trading'
@@ -598,7 +576,6 @@ export interface FileRouteTypes {
     | '/dashboard/teams/$slug'
     | '/api/public/payments/webhook'
     | '/api/public/v1/models'
-    | '/api/public/v1/signals'
     | '/dashboard/models'
     | '/dashboard/strategies'
     | '/dashboard/teams'
@@ -627,10 +604,9 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/admin'
     | '/_authenticated/dashboard/billing'
     | '/_authenticated/dashboard/brokers'
-    | '/_authenticated/dashboard/compute'
     | '/_authenticated/dashboard/data-sources'
+    | '/_authenticated/dashboard/earnings'
     | '/_authenticated/dashboard/execution'
-    | '/_authenticated/dashboard/gateway'
     | '/_authenticated/dashboard/marketplace'
     | '/_authenticated/dashboard/my-models'
     | '/_authenticated/dashboard/paper-trading'
@@ -651,7 +627,6 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/teams/$slug'
     | '/api/public/payments/webhook'
     | '/api/public/v1/models'
-    | '/api/public/v1/signals'
     | '/_authenticated/dashboard/models/'
     | '/_authenticated/dashboard/strategies/'
     | '/_authenticated/dashboard/teams/'
@@ -668,7 +643,6 @@ export interface RootRouteChildren {
   ApiPublicSyncRoute: typeof ApiPublicSyncRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiPublicV1ModelsRoute: typeof ApiPublicV1ModelsRoute
-  ApiPublicV1SignalsRoute: typeof ApiPublicV1SignalsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -841,13 +815,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardBrokersRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
-    '/_authenticated/dashboard/compute': {
-      id: '/_authenticated/dashboard/compute'
-      path: '/compute'
-      fullPath: '/dashboard/compute'
-      preLoaderRoute: typeof AuthenticatedDashboardComputeRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
     '/_authenticated/dashboard/data-sources': {
       id: '/_authenticated/dashboard/data-sources'
       path: '/data-sources'
@@ -855,18 +822,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardDataSourcesRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/earnings': {
+      id: '/_authenticated/dashboard/earnings'
+      path: '/earnings'
+      fullPath: '/dashboard/earnings'
+      preLoaderRoute: typeof AuthenticatedDashboardEarningsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/execution': {
       id: '/_authenticated/dashboard/execution'
       path: '/execution'
       fullPath: '/dashboard/execution'
       preLoaderRoute: typeof AuthenticatedDashboardExecutionRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
-    '/_authenticated/dashboard/gateway': {
-      id: '/_authenticated/dashboard/gateway'
-      path: '/gateway'
-      fullPath: '/dashboard/gateway'
-      preLoaderRoute: typeof AuthenticatedDashboardGatewayRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
     '/_authenticated/dashboard/marketplace': {
@@ -1023,13 +990,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicV1ModelsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/v1/signals': {
-      id: '/api/public/v1/signals'
-      path: '/api/public/v1/signals'
-      fullPath: '/api/public/v1/signals'
-      preLoaderRoute: typeof ApiPublicV1SignalsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -1056,10 +1016,9 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRouteWithChildren
   AuthenticatedDashboardBillingRoute: typeof AuthenticatedDashboardBillingRoute
   AuthenticatedDashboardBrokersRoute: typeof AuthenticatedDashboardBrokersRoute
-  AuthenticatedDashboardComputeRoute: typeof AuthenticatedDashboardComputeRoute
   AuthenticatedDashboardDataSourcesRoute: typeof AuthenticatedDashboardDataSourcesRoute
+  AuthenticatedDashboardEarningsRoute: typeof AuthenticatedDashboardEarningsRoute
   AuthenticatedDashboardExecutionRoute: typeof AuthenticatedDashboardExecutionRoute
-  AuthenticatedDashboardGatewayRoute: typeof AuthenticatedDashboardGatewayRoute
   AuthenticatedDashboardMarketplaceRoute: typeof AuthenticatedDashboardMarketplaceRoute
   AuthenticatedDashboardMyModelsRoute: typeof AuthenticatedDashboardMyModelsRoute
   AuthenticatedDashboardPaperTradingRoute: typeof AuthenticatedDashboardPaperTradingRoute
@@ -1087,11 +1046,10 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardAdminRouteWithChildren,
     AuthenticatedDashboardBillingRoute: AuthenticatedDashboardBillingRoute,
     AuthenticatedDashboardBrokersRoute: AuthenticatedDashboardBrokersRoute,
-    AuthenticatedDashboardComputeRoute: AuthenticatedDashboardComputeRoute,
     AuthenticatedDashboardDataSourcesRoute:
       AuthenticatedDashboardDataSourcesRoute,
+    AuthenticatedDashboardEarningsRoute: AuthenticatedDashboardEarningsRoute,
     AuthenticatedDashboardExecutionRoute: AuthenticatedDashboardExecutionRoute,
-    AuthenticatedDashboardGatewayRoute: AuthenticatedDashboardGatewayRoute,
     AuthenticatedDashboardMarketplaceRoute:
       AuthenticatedDashboardMarketplaceRoute,
     AuthenticatedDashboardMyModelsRoute: AuthenticatedDashboardMyModelsRoute,
@@ -1189,7 +1147,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicSyncRoute: ApiPublicSyncRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiPublicV1ModelsRoute: ApiPublicV1ModelsRoute,
-  ApiPublicV1SignalsRoute: ApiPublicV1SignalsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

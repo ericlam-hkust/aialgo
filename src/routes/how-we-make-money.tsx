@@ -88,7 +88,7 @@ function HowWeMakeMoneyPage() {
           {[
             "Listing an AI model or an algo strategy",
             "Platform compute — hosted inference and hosted execution",
-            "Signal Gateway access, including HFT with unlimited calls",
+            "Unlimited live execution and signal delivery to subscribers",
             "The validation backtest pipeline and re-validation",
             "Paper trading, on every listing, forever",
             "Losing trades — no fee, ever",
