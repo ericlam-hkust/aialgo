@@ -36,7 +36,7 @@ function TeamsPage() {
 
       {(teams.data ?? []).length === 0 ? (
         <EmptyState
-          icon={Building2}
+          icon={<Building2 className="h-6 w-6" aria-hidden />}
           title="No teams yet"
           description="Create a team to share model repos, roles and API tokens with collaborators."
         />
