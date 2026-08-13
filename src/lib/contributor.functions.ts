@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import type { InterfaceManifest } from "@/lib/model-interface";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { AssetClass, ModelPricingModel, ModelRiskLevel, ModelStrategyType } from "@/lib/marketplace";
 
@@ -104,6 +105,7 @@ export type ModelDraft = {
   parameters: { name: string; type: string; default: string; min?: string; max?: string; description?: string }[];
   pricingModel: ModelPricingModel;
   price: number;
+  manifest?: InterfaceManifest;
 };
 
 export const submitModel = createServerFn({ method: "POST" })
@@ -152,6 +154,7 @@ export const submitModel = createServerFn({ method: "POST" })
         api_auth_encrypted: apiAuthEncrypted,
         package_path: data.packagePath ?? null,
         parameters: data.parameters,
+        interface_manifest: (data.manifest ?? null) as never,
       })
       .select("id,slug")
       .single();
