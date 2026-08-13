@@ -52,11 +52,11 @@ function VerificationPage() {
         <Card className="border-border/70">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
-              <Radio className="h-4 w-4 text-primary" aria-hidden /> Tier 2 — Remote via Signal Gateway
+              <Radio className="h-4 w-4 text-primary" aria-hidden /> Tier 2 — Remote execution
             </CardTitle>
             <CardDescription>
-              Latency-sensitive strategies stay on the contributor's own infrastructure and push signals to our gateway.
-              We timestamp every signal on receipt, so the track record is built from data the contributor cannot
+              Latency-sensitive strategies stay on the contributor's own infrastructure and stream signals to us. We
+              timestamp every signal on receipt, so the track record is built from data the contributor cannot
               backdate. After {LIVE_VERIFIED_DAYS} days it becomes <strong>Live Verified</strong>.
             </CardDescription>
           </CardHeader>
