@@ -11,12 +11,16 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { fmtDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/use-auth";
 
 export function NotificationBell() {
   const qc = useQueryClient();
+  const { session, loading: authLoading } = useAuth();
+  const isAuthenticated = !authLoading && Boolean(session?.access_token);
   const query = useQuery({
     queryKey: ["notifications"],
     queryFn: () => listNotifications(),
+    enabled: isAuthenticated,
     refetchInterval: 60_000,
     retry: 2,
     retryDelay: 1500,
@@ -51,7 +55,12 @@ export function NotificationBell() {
       <PopoverContent align="end" className="w-96 p-0">
         <div className="flex items-center justify-between border-b border-border px-3 py-2">
           <span className="text-sm font-medium">Notifications</span>
-          <Button variant="ghost" size="sm" onClick={() => readAll.mutate()} disabled={unread === 0}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => readAll.mutate()}
+            disabled={!isAuthenticated || unread === 0}
+          >
             <CheckCheck className="mr-1.5 h-3.5 w-3.5" aria-hidden /> Mark all read
           </Button>
         </div>
@@ -76,14 +85,20 @@ export function NotificationBell() {
                         <a
                           href={n.link}
                           className="mt-1 inline-block text-xs text-primary hover:underline"
-                          onClick={() => !n.read_at && readOne.mutate(n.id)}
+                          onClick={() => isAuthenticated && !n.read_at && readOne.mutate(n.id)}
                         >
                           View
                         </a>
                       ) : null}
                     </div>
                     {!n.read_at ? (
-                      <Button variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={() => readOne.mutate(n.id)}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 px-2 text-xs"
+                        onClick={() => readOne.mutate(n.id)}
+                        disabled={!isAuthenticated}
+                      >
                         Read
                       </Button>
                     ) : null}
