@@ -19,6 +19,8 @@ export type BacktestProtocol = {
   minTrades: number;
   maxAllowedDrawdownPct: number;
   divergenceThresholdPct: number;
+  walkForwardTrainMonths: number;
+  walkForwardTestMonths: number;
 };
 
 export const DEFAULT_PROTOCOL: BacktestProtocol = {
@@ -40,7 +42,10 @@ export const DEFAULT_PROTOCOL: BacktestProtocol = {
   minTrades: 30,
   maxAllowedDrawdownPct: 35,
   divergenceThresholdPct: 30,
+  walkForwardTrainMonths: 12,
+  walkForwardTestMonths: 3,
 };
+
 
 export type BacktestConfig = {
   assetClass: string;
