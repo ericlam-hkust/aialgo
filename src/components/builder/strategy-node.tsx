@@ -1,6 +1,6 @@
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 import { Activity, AlertTriangle, GitBranch, ShieldAlert, Zap } from "lucide-react";
-import type { NodeCategory, StrategyLane } from "@/lib/strategy-graph";
+import { specFor, type NodeCategory, type StrategyLane } from "@/lib/strategy-graph";
 import { cn } from "@/lib/utils";
 import { useBuilder } from "./builder-context";
 import { IndicatorSparkline } from "./indicator-sparkline";
@@ -27,8 +27,9 @@ export function StrategyFlowNode({ id, data, selected }: NodeProps) {
   const Icon = style.icon;
   const entries = Object.entries(d.params ?? {});
   const issue = issues[id];
-  const hasInput = d.category === "condition" || d.category === "action";
-  const hasOutput = d.category === "data" || d.category === "condition";
+  const spec = specFor({ type: d.category, data: { kind: d.kind, label: d.label, params: d.params } });
+  const hasInput = (spec?.input ?? "none") !== "none";
+  const hasOutput = (spec?.output ?? "none") !== "none";
 
   return (
     <div

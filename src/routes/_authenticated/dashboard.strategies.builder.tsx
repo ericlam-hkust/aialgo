@@ -156,7 +156,7 @@ function Builder() {
 
   const past = useRef<{ nodes: Node[]; edges: Edge[] }[]>([]);
   const future = useRef<{ nodes: Node[]; edges: Edge[] }[]>([]);
-  const [historyTick, setHistoryTick] = useState(0);
+  const [, setHistoryTick] = useState(0);
 
   const snapshot = useCallback(() => {
     past.current = [...past.current.slice(-40), { nodes, edges }];
