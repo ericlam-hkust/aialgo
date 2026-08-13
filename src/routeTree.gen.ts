@@ -47,6 +47,7 @@ import { Route as AuthenticatedDashboardStrategiesIndexRouteImport } from './rou
 import { Route as AuthenticatedDashboardStrategiesBacktestRouteImport } from './routes/_authenticated/dashboard.strategies.backtest'
 import { Route as AuthenticatedDashboardStrategiesBuilderRouteImport } from './routes/_authenticated/dashboard.strategies.builder'
 import { Route as AuthenticatedDashboardStrategiesTemplatesRouteImport } from './routes/_authenticated/dashboard.strategies.templates'
+import { Route as AuthenticatedDashboardTeamsIndexRouteImport } from './routes/_authenticated/dashboard.teams.index'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicV1ModelsRouteImport } from './routes/api/public/v1/models'
 
@@ -262,6 +263,12 @@ const AuthenticatedDashboardStrategiesTemplatesRoute =
     path: '/strategies/templates',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardTeamsIndexRoute =
+  AuthenticatedDashboardTeamsIndexRouteImport.update({
+    id: '/teams/',
+    path: '/teams/',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -314,6 +321,7 @@ export interface FileRoutesByFullPath {
   '/api/public/v1/models': typeof ApiPublicV1ModelsRoute
   '/dashboard/models/': typeof AuthenticatedDashboardModelsIndexRoute
   '/dashboard/strategies/': typeof AuthenticatedDashboardStrategiesIndexRoute
+  '/dashboard/teams/': typeof AuthenticatedDashboardTeamsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -352,6 +360,7 @@ export interface FileRoutesByTo {
   '/api/public/v1/models': typeof ApiPublicV1ModelsRoute
   '/dashboard/models': typeof AuthenticatedDashboardModelsIndexRoute
   '/dashboard/strategies': typeof AuthenticatedDashboardStrategiesIndexRoute
+  '/dashboard/teams': typeof AuthenticatedDashboardTeamsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -395,6 +404,7 @@ export interface FileRoutesById {
   '/api/public/v1/models': typeof ApiPublicV1ModelsRoute
   '/_authenticated/dashboard/models/': typeof AuthenticatedDashboardModelsIndexRoute
   '/_authenticated/dashboard/strategies/': typeof AuthenticatedDashboardStrategiesIndexRoute
+  '/_authenticated/dashboard/teams/': typeof AuthenticatedDashboardTeamsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -438,6 +448,7 @@ export interface FileRouteTypes {
     | '/api/public/v1/models'
     | '/dashboard/models/'
     | '/dashboard/strategies/'
+    | '/dashboard/teams/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -476,6 +487,7 @@ export interface FileRouteTypes {
     | '/api/public/v1/models'
     | '/dashboard/models'
     | '/dashboard/strategies'
+    | '/dashboard/teams'
   id:
     | '__root__'
     | '/'
@@ -518,6 +530,7 @@ export interface FileRouteTypes {
     | '/api/public/v1/models'
     | '/_authenticated/dashboard/models/'
     | '/_authenticated/dashboard/strategies/'
+    | '/_authenticated/dashboard/teams/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -798,6 +811,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardStrategiesTemplatesRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/teams/': {
+      id: '/_authenticated/dashboard/teams/'
+      path: '/teams'
+      fullPath: '/dashboard/teams/'
+      preLoaderRoute: typeof AuthenticatedDashboardTeamsIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -853,6 +873,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardStrategiesTemplatesRoute: typeof AuthenticatedDashboardStrategiesTemplatesRoute
   AuthenticatedDashboardModelsIndexRoute: typeof AuthenticatedDashboardModelsIndexRoute
   AuthenticatedDashboardStrategiesIndexRoute: typeof AuthenticatedDashboardStrategiesIndexRoute
+  AuthenticatedDashboardTeamsIndexRoute: typeof AuthenticatedDashboardTeamsIndexRoute
 }
 
 const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
@@ -891,6 +912,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardModelsIndexRoute,
     AuthenticatedDashboardStrategiesIndexRoute:
       AuthenticatedDashboardStrategiesIndexRoute,
+    AuthenticatedDashboardTeamsIndexRoute:
+      AuthenticatedDashboardTeamsIndexRoute,
   }
 
 const AuthenticatedDashboardRouteWithChildren =
