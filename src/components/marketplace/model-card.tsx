@@ -113,7 +113,13 @@ export function ModelCard({
               <Badge variant="outline" className={riskTone(model.risk_level)}>
                 {model.risk_level} risk
               </Badge>
+              {model.overfitting_risk ? (
+                <Badge variant="outline" className="gap-1 border-warning/60 text-warning">
+                  <TriangleAlert className="h-3 w-3" aria-hidden /> Overfitting risk
+                </Badge>
+              ) : null}
             </div>
+
           </div>
 
           <div className={cn("mt-4 sm:mt-0", layout === "list" && "sm:w-[420px] sm:shrink-0")}>
