@@ -19,20 +19,18 @@ export function useLiveMarket() {
   useEffect(() => {
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
+    let failures = 0;
 
     const tick = async () => {
-      if (!busy.current) {
+      // Skip work while the tab is hidden — avoids hammering the feed in background tabs.
+      const hidden = typeof document !== "undefined" && document.hidden;
+
+      if (!hidden && !busy.current) {
         busy.current = true;
         try {
           setStatus("connecting");
-          let result: Awaited<ReturnType<typeof getQuotes>>;
-          try {
-            result = await getQuotes({ data: { symbols: WATCHED } });
-          } catch {
-            // Transient dev-server / cold-start failure: retry once before flagging an error.
-            await new Promise((r) => setTimeout(r, 1500));
-            result = await getQuotes({ data: { symbols: WATCHED } });
-          }
+          const result = await getQuotes({ data: { symbols: WATCHED } });
+          failures = 0;
           if (!cancelled) {
             setQuotes(result.quotes, result.errors);
             if (Object.keys(result.quotes).length > 0) {
@@ -40,13 +38,20 @@ export function useLiveMarket() {
             }
           }
         } catch {
+          // A dev-server reload invalidates the loaded client bundle, so the next call
+          // fails until the page reloads. Back off instead of retrying every tick.
+          failures += 1;
           if (!cancelled) setStatus("error");
         } finally {
           busy.current = false;
         }
       }
 
-      if (!cancelled) timer = setTimeout(tick, pollIntervalMs());
+      if (!cancelled) {
+        const base = pollIntervalMs();
+        const delay = failures > 0 ? Math.min(base * 2 ** failures, 60_000) : base;
+        timer = setTimeout(tick, delay);
+      }
     };
 
     void tick();
@@ -55,4 +60,5 @@ export function useLiveMarket() {
       if (timer) clearTimeout(timer);
     };
   }, [getQuotes, mark, setQuotes, setStatus]);
+
 }
