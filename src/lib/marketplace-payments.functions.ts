@@ -29,7 +29,7 @@ export const createModelCheckoutSession = createServerFn({ method: "POST" })
       if (!priceId) {
         const product = await stripe.products.create({
           name: model.name,
-          description: model.tagline ?? undefined,
+          ...(model.tagline ? { description: model.tagline } : {}),
           tax_code: "txcd_10103001",
           metadata: { modelId: model.id, slug: model.slug },
         });
