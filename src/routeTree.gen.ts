@@ -57,6 +57,7 @@ import { Route as AuthenticatedDashboardTeamsIndexRouteImport } from './routes/_
 import { Route as AuthenticatedDashboardTeamsSlugRouteImport } from './routes/_authenticated/dashboard.teams.$slug'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicV1ModelsRouteImport } from './routes/api/public/v1/models'
+import { Route as AuthenticatedDashboardStrategiesListIdRouteImport } from './routes/_authenticated/dashboard.strategies.list.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -324,6 +325,12 @@ const ApiPublicV1ModelsRoute = ApiPublicV1ModelsRouteImport.update({
   path: '/api/public/v1/models',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedDashboardStrategiesListIdRoute =
+  AuthenticatedDashboardStrategiesListIdRouteImport.update({
+    id: '/strategies/list/$id',
+    path: '/strategies/list/$id',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -373,6 +380,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/models/': typeof AuthenticatedDashboardModelsIndexRoute
   '/dashboard/strategies/': typeof AuthenticatedDashboardStrategiesIndexRoute
   '/dashboard/teams/': typeof AuthenticatedDashboardTeamsIndexRoute
+  '/dashboard/strategies/list/$id': typeof AuthenticatedDashboardStrategiesListIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -419,6 +427,7 @@ export interface FileRoutesByTo {
   '/dashboard/models': typeof AuthenticatedDashboardModelsIndexRoute
   '/dashboard/strategies': typeof AuthenticatedDashboardStrategiesIndexRoute
   '/dashboard/teams': typeof AuthenticatedDashboardTeamsIndexRoute
+  '/dashboard/strategies/list/$id': typeof AuthenticatedDashboardStrategiesListIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -470,6 +479,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/models/': typeof AuthenticatedDashboardModelsIndexRoute
   '/_authenticated/dashboard/strategies/': typeof AuthenticatedDashboardStrategiesIndexRoute
   '/_authenticated/dashboard/teams/': typeof AuthenticatedDashboardTeamsIndexRoute
+  '/_authenticated/dashboard/strategies/list/$id': typeof AuthenticatedDashboardStrategiesListIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -521,6 +531,7 @@ export interface FileRouteTypes {
     | '/dashboard/models/'
     | '/dashboard/strategies/'
     | '/dashboard/teams/'
+    | '/dashboard/strategies/list/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -567,6 +578,7 @@ export interface FileRouteTypes {
     | '/dashboard/models'
     | '/dashboard/strategies'
     | '/dashboard/teams'
+    | '/dashboard/strategies/list/$id'
   id:
     | '__root__'
     | '/'
@@ -617,6 +629,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/models/'
     | '/_authenticated/dashboard/strategies/'
     | '/_authenticated/dashboard/teams/'
+    | '/_authenticated/dashboard/strategies/list/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -970,6 +983,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicV1ModelsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/dashboard/strategies/list/$id': {
+      id: '/_authenticated/dashboard/strategies/list/$id'
+      path: '/strategies/list/$id'
+      fullPath: '/dashboard/strategies/list/$id'
+      preLoaderRoute: typeof AuthenticatedDashboardStrategiesListIdRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
   }
 }
 
@@ -1016,6 +1036,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardModelsIndexRoute: typeof AuthenticatedDashboardModelsIndexRoute
   AuthenticatedDashboardStrategiesIndexRoute: typeof AuthenticatedDashboardStrategiesIndexRoute
   AuthenticatedDashboardTeamsIndexRoute: typeof AuthenticatedDashboardTeamsIndexRoute
+  AuthenticatedDashboardStrategiesListIdRoute: typeof AuthenticatedDashboardStrategiesListIdRoute
 }
 
 const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
@@ -1056,6 +1077,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardStrategiesIndexRoute,
     AuthenticatedDashboardTeamsIndexRoute:
       AuthenticatedDashboardTeamsIndexRoute,
+    AuthenticatedDashboardStrategiesListIdRoute:
+      AuthenticatedDashboardStrategiesListIdRoute,
   }
 
 const AuthenticatedDashboardRouteWithChildren =

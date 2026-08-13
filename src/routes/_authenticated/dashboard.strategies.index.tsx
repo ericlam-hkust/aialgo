@@ -69,14 +69,10 @@ function StrategyLibrary() {
 
   const publish = useMutation({
     mutationFn: (row: Row) => publishStrategyListing({ data: { strategyId: row.id } }),
-    onSuccess: (res) => {
-      toast.success(
-        res.created
-          ? "Listing created — finish pricing and run validation in My listings."
-          : "This strategy already has a listing.",
-      );
+    onSuccess: (_res, row) => {
       qc.invalidateQueries({ queryKey: ["my-strategies"] });
-      navigate({ to: "/dashboard/models" });
+      // Straight into the listing wizard: details → verified backtest → pricing → publish.
+      navigate({ to: "/dashboard/strategies/list/$id", params: { id: row.id } });
     },
     onError: (e: Error) => toast.error(e.message),
   });

@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { DEFAULT_PROTOCOL, FAILURE_REASONS as FAILURE_REASONS_MAP, type BacktestConfig, type BacktestProtocol } from "@/lib/backtest-protocol";
+import { suggestPricing } from "@/lib/pricing-suggestion";
 
 /** Reads the admin-configured global protocol, falling back to defaults. */
 export const getBacktestProtocol = createServerFn({ method: "GET" }).handler(async () => {
@@ -109,7 +110,14 @@ export const submitForValidation = createServerFn({ method: "POST" })
 
     await supabase
       .from("ai_models")
-      .update({ status: "backtest_validation", backtest_config: data.config as never, validation_job_id: job.id })
+      .update({
+        status: "backtest_validation",
+        backtest_config: data.config as never,
+        validation_job_id: job.id,
+        data_source_kind: data.config.dataSourceKind ?? "platform",
+        data_source_label: data.config.dataSourceLabel ?? "AlgoForge platform market data",
+        data_source_id: data.config.dataSourceId ?? null,
+      })
       .eq("id", data.modelId);
     await supabase.from("model_submissions").upsert(
       { model_id: data.modelId, user_id: userId, status: "backtest_validation" },
@@ -229,6 +237,16 @@ export const advanceBacktestJob = createServerFn({ method: "POST" })
     if (job.kind !== "sandbox" && job.model_id) {
       const nextRevalidation = new Date();
       nextRevalidation.setMonth(nextRevalidation.getMonth() + (protocol.revalidationMonths || 3));
+      const pricing = suggestPricing({
+        sharpe: report.metrics.sharpe,
+        maxDrawdown: report.metrics.maxDrawdown,
+        winRate: report.metrics.winRate,
+        profitFactor: report.metrics.profitFactor,
+        consistencyScore: report.walkForward?.consistencyScore ?? 0,
+        trades: report.metrics.trades,
+        overfittingRisk: Boolean(report.walkForward?.overfittingRisk),
+        cagr: report.metrics.cagr,
+      });
       await supabase
         .from("ai_models")
         .update({
@@ -240,12 +258,19 @@ export const advanceBacktestJob = createServerFn({ method: "POST" })
                 sharpe: report.metrics.sharpe,
                 max_drawdown: report.metrics.maxDrawdown,
                 win_rate: report.metrics.winRate,
+                loss_rate: Math.max(0, Math.round((100 - report.metrics.winRate) * 100) / 100),
+                profit_factor: report.metrics.profitFactor,
+                total_trades: report.metrics.trades,
+                total_return: report.metrics.totalReturn,
                 cagr: report.metrics.cagr,
+                backtest_ran_at: new Date().toISOString(),
                 last_validated_at: new Date().toISOString(),
                 next_revalidation_at: nextRevalidation.toISOString(),
                 divergence_flagged: false,
                 overfitting_risk: Boolean(report.walkForward?.overfittingRisk),
                 consistency_score: report.walkForward?.consistencyScore ?? 0,
+                suggested_price: pricing.suggested,
+                pricing_score: pricing.score,
               }),
 
         })
