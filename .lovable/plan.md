@@ -37,10 +37,7 @@ When the upload wizard runs in derivative mode, the feature schema and output co
 
 New docs page `/marketplace/docs/fine-tuning`: how base models were trained (high level), frozen-vs-trainable contract, local SDK walkthrough, cloud walkthrough, recommended data windows, pitfalls (short-window overfitting, linked to the walk-forward consistency score), and a publish checklist. Linked from docs index and every base model page.
 
-## 7. Demo flow (mock data)
-
-
-## 8. Multi-model pipeline bundles
+## 7. Multi-model pipeline bundles
 
 Extend the upload system so one listing can package several cooperating models.
 
