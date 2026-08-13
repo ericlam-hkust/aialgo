@@ -30,7 +30,18 @@ import { FLAT_NAV, NAV_GROUPS, type NavItem } from "@/lib/nav";
 import { cn } from "@/lib/utils";
 
 
+const OPEN_KEY = "algoforge.nav.open";
+
+function isActive(item: NavItem, pathname: string) {
+  return item.exact === false ? pathname.startsWith(item.to) : pathname === item.to;
+}
+
+function branchActive(item: NavItem, pathname: string) {
+  return isActive(item, pathname) || (item.children ?? []).some((c) => isActive(c, pathname));
+}
+
 export function AppShell({ children }: { children: ReactNode }) {
+
   const [collapsed, setCollapsed] = useState(false);
   const { theme, toggle } = useTheme();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
