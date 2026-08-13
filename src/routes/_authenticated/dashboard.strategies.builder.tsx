@@ -534,12 +534,20 @@ function Builder() {
           </div>
         </header>
 
-        <div className="grid gap-3 xl:grid-cols-[224px_minmax(0,1fr)_320px]">
-          <aside className="order-2 h-[300px] overflow-hidden rounded-xl border border-border bg-card xl:order-1 xl:h-[640px]">
+        <ResizablePanelGroup
+          key={isWide ? "wide" : "narrow"}
+          direction={isWide ? "horizontal" : "vertical"}
+          autoSaveId={isWide ? "builder-cols" : "builder-rows"}
+          className={isWide ? "h-[640px] gap-0" : "h-[1180px]"}
+        >
+          <ResizablePanel defaultSize={isWide ? 18 : 22} minSize={10} className="overflow-hidden rounded-xl border border-border bg-card">
             <NodePalette onAdd={(spec) => placeNode(spec)} />
-          </aside>
+          </ResizablePanel>
 
-          <main className="order-1 h-[640px] overflow-hidden rounded-xl border border-border bg-card/40 xl:order-2">
+          <ResizableHandle withHandle className="mx-1.5 my-1.5 bg-transparent" />
+
+          <ResizablePanel defaultSize={isWide ? 56 : 48} minSize={20} className="overflow-hidden rounded-xl border border-border bg-card/40">
+
             {view === "canvas" ? (
               <div className="h-full" onDrop={onDrop} onDragOver={(e) => e.preventDefault()}>
                 <ReactFlow
