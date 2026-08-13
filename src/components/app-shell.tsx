@@ -8,10 +8,12 @@ import {
   ChevronLeft,
   CreditCard,
   Database,
+  Banknote,
   Gavel,
   Package,
   Sparkles,
   LayoutDashboard,
+  Layers,
   LineChart,
   LogOut,
   Moon,
@@ -36,6 +38,7 @@ import { useEntitlements } from "@/hooks/use-entitlements";
 import { UPGRADE_EVENT } from "@/lib/upgrade-events";
 import { useI18n } from "@/lib/i18n";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { NotificationBell } from "@/components/notification-bell";
 
 import { cn } from "@/lib/utils";
 
@@ -48,7 +51,9 @@ const NAV = [
   { to: "/dashboard/paper-trading", key: "nav.paperTrading", icon: Activity, exact: true },
   { to: "/dashboard/marketplace", key: "nav.marketplace", icon: Store, exact: false },
   { to: "/models", key: "nav.models", icon: Sparkles, exact: false },
-  { to: "/dashboard/models", key: "nav.contributor", icon: Package, exact: false },
+  { to: "/dashboard/my-models", key: "nav.myModels", icon: Layers, exact: true },
+  { to: "/dashboard/models", key: "nav.contributor", icon: Package, exact: true },
+  { to: "/dashboard/models/payouts", key: "nav.payouts", icon: Banknote, exact: true },
   { to: "/dashboard/wallet", key: "nav.wallet", icon: Wallet, exact: true },
   { to: "/dashboard/admin", key: "nav.admin", icon: Gavel, exact: true },
   { to: "/dashboard/risk", key: "nav.risk", icon: ShieldAlert, exact: true },
@@ -168,6 +173,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             ))}
           </nav>
           <div className="flex items-center gap-1">
+            <NotificationBell />
             <LanguageSwitcher />
             <Button variant="ghost" size="icon" onClick={toggle} aria-label={t("shell.toggleTheme")}>
               {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
