@@ -30,7 +30,7 @@ const STARTERS = [
 const GREETING: Msg = {
   role: "assistant",
   content:
-    "Hi, I'm your AlgoForge trading assistant. Ask me anything about strategies, backtesting or risk — or describe a strategy in plain English and I'll build it for you.",
+    "Hi, I'm your aiAlgo trading assistant. Ask me anything about strategies, backtesting or risk — or describe a strategy in plain English and I'll build it for you.",
 };
 
 export function AiAssistant() {

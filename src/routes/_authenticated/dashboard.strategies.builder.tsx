@@ -73,13 +73,13 @@ export const Route = createFileRoute("/_authenticated/dashboard/strategies/build
     typeof search["id"] === "string" ? { id: search["id"] } : {},
   head: () => ({
     meta: [
-      { title: "Algo Builder · AlgoForge" },
+      { title: "Algo Builder · aiAlgo" },
       {
         name: "description",
         content:
           "Design entry, exit and risk rules on a visual canvas, draft them with AI, and edit the generated Python directly.",
       },
-      { property: "og:title", content: "Algo Builder · AlgoForge" },
+      { property: "og:title", content: "Algo Builder · aiAlgo" },
       {
         property: "og:description",
         content: "Visual, AI-assisted and code-level strategy building in one workspace.",

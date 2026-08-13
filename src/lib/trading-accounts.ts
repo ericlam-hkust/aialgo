@@ -17,12 +17,12 @@ export const PERMISSION_CHECKLIST = [
   "Enable spot / equities trading",
   "Enable read-only account and balance access",
   "Never enable withdrawals or transfers",
-  "Restrict the key to AlgoForge IPs where your venue supports it",
+  "Restrict the key to aiAlgo IPs where your venue supports it",
 ];
 
 export const PAPER_STARTING_BALANCE = 100_000;
 
 export function providerLabel(value: string): string {
-  if (value === "paper") return "AlgoForge Paper Account";
+  if (value === "paper") return "aiAlgo Paper Account";
   return ACCOUNT_PROVIDERS.find((p) => p.value === value)?.label ?? value;
 }

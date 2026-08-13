@@ -18,13 +18,13 @@ import { PLAN_LABEL, formatLimit } from "@/lib/entitlements";
 export const Route = createFileRoute("/_authenticated/dashboard/billing")({
   head: () => ({
     meta: [
-      { title: "Billing & Plans | AlgoForge" },
+      { title: "Billing & Plans | aiAlgo" },
       {
         name: "description",
-        content: "Manage your AlgoForge subscription, monitor monthly usage, and upgrade to Pro or Elite.",
+        content: "Manage your aiAlgo subscription, monitor monthly usage, and upgrade to Pro or Elite.",
       },
-      { property: "og:title", content: "Billing & Plans | AlgoForge" },
-      { property: "og:description", content: "Manage your AlgoForge subscription and plan usage." },
+      { property: "og:title", content: "Billing & Plans | aiAlgo" },
+      { property: "og:description", content: "Manage your aiAlgo subscription and plan usage." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

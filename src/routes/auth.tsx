@@ -14,7 +14,7 @@ function AuthLayout() {
           <span className="flex h-7 w-7 items-center justify-center rounded-md bg-primary text-primary-foreground">
             <Workflow className="h-4 w-4" aria-hidden />
           </span>
-          AlgoForge
+          aiAlgo
         </Link>
         <Outlet />
       </div>

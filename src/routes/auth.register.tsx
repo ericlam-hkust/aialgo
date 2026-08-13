@@ -14,12 +14,12 @@ import { Separator } from "@/components/ui/separator";
 export const Route = createFileRoute("/auth/register")({
   head: () => ({
     meta: [
-      { title: "Create your account — AlgoForge" },
+      { title: "Create your account — aiAlgo" },
       {
         name: "description",
-        content: "Create a free AlgoForge account and build your first no-code trading strategy today.",
+        content: "Create a free aiAlgo account and build your first no-code trading strategy today.",
       },
-      { property: "og:title", content: "Create your account — AlgoForge" },
+      { property: "og:title", content: "Create your account — aiAlgo" },
       {
         property: "og:description",
         content: "Free visual strategy builder, backtesting and paper trading for HK and US markets.",

@@ -8,14 +8,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 export const Route = createFileRoute("/marketplace/docs")({
   head: () => ({
     meta: [
-      { title: "Model Developer Documentation — AlgoForge" },
+      { title: "Model Developer Documentation — aiAlgo" },
       {
         name: "description",
         content:
-          "Model interface contract, baseline example code, backtest assumptions, data schemas and the submission checklist for AlgoForge contributors.",
+          "Model interface contract, baseline example code, backtest assumptions, data schemas and the submission checklist for aiAlgo contributors.",
       },
-      { property: "og:title", content: "Model Developer Documentation — AlgoForge" },
-      { property: "og:description", content: "Everything you need to ship a validated trading model on AlgoForge." },
+      { property: "og:title", content: "Model Developer Documentation — aiAlgo" },
+      { property: "og:description", content: "Everything you need to ship a validated trading model on aiAlgo." },
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

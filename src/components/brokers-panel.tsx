@@ -115,7 +115,7 @@ export function BrokersPanel() {
         <AlertTitle>Credentials are encrypted at rest</AlertTitle>
         <AlertDescription>
           Keys and tokens are encrypted with AES-GCM before they touch the database and are only decrypted inside
-          server functions during a sync. AlgoForge never places live orders on your behalf.
+          server functions during a sync. aiAlgo never places live orders on your behalf.
         </AlertDescription>
       </Alert>
 

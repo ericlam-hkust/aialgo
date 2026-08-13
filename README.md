@@ -1,6 +1,6 @@
 # AlgoNavigator Pro
 
-Build a full-stack algorithmic trading platform called "AlgoForge" designed for retail traders in Hong Kong and global markets. The platform enables users to create, backtest, and simulate automated trading strategies without writing code, using a visual drag-and-drop builder and AI-assisted natural language strategy creation.
+Build a full-stack algorithmic trading platform called "aiAlgo" designed for retail traders in Hong Kong and global markets. The platform enables users to create, backtest, and simulate automated trading strategies without writing code, using a visual drag-and-drop builder and AI-assisted natural language strategy creation.
 
 ### TECH STACK
 

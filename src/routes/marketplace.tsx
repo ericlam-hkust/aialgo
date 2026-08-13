@@ -25,7 +25,7 @@ function ModelsLayout() {
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4">
           <Link to="/" className="flex items-center gap-2">
             <Wallet className="h-5 w-5 text-primary" aria-hidden />
-            <span className="text-sm font-semibold tracking-tight">AlgoForge</span>
+            <span className="text-sm font-semibold tracking-tight">aiAlgo</span>
           </Link>
           <nav className="flex items-center gap-2">
             <Button asChild variant="ghost" size="sm">

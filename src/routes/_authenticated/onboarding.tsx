@@ -158,7 +158,7 @@ function Onboarding() {
               ) : (
                 <Button onClick={finish} disabled={saving}>
                   {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden /> : null}
-                  Enter AlgoForge
+                  Enter aiAlgo
                 </Button>
               )}
             </div>

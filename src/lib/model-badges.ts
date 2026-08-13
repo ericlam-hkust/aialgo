@@ -14,7 +14,7 @@ export function modelBadges(input: BadgeInput): ModelBadge[] {
     badges.push({
       key: "backtest",
       label: "Backtest Verified",
-      hint: "AlgoForge re-ran this strategy out of sample and stored the equity curve.",
+      hint: "aiAlgo re-ran this strategy out of sample and stored the equity curve.",
     });
   }
   if (input.liveDays >= 30) {

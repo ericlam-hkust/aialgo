@@ -20,13 +20,13 @@ export const Route = createFileRoute("/marketplace/data-library")({
   loader: ({ context }) => context.queryClient.ensureQueryData(catalogQuery),
   head: () => ({
     meta: [
-      { title: "Historical Data Library — AlgoForge" },
+      { title: "Historical Data Library — aiAlgo" },
       {
         name: "description",
         content:
           "Browse every historical market data feed available for model backtesting: asset classes, instruments, timeframes, coverage windows and update frequency.",
       },
-      { property: "og:title", content: "Historical Data Library — AlgoForge" },
+      { property: "og:title", content: "Historical Data Library — aiAlgo" },
       { property: "og:description", content: "Documented OHLCV feeds across crypto, equities, forex and futures for verified model backtests." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

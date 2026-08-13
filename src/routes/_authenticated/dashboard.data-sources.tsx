@@ -27,15 +27,15 @@ import {
 export const Route = createFileRoute("/_authenticated/dashboard/data-sources")({
   head: () => ({
     meta: [
-      { title: "Market Data Sources · AlgoForge" },
+      { title: "Market Data Sources · aiAlgo" },
       {
         name: "description",
         content: "Connect market data providers, verify API keys and run live and historical data syncs.",
       },
-      { property: "og:title", content: "Market Data Sources · AlgoForge" },
+      { property: "og:title", content: "Market Data Sources · aiAlgo" },
       {
         property: "og:description",
-        content: "Connect market data providers and run live and historical data syncs on AlgoForge.",
+        content: "Connect market data providers and run live and historical data syncs on aiAlgo.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -203,7 +203,7 @@ function DataSources() {
                   {platformAvailable.includes(p.id) ? (
                     <div className="flex items-center justify-between rounded-md border border-border px-3 py-2">
                       <Label htmlFor={`platform-${p.id}`} className="text-xs">
-                        Use AlgoForge platform key
+                        Use aiAlgo platform key
                       </Label>
                       <Switch
                         id={`platform-${p.id}`}

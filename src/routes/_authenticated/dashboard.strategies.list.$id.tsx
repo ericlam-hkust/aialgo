@@ -32,13 +32,13 @@ import { fmtNum } from "@/lib/format";
 export const Route = createFileRoute("/_authenticated/dashboard/strategies/list/$id")({
   head: () => ({
     meta: [
-      { title: "List strategy on the marketplace — AlgoForge" },
+      { title: "List strategy on the marketplace — aiAlgo" },
       {
         name: "description",
         content:
           "Publish an algo strategy: verified platform backtest, data source attribution and a data-driven price suggestion.",
       },
-      { property: "og:title", content: "List strategy on the marketplace — AlgoForge" },
+      { property: "og:title", content: "List strategy on the marketplace — aiAlgo" },
       {
         property: "og:description",
         content: "Run the platform backtest, review win rate and drawdown, and price your strategy with confidence.",
@@ -336,7 +336,7 @@ function BacktestStep({
   const connection = (sources.data?.connections ?? []).find((c) => c.id === sourceValue);
   const sourceLabel =
     sourceValue === "platform"
-      ? "AlgoForge platform market data"
+      ? "aiAlgo platform market data"
       : `${connection?.label ?? connection?.provider ?? "Contributor feed"} (own connection)`;
 
   const run = useMutation({
@@ -386,7 +386,7 @@ function BacktestStep({
               <Select value={sourceValue} onValueChange={setSourceValue}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="platform">AlgoForge platform market data</SelectItem>
+                  <SelectItem value="platform">aiAlgo platform market data</SelectItem>
                   {(sources.data?.connections ?? [])
                     .filter((c) => c.enabled)
                     .map((c) => (

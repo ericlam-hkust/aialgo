@@ -34,12 +34,12 @@ export const Route = createFileRoute("/_authenticated/dashboard/execution")({
   component: ExecutionDashboard,
   head: () => ({
     meta: [
-      { title: "Execution Monitor — AlgoForge" },
+      { title: "Execution Monitor — aiAlgo" },
       {
         name: "description",
         content: "Live monitoring of every active model: signals, risk-engine decisions, orders, P&L and kill switch.",
       },
-      { property: "og:title", content: "Execution Monitor — AlgoForge" },
+      { property: "og:title", content: "Execution Monitor — aiAlgo" },
       { property: "og:description", content: "Watch signals flow through the risk engine into your broker account." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

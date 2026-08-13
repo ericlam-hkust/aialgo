@@ -18,12 +18,12 @@ export const Route = createFileRoute("/_authenticated/dashboard/earnings")({
   component: EarningsPage,
   head: () => ({
     meta: [
-      { title: "Earnings — AlgoForge" },
+      { title: "Earnings — aiAlgo" },
       {
         name: "description",
         content: "Contributor earnings console: gross sales, commission split, Pro Creator status and payout history.",
       },
-      { property: "og:title", content: "Earnings — AlgoForge" },
+      { property: "og:title", content: "Earnings — aiAlgo" },
       { property: "og:description", content: "See exactly what you keep from every fee your models and algos collect." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
