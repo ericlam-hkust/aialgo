@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { getExecutionOverview, tickExecution, triggerKillSwitch } from "@/lib/execution.functions";
-import { pauseActivation, resumeActivation } from "@/lib/activations.functions";
+import { resumeActivation } from "@/lib/activations.functions";
 import { providerLabel } from "@/lib/trading-accounts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -75,7 +75,7 @@ function ExecutionDashboard() {
   const account = (overview.data?.accounts ?? []).find((a) => a.id === active?.broker_connection_id);
 
   const pause = useMutation({
-    mutationFn: (id: string) => pauseActivation({ data: { activationId: id } }),
+    mutationFn: (id: string) => triggerKillSwitch({ data: { activationId: id } }),
     onSuccess: () => {
       toast.success("Model paused");
       void qc.invalidateQueries({ queryKey: ["execution-overview"] });
@@ -123,7 +123,7 @@ function ExecutionDashboard() {
   if (!active) {
     return (
       <EmptyState
-        icon={Activity}
+        icon={<Activity className="h-6 w-6" aria-hidden />}
         title="No active models"
         description="Apply a model from the marketplace to see its live execution chain here."
       />
