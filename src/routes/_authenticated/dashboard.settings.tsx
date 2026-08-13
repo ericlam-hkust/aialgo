@@ -113,7 +113,9 @@ function SettingsPage() {
     setPayoutEmail(contributor.payout_email ?? "");
   }, [contributor]);
 
-  const updateProfile = async (patch: Record<string, unknown>) => {
+  type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
+
+  const updateProfile = async (patch: ProfileUpdate) => {
     const uid = (await supabase.auth.getUser()).data.user?.id ?? "";
     const { error } = await supabase.from("profiles").update(patch).eq("id", uid);
     if (error) throw new Error(error.message);
