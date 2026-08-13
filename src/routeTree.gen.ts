@@ -31,12 +31,10 @@ import { Route as MarketplaceFineTuningGuideRouteImport } from './routes/marketp
 import { Route as MarketplaceVerificationRouteImport } from './routes/marketplace.verification'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardAccountsRouteImport } from './routes/_authenticated/dashboard.accounts'
-import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated/dashboard.admin'
 import { Route as AuthenticatedDashboardBacktestRouteImport } from './routes/_authenticated/dashboard.backtest'
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
 import { Route as AuthenticatedDashboardBrokersRouteImport } from './routes/_authenticated/dashboard.brokers'
 import { Route as AuthenticatedDashboardDataSourcesRouteImport } from './routes/_authenticated/dashboard.data-sources'
-import { Route as AuthenticatedDashboardEarningsRouteImport } from './routes/_authenticated/dashboard.earnings'
 import { Route as AuthenticatedDashboardExecutionRouteImport } from './routes/_authenticated/dashboard.execution'
 import { Route as AuthenticatedDashboardMyModelsRouteImport } from './routes/_authenticated/dashboard.my-models'
 import { Route as AuthenticatedDashboardPaperTradingRouteImport } from './routes/_authenticated/dashboard.paper-trading'
@@ -45,8 +43,6 @@ import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_au
 import { Route as ApiPublicSyncRouteImport } from './routes/api/public/sync'
 import { Route as MarketplaceBaseModelsIndexRouteImport } from './routes/marketplace.base-models.index'
 import { Route as MarketplaceBaseModelsIdRouteImport } from './routes/marketplace.base-models.$id'
-import { Route as AuthenticatedDashboardAdminBacktestRouteImport } from './routes/_authenticated/dashboard.admin.backtest'
-import { Route as AuthenticatedDashboardAdminRevenueRouteImport } from './routes/_authenticated/dashboard.admin.revenue'
 import { Route as AuthenticatedDashboardModelsIndexRouteImport } from './routes/_authenticated/dashboard.models.index'
 import { Route as AuthenticatedDashboardModelsBacktestsRouteImport } from './routes/_authenticated/dashboard.models.backtests'
 import { Route as AuthenticatedDashboardModelsNewRouteImport } from './routes/_authenticated/dashboard.models.new'
@@ -175,12 +171,6 @@ const AuthenticatedDashboardAccountsRoute =
     path: '/accounts',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
-const AuthenticatedDashboardAdminRoute =
-  AuthenticatedDashboardAdminRouteImport.update({
-    id: '/admin',
-    path: '/admin',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
 const AuthenticatedDashboardBacktestRoute =
   AuthenticatedDashboardBacktestRouteImport.update({
     id: '/backtest',
@@ -203,12 +193,6 @@ const AuthenticatedDashboardDataSourcesRoute =
   AuthenticatedDashboardDataSourcesRouteImport.update({
     id: '/data-sources',
     path: '/data-sources',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
-const AuthenticatedDashboardEarningsRoute =
-  AuthenticatedDashboardEarningsRouteImport.update({
-    id: '/earnings',
-    path: '/earnings',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardExecutionRoute =
@@ -257,18 +241,6 @@ const MarketplaceBaseModelsIdRoute = MarketplaceBaseModelsIdRouteImport.update({
   path: '/base-models/$id',
   getParentRoute: () => MarketplaceRoute,
 } as any)
-const AuthenticatedDashboardAdminBacktestRoute =
-  AuthenticatedDashboardAdminBacktestRouteImport.update({
-    id: '/backtest',
-    path: '/backtest',
-    getParentRoute: () => AuthenticatedDashboardAdminRoute,
-  } as any)
-const AuthenticatedDashboardAdminRevenueRoute =
-  AuthenticatedDashboardAdminRevenueRouteImport.update({
-    id: '/revenue',
-    path: '/revenue',
-    getParentRoute: () => AuthenticatedDashboardAdminRoute,
-  } as any)
 const AuthenticatedDashboardModelsIndexRoute =
   AuthenticatedDashboardModelsIndexRouteImport.update({
     id: '/models/',
@@ -380,12 +352,10 @@ export interface FileRoutesByFullPath {
   '/auth/': typeof AuthIndexRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/dashboard/accounts': typeof AuthenticatedDashboardAccountsRoute
-  '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/backtest': typeof AuthenticatedDashboardBacktestRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
   '/dashboard/data-sources': typeof AuthenticatedDashboardDataSourcesRoute
-  '/dashboard/earnings': typeof AuthenticatedDashboardEarningsRoute
   '/dashboard/execution': typeof AuthenticatedDashboardExecutionRoute
   '/dashboard/my-models': typeof AuthenticatedDashboardMyModelsRoute
   '/dashboard/paper-trading': typeof AuthenticatedDashboardPaperTradingRoute
@@ -395,8 +365,6 @@ export interface FileRoutesByFullPath {
   '/marketplace/base-models/$id': typeof MarketplaceBaseModelsIdRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/marketplace/base-models/': typeof MarketplaceBaseModelsIndexRoute
-  '/dashboard/admin/backtest': typeof AuthenticatedDashboardAdminBacktestRoute
-  '/dashboard/admin/revenue': typeof AuthenticatedDashboardAdminRevenueRoute
   '/dashboard/models/backtests': typeof AuthenticatedDashboardModelsBacktestsRoute
   '/dashboard/models/new': typeof AuthenticatedDashboardModelsNewRoute
   '/dashboard/models/payouts': typeof AuthenticatedDashboardModelsPayoutsRoute
@@ -431,12 +399,10 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthIndexRoute
   '/marketplace': typeof MarketplaceIndexRoute
   '/dashboard/accounts': typeof AuthenticatedDashboardAccountsRoute
-  '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/backtest': typeof AuthenticatedDashboardBacktestRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
   '/dashboard/data-sources': typeof AuthenticatedDashboardDataSourcesRoute
-  '/dashboard/earnings': typeof AuthenticatedDashboardEarningsRoute
   '/dashboard/execution': typeof AuthenticatedDashboardExecutionRoute
   '/dashboard/my-models': typeof AuthenticatedDashboardMyModelsRoute
   '/dashboard/paper-trading': typeof AuthenticatedDashboardPaperTradingRoute
@@ -446,8 +412,6 @@ export interface FileRoutesByTo {
   '/marketplace/base-models/$id': typeof MarketplaceBaseModelsIdRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/marketplace/base-models': typeof MarketplaceBaseModelsIndexRoute
-  '/dashboard/admin/backtest': typeof AuthenticatedDashboardAdminBacktestRoute
-  '/dashboard/admin/revenue': typeof AuthenticatedDashboardAdminRevenueRoute
   '/dashboard/models/backtests': typeof AuthenticatedDashboardModelsBacktestsRoute
   '/dashboard/models/new': typeof AuthenticatedDashboardModelsNewRoute
   '/dashboard/models/payouts': typeof AuthenticatedDashboardModelsPayoutsRoute
@@ -487,12 +451,10 @@ export interface FileRoutesById {
   '/auth/': typeof AuthIndexRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/_authenticated/dashboard/accounts': typeof AuthenticatedDashboardAccountsRoute
-  '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/_authenticated/dashboard/backtest': typeof AuthenticatedDashboardBacktestRoute
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/_authenticated/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
   '/_authenticated/dashboard/data-sources': typeof AuthenticatedDashboardDataSourcesRoute
-  '/_authenticated/dashboard/earnings': typeof AuthenticatedDashboardEarningsRoute
   '/_authenticated/dashboard/execution': typeof AuthenticatedDashboardExecutionRoute
   '/_authenticated/dashboard/my-models': typeof AuthenticatedDashboardMyModelsRoute
   '/_authenticated/dashboard/paper-trading': typeof AuthenticatedDashboardPaperTradingRoute
@@ -502,8 +464,6 @@ export interface FileRoutesById {
   '/marketplace/base-models/$id': typeof MarketplaceBaseModelsIdRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/marketplace/base-models/': typeof MarketplaceBaseModelsIndexRoute
-  '/_authenticated/dashboard/admin/backtest': typeof AuthenticatedDashboardAdminBacktestRoute
-  '/_authenticated/dashboard/admin/revenue': typeof AuthenticatedDashboardAdminRevenueRoute
   '/_authenticated/dashboard/models/backtests': typeof AuthenticatedDashboardModelsBacktestsRoute
   '/_authenticated/dashboard/models/new': typeof AuthenticatedDashboardModelsNewRoute
   '/_authenticated/dashboard/models/payouts': typeof AuthenticatedDashboardModelsPayoutsRoute
@@ -543,12 +503,10 @@ export interface FileRouteTypes {
     | '/auth/'
     | '/marketplace/'
     | '/dashboard/accounts'
-    | '/dashboard/admin'
     | '/dashboard/backtest'
     | '/dashboard/billing'
     | '/dashboard/brokers'
     | '/dashboard/data-sources'
-    | '/dashboard/earnings'
     | '/dashboard/execution'
     | '/dashboard/my-models'
     | '/dashboard/paper-trading'
@@ -558,8 +516,6 @@ export interface FileRouteTypes {
     | '/marketplace/base-models/$id'
     | '/dashboard/'
     | '/marketplace/base-models/'
-    | '/dashboard/admin/backtest'
-    | '/dashboard/admin/revenue'
     | '/dashboard/models/backtests'
     | '/dashboard/models/new'
     | '/dashboard/models/payouts'
@@ -594,12 +550,10 @@ export interface FileRouteTypes {
     | '/auth'
     | '/marketplace'
     | '/dashboard/accounts'
-    | '/dashboard/admin'
     | '/dashboard/backtest'
     | '/dashboard/billing'
     | '/dashboard/brokers'
     | '/dashboard/data-sources'
-    | '/dashboard/earnings'
     | '/dashboard/execution'
     | '/dashboard/my-models'
     | '/dashboard/paper-trading'
@@ -609,8 +563,6 @@ export interface FileRouteTypes {
     | '/marketplace/base-models/$id'
     | '/dashboard'
     | '/marketplace/base-models'
-    | '/dashboard/admin/backtest'
-    | '/dashboard/admin/revenue'
     | '/dashboard/models/backtests'
     | '/dashboard/models/new'
     | '/dashboard/models/payouts'
@@ -649,12 +601,10 @@ export interface FileRouteTypes {
     | '/auth/'
     | '/marketplace/'
     | '/_authenticated/dashboard/accounts'
-    | '/_authenticated/dashboard/admin'
     | '/_authenticated/dashboard/backtest'
     | '/_authenticated/dashboard/billing'
     | '/_authenticated/dashboard/brokers'
     | '/_authenticated/dashboard/data-sources'
-    | '/_authenticated/dashboard/earnings'
     | '/_authenticated/dashboard/execution'
     | '/_authenticated/dashboard/my-models'
     | '/_authenticated/dashboard/paper-trading'
@@ -664,8 +614,6 @@ export interface FileRouteTypes {
     | '/marketplace/base-models/$id'
     | '/_authenticated/dashboard/'
     | '/marketplace/base-models/'
-    | '/_authenticated/dashboard/admin/backtest'
-    | '/_authenticated/dashboard/admin/revenue'
     | '/_authenticated/dashboard/models/backtests'
     | '/_authenticated/dashboard/models/new'
     | '/_authenticated/dashboard/models/payouts'
@@ -852,13 +800,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAccountsRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
-    '/_authenticated/dashboard/admin': {
-      id: '/_authenticated/dashboard/admin'
-      path: '/admin'
-      fullPath: '/dashboard/admin'
-      preLoaderRoute: typeof AuthenticatedDashboardAdminRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
     '/_authenticated/dashboard/backtest': {
       id: '/_authenticated/dashboard/backtest'
       path: '/backtest'
@@ -885,13 +826,6 @@ declare module '@tanstack/react-router' {
       path: '/data-sources'
       fullPath: '/dashboard/data-sources'
       preLoaderRoute: typeof AuthenticatedDashboardDataSourcesRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
-    '/_authenticated/dashboard/earnings': {
-      id: '/_authenticated/dashboard/earnings'
-      path: '/earnings'
-      fullPath: '/dashboard/earnings'
-      preLoaderRoute: typeof AuthenticatedDashboardEarningsRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
     '/_authenticated/dashboard/execution': {
@@ -949,20 +883,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/marketplace/base-models/$id'
       preLoaderRoute: typeof MarketplaceBaseModelsIdRouteImport
       parentRoute: typeof MarketplaceRoute
-    }
-    '/_authenticated/dashboard/admin/backtest': {
-      id: '/_authenticated/dashboard/admin/backtest'
-      path: '/backtest'
-      fullPath: '/dashboard/admin/backtest'
-      preLoaderRoute: typeof AuthenticatedDashboardAdminBacktestRouteImport
-      parentRoute: typeof AuthenticatedDashboardAdminRoute
-    }
-    '/_authenticated/dashboard/admin/revenue': {
-      id: '/_authenticated/dashboard/admin/revenue'
-      path: '/revenue'
-      fullPath: '/dashboard/admin/revenue'
-      preLoaderRoute: typeof AuthenticatedDashboardAdminRevenueRouteImport
-      parentRoute: typeof AuthenticatedDashboardAdminRoute
     }
     '/_authenticated/dashboard/models/': {
       id: '/_authenticated/dashboard/models/'
@@ -1072,32 +992,12 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AuthenticatedDashboardAdminRouteChildren {
-  AuthenticatedDashboardAdminBacktestRoute: typeof AuthenticatedDashboardAdminBacktestRoute
-  AuthenticatedDashboardAdminRevenueRoute: typeof AuthenticatedDashboardAdminRevenueRoute
-}
-
-const AuthenticatedDashboardAdminRouteChildren: AuthenticatedDashboardAdminRouteChildren =
-  {
-    AuthenticatedDashboardAdminBacktestRoute:
-      AuthenticatedDashboardAdminBacktestRoute,
-    AuthenticatedDashboardAdminRevenueRoute:
-      AuthenticatedDashboardAdminRevenueRoute,
-  }
-
-const AuthenticatedDashboardAdminRouteWithChildren =
-  AuthenticatedDashboardAdminRoute._addFileChildren(
-    AuthenticatedDashboardAdminRouteChildren,
-  )
-
 interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardAccountsRoute: typeof AuthenticatedDashboardAccountsRoute
-  AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRouteWithChildren
   AuthenticatedDashboardBacktestRoute: typeof AuthenticatedDashboardBacktestRoute
   AuthenticatedDashboardBillingRoute: typeof AuthenticatedDashboardBillingRoute
   AuthenticatedDashboardBrokersRoute: typeof AuthenticatedDashboardBrokersRoute
   AuthenticatedDashboardDataSourcesRoute: typeof AuthenticatedDashboardDataSourcesRoute
-  AuthenticatedDashboardEarningsRoute: typeof AuthenticatedDashboardEarningsRoute
   AuthenticatedDashboardExecutionRoute: typeof AuthenticatedDashboardExecutionRoute
   AuthenticatedDashboardMyModelsRoute: typeof AuthenticatedDashboardMyModelsRoute
   AuthenticatedDashboardPaperTradingRoute: typeof AuthenticatedDashboardPaperTradingRoute
@@ -1122,14 +1022,11 @@ interface AuthenticatedDashboardRouteChildren {
 const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
   {
     AuthenticatedDashboardAccountsRoute: AuthenticatedDashboardAccountsRoute,
-    AuthenticatedDashboardAdminRoute:
-      AuthenticatedDashboardAdminRouteWithChildren,
     AuthenticatedDashboardBacktestRoute: AuthenticatedDashboardBacktestRoute,
     AuthenticatedDashboardBillingRoute: AuthenticatedDashboardBillingRoute,
     AuthenticatedDashboardBrokersRoute: AuthenticatedDashboardBrokersRoute,
     AuthenticatedDashboardDataSourcesRoute:
       AuthenticatedDashboardDataSourcesRoute,
-    AuthenticatedDashboardEarningsRoute: AuthenticatedDashboardEarningsRoute,
     AuthenticatedDashboardExecutionRoute: AuthenticatedDashboardExecutionRoute,
     AuthenticatedDashboardMyModelsRoute: AuthenticatedDashboardMyModelsRoute,
     AuthenticatedDashboardPaperTradingRoute:
