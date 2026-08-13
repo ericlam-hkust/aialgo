@@ -35,7 +35,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
     realtimeData: false,
     premiumFeeds: false,
     multiAccount: false,
-    liveDataSources: false,
+    liveDataSources: true, // contributors need their own feeds to backtest — never gated
     paperDeployments: true,
     brokerConnections: false,
     intradaySync: false,
