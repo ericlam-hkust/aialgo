@@ -200,7 +200,7 @@ function ActivationCard({ row, onChanged }: { row: ActivationRow; onChanged: () 
             </div>
             {!row.auto_upgrade ? (
               <Select
-                value={row.pinned_version ?? row.runningVersion ?? undefined}
+                value={row.pinned_version ?? row.runningVersion ?? ""}
                 onValueChange={(v) => version.mutate({ autoUpgrade: false, version: v })}
               >
                 <SelectTrigger>

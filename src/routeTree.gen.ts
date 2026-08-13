@@ -26,6 +26,7 @@ import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_aut
 import { Route as AuthenticatedDashboardBrokersRouteImport } from './routes/_authenticated/dashboard.brokers'
 import { Route as AuthenticatedDashboardDataSourcesRouteImport } from './routes/_authenticated/dashboard.data-sources'
 import { Route as AuthenticatedDashboardMarketplaceRouteImport } from './routes/_authenticated/dashboard.marketplace'
+import { Route as AuthenticatedDashboardMyModelsRouteImport } from './routes/_authenticated/dashboard.my-models'
 import { Route as AuthenticatedDashboardPaperTradingRouteImport } from './routes/_authenticated/dashboard.paper-trading'
 import { Route as AuthenticatedDashboardRiskRouteImport } from './routes/_authenticated/dashboard.risk'
 import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
@@ -129,6 +130,12 @@ const AuthenticatedDashboardMarketplaceRoute =
     path: '/marketplace',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardMyModelsRoute =
+  AuthenticatedDashboardMyModelsRouteImport.update({
+    id: '/my-models',
+    path: '/my-models',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardPaperTradingRoute =
   AuthenticatedDashboardPaperTradingRouteImport.update({
     id: '/paper-trading',
@@ -217,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
   '/dashboard/data-sources': typeof AuthenticatedDashboardDataSourcesRoute
   '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
+  '/dashboard/my-models': typeof AuthenticatedDashboardMyModelsRoute
   '/dashboard/paper-trading': typeof AuthenticatedDashboardPaperTradingRoute
   '/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
@@ -244,6 +252,7 @@ export interface FileRoutesByTo {
   '/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
   '/dashboard/data-sources': typeof AuthenticatedDashboardDataSourcesRoute
   '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
+  '/dashboard/my-models': typeof AuthenticatedDashboardMyModelsRoute
   '/dashboard/paper-trading': typeof AuthenticatedDashboardPaperTradingRoute
   '/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
@@ -276,6 +285,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
   '/_authenticated/dashboard/data-sources': typeof AuthenticatedDashboardDataSourcesRoute
   '/_authenticated/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
+  '/_authenticated/dashboard/my-models': typeof AuthenticatedDashboardMyModelsRoute
   '/_authenticated/dashboard/paper-trading': typeof AuthenticatedDashboardPaperTradingRoute
   '/_authenticated/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
   '/_authenticated/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
@@ -308,6 +318,7 @@ export interface FileRouteTypes {
     | '/dashboard/brokers'
     | '/dashboard/data-sources'
     | '/dashboard/marketplace'
+    | '/dashboard/my-models'
     | '/dashboard/paper-trading'
     | '/dashboard/risk'
     | '/dashboard/settings'
@@ -335,6 +346,7 @@ export interface FileRouteTypes {
     | '/dashboard/brokers'
     | '/dashboard/data-sources'
     | '/dashboard/marketplace'
+    | '/dashboard/my-models'
     | '/dashboard/paper-trading'
     | '/dashboard/risk'
     | '/dashboard/settings'
@@ -366,6 +378,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/brokers'
     | '/_authenticated/dashboard/data-sources'
     | '/_authenticated/dashboard/marketplace'
+    | '/_authenticated/dashboard/my-models'
     | '/_authenticated/dashboard/paper-trading'
     | '/_authenticated/dashboard/risk'
     | '/_authenticated/dashboard/settings'
@@ -511,6 +524,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardMarketplaceRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/my-models': {
+      id: '/_authenticated/dashboard/my-models'
+      path: '/my-models'
+      fullPath: '/dashboard/my-models'
+      preLoaderRoute: typeof AuthenticatedDashboardMyModelsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/paper-trading': {
       id: '/_authenticated/dashboard/paper-trading'
       path: '/paper-trading'
@@ -604,6 +624,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardBrokersRoute: typeof AuthenticatedDashboardBrokersRoute
   AuthenticatedDashboardDataSourcesRoute: typeof AuthenticatedDashboardDataSourcesRoute
   AuthenticatedDashboardMarketplaceRoute: typeof AuthenticatedDashboardMarketplaceRoute
+  AuthenticatedDashboardMyModelsRoute: typeof AuthenticatedDashboardMyModelsRoute
   AuthenticatedDashboardPaperTradingRoute: typeof AuthenticatedDashboardPaperTradingRoute
   AuthenticatedDashboardRiskRoute: typeof AuthenticatedDashboardRiskRoute
   AuthenticatedDashboardSettingsRoute: typeof AuthenticatedDashboardSettingsRoute
@@ -626,6 +647,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardDataSourcesRoute,
     AuthenticatedDashboardMarketplaceRoute:
       AuthenticatedDashboardMarketplaceRoute,
+    AuthenticatedDashboardMyModelsRoute: AuthenticatedDashboardMyModelsRoute,
     AuthenticatedDashboardPaperTradingRoute:
       AuthenticatedDashboardPaperTradingRoute,
     AuthenticatedDashboardRiskRoute: AuthenticatedDashboardRiskRoute,
