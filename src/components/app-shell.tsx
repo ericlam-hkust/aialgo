@@ -1,39 +1,19 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  Activity,
-  BarChart3,
-  Boxes,
-  Building2,
-  ChevronLeft,
-  CreditCard,
-  Database,
-  Banknote,
-  BookOpen,
-  FlaskConical,
-  Gauge,
-  Library,
-  Gavel,
-  Package,
-  Sparkles,
-  LayoutDashboard,
-  Layers,
-  LineChart,
-  LogOut,
-  Moon,
-  PlugZap,
-  Zap,
-  Settings,
-  ShieldAlert,
-  Store,
-  Sun,
-  TrendingUp,
-  Wallet,
-} from "lucide-react";
+import { ChevronDown, ChevronLeft, LogOut, Moon, Search, Settings, Sun, Wallet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/hooks/use-theme";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { Separator } from "@/components/ui/separator";
 import { useMarketStore } from "@/store/market-store";
 import { useLiveMarket } from "@/hooks/use-live-market";
@@ -45,37 +25,10 @@ import { UPGRADE_EVENT } from "@/lib/upgrade-events";
 import { useI18n } from "@/lib/i18n";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { NotificationBell } from "@/components/notification-bell";
+import { FLAT_NAV, NAV_GROUPS, type NavItem } from "@/lib/nav";
 
 import { cn } from "@/lib/utils";
 
-const NAV = [
-  { to: "/dashboard", key: "nav.overview", icon: LayoutDashboard, exact: true },
-  { to: "/dashboard/strategies", key: "nav.strategies", icon: Boxes, exact: false },
-  { to: "/dashboard/strategies/builder", key: "nav.builder", icon: LineChart, exact: true },
-  { to: "/dashboard/strategies/templates", key: "nav.templates", icon: BarChart3, exact: true },
-  { to: "/dashboard/strategies/backtest", key: "nav.backtest", icon: TrendingUp, exact: true },
-  { to: "/dashboard/paper-trading", key: "nav.paperTrading", icon: Activity, exact: true },
-  { to: "/dashboard/marketplace", key: "nav.marketplace", icon: Store, exact: false },
-  { to: "/models", key: "nav.models", icon: Sparkles, exact: false },
-  { to: "/dashboard/my-models", key: "nav.myModels", icon: Layers, exact: true },
-  { to: "/dashboard/models", key: "nav.contributor", icon: Package, exact: true },
-  { to: "/dashboard/models/backtests", key: "nav.validation", icon: Gauge, exact: true },
-  { to: "/dashboard/models/playground", key: "nav.playground", icon: FlaskConical, exact: true },
-  { to: "/dashboard/models/payouts", key: "nav.payouts", icon: Banknote, exact: true },
-  { to: "/models/data-library", key: "nav.dataLibrary", icon: Library, exact: true },
-  { to: "/models/docs", key: "nav.docs", icon: BookOpen, exact: true },
-  { to: "/models/api-status", key: "nav.apiStatus", icon: Activity, exact: true },
-  { to: "/dashboard/teams", key: "nav.teams", icon: Building2, exact: false },
-  { to: "/dashboard/wallet", key: "nav.wallet", icon: Wallet, exact: true },
-  { to: "/dashboard/admin", key: "nav.admin", icon: Gavel, exact: true },
-  { to: "/dashboard/risk", key: "nav.risk", icon: ShieldAlert, exact: true },
-  { to: "/dashboard/execution", key: "nav.execution", icon: Zap, exact: true },
-  { to: "/dashboard/accounts", key: "nav.accounts", icon: PlugZap, exact: true },
-  { to: "/dashboard/brokers", key: "nav.brokers", icon: PlugZap, exact: true },
-  { to: "/dashboard/data-sources", key: "nav.dataSources", icon: Database, exact: true },
-  { to: "/dashboard/billing", key: "nav.billing", icon: CreditCard, exact: true },
-  { to: "/dashboard/settings", key: "nav.settings", icon: Settings, exact: true },
-] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
