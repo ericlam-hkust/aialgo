@@ -22,6 +22,7 @@ export type Database = {
           asset_class: Database["public"]["Enums"]["asset_class"]
           backtest_config: Json
           cagr: number
+          consistency_score: number
           contributor_id: string
           created_at: string
           currency: string
@@ -35,6 +36,7 @@ export type Database = {
           max_drawdown: number
           name: string
           next_revalidation_at: string | null
+          overfitting_risk: boolean
           package_kind: string
           package_path: string | null
           parameters: Json
@@ -64,6 +66,7 @@ export type Database = {
           asset_class?: Database["public"]["Enums"]["asset_class"]
           backtest_config?: Json
           cagr?: number
+          consistency_score?: number
           contributor_id: string
           created_at?: string
           currency?: string
@@ -77,6 +80,7 @@ export type Database = {
           max_drawdown?: number
           name: string
           next_revalidation_at?: string | null
+          overfitting_risk?: boolean
           package_kind?: string
           package_path?: string | null
           parameters?: Json
@@ -106,6 +110,7 @@ export type Database = {
           asset_class?: Database["public"]["Enums"]["asset_class"]
           backtest_config?: Json
           cagr?: number
+          consistency_score?: number
           contributor_id?: string
           created_at?: string
           currency?: string
@@ -119,6 +124,7 @@ export type Database = {
           max_drawdown?: number
           name?: string
           next_revalidation_at?: string | null
+          overfitting_risk?: boolean
           package_kind?: string
           package_path?: string | null
           parameters?: Json

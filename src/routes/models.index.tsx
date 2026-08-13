@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowUpDown, LayoutGrid, List, Search, Trophy } from "lucide-react";
+import { ArrowUpDown, GitCompare, LayoutGrid, List, Search, Trophy } from "lucide-react";
 import { listPublicModels, type PublicModel } from "@/lib/models.functions";
 import { ModelCard, type ModelCardModel } from "@/components/marketplace/model-card";
 import { Input } from "@/components/ui/input";
@@ -55,6 +55,11 @@ function Catalog() {
   const [pricing, setPricing] = useState<string>(ALL);
   const [sort, setSort] = useState<SortKey>("popular");
   const [layout, setLayout] = useState<"grid" | "list">("grid");
+  const [compare, setCompare] = useState<string[]>([]);
+
+  const toggleCompare = (slug: string) =>
+    setCompare((prev) => (prev.includes(slug) ? prev.filter((s) => s !== slug) : prev.length >= 3 ? prev : [...prev, slug]));
+
 
   const filtered = useMemo(() => {
     const term = q.trim().toLowerCase();
@@ -183,10 +188,46 @@ function Catalog() {
           ) : (
             <div className={layout === "grid" ? "grid gap-4 md:grid-cols-2 xl:grid-cols-3" : "space-y-3"}>
               {filtered.map((m) => (
-                <ModelCard key={m.slug} model={m as unknown as ModelCardModel} layout={layout} />
+                <ModelCard
+                  key={m.slug}
+                  model={m as unknown as ModelCardModel}
+                  layout={layout}
+                  selected={compare.includes(m.slug)}
+                  onToggleSelect={() => toggleCompare(m.slug)}
+                />
               ))}
             </div>
           )}
+
+          {compare.length ? (
+            <div className="sticky bottom-4 z-20 flex flex-wrap items-center gap-3 rounded-lg border border-primary/40 bg-card/95 p-3 shadow-lg backdrop-blur">
+              <GitCompare className="h-4 w-4 text-primary" aria-hidden />
+              <span className="text-sm">
+                {compare.length} of 3 selected{compare.length === 3 ? " (max)" : ""}
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {compare.map((slug) => (
+                  <Badge key={slug} variant="secondary" className="gap-1">
+                    {(data as PublicModel[]).find((m) => m.slug === slug)?.name ?? slug}
+                    <button type="button" onClick={() => toggleCompare(slug)} aria-label={`Remove ${slug}`}>
+                      ×
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+              <div className="ml-auto flex gap-2">
+                <Button variant="ghost" size="sm" onClick={() => setCompare([])}>
+                  Clear
+                </Button>
+                <Button asChild size="sm" disabled={compare.length < 2}>
+                  <Link to="/models/compare" search={{ models: compare.join(",") }}>
+                    Compare {compare.length}
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          ) : null}
+
         </TabsContent>
 
         <TabsContent value="leaderboard" className="mt-6">

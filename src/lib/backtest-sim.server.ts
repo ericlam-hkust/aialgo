@@ -1,4 +1,12 @@
-import type { BacktestConfig, BacktestProtocol, BacktestReport } from "@/lib/backtest-protocol";
+import type {
+  BacktestConfig,
+  BacktestProtocol,
+  BacktestReport,
+  WalkForwardAnalysis,
+  WalkForwardWindow,
+} from "@/lib/backtest-protocol";
+import { OVERFITTING_CONSISTENCY_THRESHOLD } from "@/lib/backtest-protocol";
+
 
 /** Deterministic PRNG so a job always regenerates the same report. */
 function rng(seed: string) {
@@ -174,6 +182,15 @@ export function simulateBacktest(input: {
     worstMonth: round(Math.min(...monthly.map((m) => m.ret))),
   };
 
+  const walkForward = walkForwardAnalysis({
+    equity: equitySeries,
+    protocol,
+    rand,
+    baseSharpe: sharpe,
+    baseWinRate: winRate,
+    totalTrades: trades,
+  });
+
   let failureCode = input.forceFailure;
   if (!failureCode) {
     if (metrics.trades < protocol.minTrades) failureCode = "too_few_trades";
@@ -196,10 +213,136 @@ export function simulateBacktest(input: {
     tradeDistribution,
     regimes,
     years: yearly,
+    walkForward,
+
     passed: !failureCode,
     failureCode,
     protocol,
     config,
     generatedAt: new Date().toISOString(),
+  };
+}
+
+function addMonths(d: Date, n: number) {
+  const out = new Date(d.getTime());
+  out.setUTCMonth(out.getUTCMonth() + n);
+  return out;
+}
+
+/**
+ * Rolling train/test walk-forward analysis. Each window trains on the previous
+ * N months and is evaluated on the following M months; dispersion across the
+ * test windows becomes the consistency score and the overfitting flag.
+ */
+function walkForwardAnalysis(input: {
+  equity: BacktestReport["equity"];
+  protocol: BacktestProtocol;
+  rand: () => number;
+  baseSharpe: number;
+  baseWinRate: number;
+  totalTrades: number;
+}): WalkForwardAnalysis {
+  const { equity, protocol, rand } = input;
+  const trainMonths = protocol.walkForwardTrainMonths || 12;
+  const testMonths = protocol.walkForwardTestMonths || 3;
+  const windows: WalkForwardWindow[] = [];
+  const trainReturns: number[] = [];
+
+  if (equity.length < 10) {
+    return {
+      windows: [],
+      trainMonths,
+      testMonths,
+      meanReturn: 0,
+      stdReturn: 0,
+      consistencyScore: 0,
+      positiveWindows: 0,
+      efficiency: 0,
+      overfittingRisk: false,
+    };
+  }
+
+  const first = new Date(equity[0]!.t);
+  const last = new Date(equity[equity.length - 1]!.t);
+  const valueAt = (target: Date) => {
+    const ts = target.getTime();
+    let best = equity[0]!;
+    for (const p of equity) {
+      if (new Date(p.t).getTime() <= ts) best = p;
+      else break;
+    }
+    return best.v;
+  };
+  const ddBetween = (a: Date, b: Date) => {
+    let peak = 0;
+    let dd = 0;
+    for (const p of equity) {
+      const t = new Date(p.t).getTime();
+      if (t < a.getTime() || t > b.getTime()) continue;
+      peak = Math.max(peak, p.v);
+      if (peak) dd = Math.min(dd, ((p.v - peak) / peak) * 100);
+    }
+    return Math.abs(dd);
+  };
+
+  let cursor = first;
+  let index = 1;
+  while (addMonths(cursor, trainMonths + testMonths) <= last) {
+    const trainStart = cursor;
+    const trainEnd = addMonths(cursor, trainMonths);
+    const testStart = trainEnd;
+    const testEnd = addMonths(trainEnd, testMonths);
+
+    const trainRet = ((valueAt(trainEnd) - valueAt(trainStart)) / valueAt(trainStart)) * 100;
+    const testRet = ((valueAt(testEnd) - valueAt(testStart)) / valueAt(testStart)) * 100;
+    const wobble = 0.75 + rand() * 0.5;
+
+    windows.push({
+      index,
+      trainStart: trainStart.toISOString().slice(0, 10),
+      trainEnd: trainEnd.toISOString().slice(0, 10),
+      testStart: testStart.toISOString().slice(0, 10),
+      testEnd: testEnd.toISOString().slice(0, 10),
+      ret: round(testRet, 2),
+      sharpe: round(input.baseSharpe * wobble, 2),
+      maxDrawdown: round(ddBetween(testStart, testEnd), 1),
+      winRate: round(Math.min(95, input.baseWinRate * (0.85 + rand() * 0.3)), 1),
+      trades: Math.max(1, Math.round((input.totalTrades * testMonths) / Math.max(1, (last.getTime() - first.getTime()) / (30.44 * 86_400_000)))),
+    });
+    trainReturns.push(trainRet);
+
+    cursor = addMonths(cursor, testMonths);
+    index += 1;
+  }
+
+  const rets = windows.map((w) => w.ret);
+  const mean = rets.reduce((a, b) => a + b, 0) / Math.max(1, rets.length);
+  const std = Math.sqrt(rets.reduce((a, b) => a + (b - mean) ** 2, 0) / Math.max(1, rets.length));
+  const positive = rets.filter((r) => r > 0).length;
+  const hitRate = positive / Math.max(1, rets.length);
+
+  // Normalised train→test efficiency: how much of the in-sample edge survives.
+  const trainMean = trainReturns.reduce((a, b) => a + b, 0) / Math.max(1, trainReturns.length);
+  const scaledTrain = trainMean * (testMonths / Math.max(1, trainMonths));
+  const efficiency = Math.abs(scaledTrain) > 0.01 ? Math.max(0, Math.min(2, mean / scaledTrain)) : 1;
+
+  // Dispersion penalty: std relative to |mean| return per window.
+  const cv = std / (Math.abs(mean) || 1);
+  const stability = Math.max(0, 1 - Math.min(1, cv / 3));
+  const consistencyScore = round(
+    Math.max(0, Math.min(100, (stability * 0.45 + hitRate * 0.35 + Math.min(1, efficiency) * 0.2) * 100)),
+    1,
+  );
+
+  return {
+    windows,
+    trainMonths,
+    testMonths,
+    meanReturn: round(mean, 2),
+    stdReturn: round(std, 2),
+    consistencyScore,
+    positiveWindows: positive,
+    efficiency: round(efficiency, 2),
+    overfittingRisk: consistencyScore < OVERFITTING_CONSISTENCY_THRESHOLD || efficiency < 0.5,
   };
 }

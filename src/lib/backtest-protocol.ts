@@ -19,6 +19,8 @@ export type BacktestProtocol = {
   minTrades: number;
   maxAllowedDrawdownPct: number;
   divergenceThresholdPct: number;
+  walkForwardTrainMonths: number;
+  walkForwardTestMonths: number;
 };
 
 export const DEFAULT_PROTOCOL: BacktestProtocol = {
@@ -40,7 +42,10 @@ export const DEFAULT_PROTOCOL: BacktestProtocol = {
   minTrades: 30,
   maxAllowedDrawdownPct: 35,
   divergenceThresholdPct: 30,
+  walkForwardTrainMonths: 12,
+  walkForwardTestMonths: 3,
 };
+
 
 export type BacktestConfig = {
   assetClass: string;
@@ -108,6 +113,33 @@ export type BacktestMetrics = {
   worstMonth: number;
 };
 
+export type WalkForwardWindow = {
+  index: number;
+  trainStart: string;
+  trainEnd: string;
+  testStart: string;
+  testEnd: string;
+  ret: number;
+  sharpe: number;
+  maxDrawdown: number;
+  winRate: number;
+  trades: number;
+};
+
+export type WalkForwardAnalysis = {
+  windows: WalkForwardWindow[];
+  trainMonths: number;
+  testMonths: number;
+  meanReturn: number;
+  stdReturn: number;
+  /** 0-100 — higher means results hold up consistently across windows. */
+  consistencyScore: number;
+  positiveWindows: number;
+  /** Test-window return / train-window return, averaged. <0.5 is a red flag. */
+  efficiency: number;
+  overfittingRisk: boolean;
+};
+
 export type BacktestReport = {
   metrics: BacktestMetrics;
   holdoutMetrics: Pick<BacktestMetrics, "totalReturn" | "cagr" | "sharpe" | "maxDrawdown" | "winRate">;
@@ -117,12 +149,16 @@ export type BacktestReport = {
   tradeDistribution: { bucket: string; count: number }[];
   regimes: { regime: string; ret: number; sharpe: number; trades: number }[];
   years: { year: number; ret: number; benchmark: number }[];
+  walkForward?: WalkForwardAnalysis;
   passed: boolean;
   failureCode?: string | undefined;
   protocol: BacktestProtocol;
   config: BacktestConfig;
   generatedAt: string;
 };
+
+export const OVERFITTING_CONSISTENCY_THRESHOLD = 55;
+
 
 export function stageLabel(stage: string) {
   return (

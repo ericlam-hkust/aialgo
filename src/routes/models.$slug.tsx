@@ -5,13 +5,17 @@ import { toast } from "sonner";
 import {
   Area,
   AreaChart,
+  Bar,
+  BarChart,
   CartesianGrid,
+  Legend,
   ResponsiveContainer,
   Tooltip as ReTooltip,
   XAxis,
   YAxis,
 } from "recharts";
-import { ArrowLeft, BadgeCheck, ShieldCheck, Star, Users } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ArrowLeft, BadgeCheck, GitCompare, ShieldCheck, Star, TriangleAlert, Users } from "lucide-react";
 import { getPublicModel, submitReview } from "@/lib/models.functions";
 import { getReviewEligibility } from "@/lib/activations.functions";
 import { daysSince, modelBadges } from "@/lib/model-badges";
@@ -84,7 +88,17 @@ function ModelDetail() {
   const [applyOpen, setApplyOpen] = useState(false);
   const currentVersion = data?.versions.find((v) => v.is_current)?.version ?? data?.versions[0]?.version ?? "";
   const [selectedVersion, setSelectedVersion] = useState(currentVersion);
+  const versionReports = (data?.versionReports ?? []).map((v) => ({
+    version: v.version,
+    report: (v.job.results as unknown as BacktestReport | null) ?? null,
+    completedAt: v.job.completed_at,
+  }));
+  const [reportVersion, setReportVersion] = useState(versionReports[0]?.version ?? "");
+  const activeReport =
+    versionReports.find((v) => v.version === reportVersion)?.report ?? versionReports[0]?.report ?? null;
+  const latestWalkForward = versionReports[0]?.report?.walkForward ?? null;
   if (!data) return <ModelNotFound />;
+
 
   const badges = modelBadges({
     hasBacktest: Boolean(data.backtest),
@@ -125,7 +139,23 @@ function ModelDetail() {
                   {data.last_validated_at ? ` · ${new Date(data.last_validated_at).toISOString().slice(0, 10)}` : ""}
                 </span>
               ) : null}
+              {data.overfitting_risk || latestWalkForward?.overfittingRisk ? (
+                <span
+                  title="Results vary widely across walk-forward test windows"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-warning/50 bg-warning/10 px-2.5 py-1 text-xs font-medium text-warning"
+                >
+                  <TriangleAlert className="h-3.5 w-3.5" aria-hidden />
+                  Overfitting Risk
+                  {latestWalkForward ? ` · consistency ${fmtNum(latestWalkForward.consistencyScore, 0)}/100` : ""}
+                </span>
+              ) : latestWalkForward ? (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-profit/40 bg-profit/10 px-2.5 py-1 text-xs font-medium text-profit">
+                  <BadgeCheck className="h-3.5 w-3.5" aria-hidden />
+                  Walk-forward consistency {fmtNum(latestWalkForward.consistencyScore, 0)}/100
+                </span>
+              ) : null}
             </div>
+
             {badges.length ? (
               <div className="mt-3 flex flex-wrap gap-2">
 
@@ -199,16 +229,34 @@ function ModelDetail() {
             </TabsContent>
 
             <TabsContent value="backtest" className="mt-4 space-y-4">
-              {data.verifiedBacktest?.results ? (
-                <BacktestReportView
-                  report={data.verifiedBacktest.results as unknown as BacktestReport}
-                  variant="verified"
-                  title={`Version ${data.verifiedBacktest.model_version ?? "1.0.0"}`}
-                />
+              {versionReports.length ? (
+                <>
+                  {versionReports.length > 1 ? (
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="text-sm text-muted-foreground">Verified report for version</span>
+                      <Select value={reportVersion} onValueChange={setReportVersion}>
+                        <SelectTrigger className="w-48">
+                          <SelectValue placeholder="Version" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {versionReports.map((v) => (
+                            <SelectItem key={v.version} value={v.version}>
+                              v{v.version}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  ) : null}
+                  {activeReport ? (
+                    <BacktestReportView report={activeReport} variant="verified" title={`Version ${reportVersion}`} />
+                  ) : null}
+                </>
               ) : (
                 <EquityCard title="Out-of-sample equity curve" series={backtestSeries} />
               )}
             </TabsContent>
+
 
             <TabsContent value="live" className="mt-4 space-y-4">
               {data.divergence_flagged ? (
@@ -224,6 +272,79 @@ function ModelDetail() {
 
 
             <TabsContent value="versions" className="mt-4 space-y-3">
+              {versionReports.length ? (
+                <Card className="border-border/70">
+                  <CardHeader>
+                    <CardTitle className="text-base">Performance evolution across versions</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="h-[240px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart
+                          data={[...versionReports]
+                            .reverse()
+                            .map((v) => ({
+                              version: `v${v.version}`,
+                              cagr: v.report?.metrics.cagr ?? 0,
+                              sharpe: v.report?.metrics.sharpe ?? 0,
+                            }))}
+                          margin={{ left: 4, right: 8, top: 8, bottom: 0 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
+                          <XAxis dataKey="version" tick={{ fontSize: 11 }} stroke="var(--color-muted-foreground)" />
+                          <YAxis yAxisId="l" tick={{ fontSize: 11 }} stroke="var(--color-muted-foreground)" width={48} />
+                          <YAxis yAxisId="r" orientation="right" tick={{ fontSize: 11 }} stroke="var(--color-muted-foreground)" width={40} />
+                          <ReTooltip
+                            contentStyle={{
+                              background: "var(--color-card)",
+                              border: "1px solid var(--color-border)",
+                              borderRadius: 8,
+                              fontSize: 12,
+                            }}
+                          />
+                          <Legend wrapperStyle={{ fontSize: 12 }} />
+                          <Bar yAxisId="l" dataKey="cagr" name="CAGR %" fill="var(--color-primary)" radius={[4, 4, 0, 0]} />
+                          <Bar yAxisId="r" dataKey="sharpe" name="Sharpe" fill="var(--color-muted-foreground)" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Version</TableHead>
+                          <TableHead className="text-right">CAGR</TableHead>
+                          <TableHead className="text-right">Sharpe</TableHead>
+                          <TableHead className="text-right">Max DD</TableHead>
+                          <TableHead className="text-right">Consistency</TableHead>
+                          <TableHead className="text-right">Verified</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {versionReports.map((v) => (
+                          <TableRow key={v.version}>
+                            <TableCell className="mono">v{v.version}</TableCell>
+                            <TableCell className={`mono text-right ${pnlClass(v.report?.metrics.cagr ?? 0)}`}>
+                              {v.report ? `${fmtNum(v.report.metrics.cagr, 1)}%` : "—"}
+                            </TableCell>
+                            <TableCell className="mono text-right">
+                              {v.report ? fmtNum(v.report.metrics.sharpe, 2) : "—"}
+                            </TableCell>
+                            <TableCell className="mono text-right text-loss">
+                              {v.report ? `-${fmtNum(v.report.metrics.maxDrawdown, 1)}%` : "—"}
+                            </TableCell>
+                            <TableCell className="mono text-right">
+                              {v.report?.walkForward ? `${fmtNum(v.report.walkForward.consistencyScore, 0)}/100` : "—"}
+                            </TableCell>
+                            <TableCell className="mono text-right text-xs text-muted-foreground">
+                              {v.completedAt ? fmtDate(v.completedAt) : "—"}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+              ) : null}
               {data.versions.length > 1 ? (
                 <div className="flex items-center gap-3">
                   <span className="text-sm text-muted-foreground">Viewing changelog for</span>
@@ -242,6 +363,7 @@ function ModelDetail() {
                   </Select>
                 </div>
               ) : null}
+
               {data.versions.map((v) => (
                 <Card
                   key={v.id}
