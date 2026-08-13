@@ -11,7 +11,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { ArrowLeft, BadgeCheck, ShieldCheck, Star, Users } from "lucide-react";
+import { ArrowLeft, BadgeCheck, GitCompare, ShieldCheck, Star, TriangleAlert, Users } from "lucide-react";
 import { getPublicModel, submitReview } from "@/lib/models.functions";
 import { getReviewEligibility } from "@/lib/activations.functions";
 import { daysSince, modelBadges } from "@/lib/model-badges";
