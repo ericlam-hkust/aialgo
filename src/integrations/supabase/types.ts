@@ -433,9 +433,12 @@ export type Database = {
           display_name: string
           handle: string
           id: string
+          kyc_status: string
           payout_email: string | null
           payout_status: string
           stripe_account_id: string | null
+          tax_form_status: string
+          tax_form_submitted_at: string | null
           updated_at: string
           user_id: string | null
           verified: boolean
@@ -448,9 +451,12 @@ export type Database = {
           display_name: string
           handle: string
           id?: string
+          kyc_status?: string
           payout_email?: string | null
           payout_status?: string
           stripe_account_id?: string | null
+          tax_form_status?: string
+          tax_form_submitted_at?: string | null
           updated_at?: string
           user_id?: string | null
           verified?: boolean
@@ -463,9 +469,12 @@ export type Database = {
           display_name?: string
           handle?: string
           id?: string
+          kyc_status?: string
           payout_email?: string | null
           payout_status?: string
           stripe_account_id?: string | null
+          tax_form_status?: string
+          tax_form_submitted_at?: string | null
           updated_at?: string
           user_id?: string | null
           verified?: boolean
@@ -779,14 +788,20 @@ export type Database = {
       model_activations: {
         Row: {
           activated_at: string
+          auto_upgrade: boolean
           broker_connection_id: string | null
           capital_allocation: number
           daily_loss_limit_pct: number
           id: string
+          kill_switch_drawdown_pct: number
           max_position_size_pct: number
           mode: string
           model_id: string
           parameters: Json
+          paused_at: string | null
+          paused_reason: string | null
+          peak_equity: number
+          pinned_version: string | null
           pnl: number
           pnl_pct: number
           purchase_id: string | null
@@ -797,14 +812,20 @@ export type Database = {
         }
         Insert: {
           activated_at?: string
+          auto_upgrade?: boolean
           broker_connection_id?: string | null
           capital_allocation?: number
           daily_loss_limit_pct?: number
           id?: string
+          kill_switch_drawdown_pct?: number
           max_position_size_pct?: number
           mode?: string
           model_id: string
           parameters?: Json
+          paused_at?: string | null
+          paused_reason?: string | null
+          peak_equity?: number
+          pinned_version?: string | null
           pnl?: number
           pnl_pct?: number
           purchase_id?: string | null
@@ -815,14 +836,20 @@ export type Database = {
         }
         Update: {
           activated_at?: string
+          auto_upgrade?: boolean
           broker_connection_id?: string | null
           capital_allocation?: number
           daily_loss_limit_pct?: number
           id?: string
+          kill_switch_drawdown_pct?: number
           max_position_size_pct?: number
           mode?: string
           model_id?: string
           parameters?: Json
+          paused_at?: string | null
+          paused_reason?: string | null
+          peak_equity?: number
+          pinned_version?: string | null
           pnl?: number
           pnl_pct?: number
           purchase_id?: string | null
@@ -951,28 +978,34 @@ export type Database = {
           author_name: string
           comment: string
           created_at: string
+          days_active: number
           id: string
           model_id: string
           rating: number
           user_id: string | null
+          verified: boolean
         }
         Insert: {
           author_name?: string
           comment?: string
           created_at?: string
+          days_active?: number
           id?: string
           model_id: string
           rating: number
           user_id?: string | null
+          verified?: boolean
         }
         Update: {
           author_name?: string
           comment?: string
           created_at?: string
+          days_active?: number
           id?: string
           model_id?: string
           rating?: number
           user_id?: string | null
+          verified?: boolean
         }
         Relationships: [
           {
@@ -1131,6 +1164,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notifications: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          kind: string
+          link: string | null
+          metadata: Json
+          read_at: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          id?: string
+          kind: string
+          link?: string | null
+          metadata?: Json
+          read_at?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          link?: string | null
+          metadata?: Json
+          read_at?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       paper_positions: {
         Row: {
