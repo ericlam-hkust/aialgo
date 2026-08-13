@@ -57,6 +57,11 @@ export type BacktestConfig = {
   startDate?: string;
   endDate?: string;
   notes?: string;
+  /** Which data feed produced the run — platform catalog or a contributor connection. */
+  dataSourceKind?: "platform" | "contributor";
+  dataSourceId?: string;
+  dataSourceLabel?: string;
+
 };
 
 export const TIMEFRAMES = ["1m", "5m", "1h", "1d"] as const;
