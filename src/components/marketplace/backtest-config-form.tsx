@@ -1,8 +1,11 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { CheckCircle2, Database, XCircle } from "lucide-react";
 import { checkDataAvailability } from "@/lib/backtest-validation.functions";
 import { listDataCatalog } from "@/lib/data-library.functions";
+import { listDataSources } from "@/lib/data-sources.functions";
+import { PROVIDERS } from "@/lib/data-providers";
 import { DATA_INPUTS, SIGNAL_FREQUENCIES, TIMEFRAMES, type BacktestConfig } from "@/lib/backtest-protocol";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+
 export const emptyBacktestConfig = (assetClass = "stocks"): BacktestConfig => ({
   assetClass,
   universe: [],
@@ -19,6 +23,8 @@ export const emptyBacktestConfig = (assetClass = "stocks"): BacktestConfig => ({
   signalFrequency: "daily",
   minimumCapital: 10_000,
   dataInputs: ["ohlcv"],
+  dataSourceKind: "platform",
+  dataSourceLabel: "aiAlgo platform market data",
 });
 
 export function BacktestConfigForm({
@@ -31,12 +37,15 @@ export function BacktestConfigForm({
   showDateRange?: boolean;
 }) {
   const catalog = useQuery({ queryKey: ["data-catalog"], queryFn: () => listDataCatalog() });
+  const sources = useQuery({ queryKey: ["data-sources"], queryFn: () => listDataSources() });
   const [checked, setChecked] = useState<Awaited<ReturnType<typeof checkDataAvailability>> | null>(null);
 
   const feeds = useMemo(
     () => (catalog.data ?? []).filter((f) => f.asset_class === value.assetClass),
     [catalog.data, value.assetClass],
   );
+
+  const connections = sources.data?.connections ?? [];
 
   const check = useMutation({
     mutationFn: () => checkDataAvailability({ data: { symbols: value.universe, timeframe: value.timeframe } }),
@@ -55,8 +64,91 @@ export function BacktestConfigForm({
     set({ universe: next });
   };
 
+  const selectSource = (id: string) => {
+    if (id === "platform") {
+      setChecked(null);
+      const { dataSourceId: _omit, ...rest } = value;
+      onChange({ ...rest, dataSourceKind: "platform", dataSourceLabel: "aiAlgo platform market data" });
+      return;
+    }
+
+    const conn = connections.find((c) => c.id === id);
+    if (!conn) return;
+    const providerName = PROVIDERS.find((p) => p.id === conn.provider)?.name ?? conn.provider;
+    set({
+      dataSourceKind: "contributor",
+      dataSourceId: conn.id,
+      dataSourceLabel: conn.label ? `${providerName} — ${conn.label}` : providerName,
+    });
+  };
+
   return (
     <div className="space-y-5">
+      <Card className="border-border/70">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Database className="h-4 w-4" aria-hidden /> Data source
+          </CardTitle>
+          <CardDescription>
+            Every run is stamped with the feed that produced it, and buyers see this on the listing.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <button
+            type="button"
+            onClick={() => selectSource("platform")}
+            className={`flex w-full items-center justify-between rounded-md border px-3 py-2 text-left text-sm transition-colors ${
+              value.dataSourceKind !== "contributor"
+                ? "border-primary bg-primary/10"
+                : "border-border hover:border-primary/50"
+            }`}
+          >
+            <span>
+              <span className="font-medium">aiAlgo platform market data</span>
+              <span className="block text-xs text-muted-foreground">Verified platform feeds from the data library.</span>
+            </span>
+            <Badge variant="secondary">Platform verified</Badge>
+          </button>
+
+          {connections.map((conn) => {
+            const usable = conn.enabled && conn.status === "connected";
+            const providerName = PROVIDERS.find((p) => p.id === conn.provider)?.name ?? conn.provider;
+            const active = value.dataSourceId === conn.id;
+            return (
+              <button
+                key={conn.id}
+                type="button"
+                disabled={!usable}
+                onClick={() => selectSource(conn.id)}
+                className={`flex w-full items-center justify-between rounded-md border px-3 py-2 text-left text-sm transition-colors ${
+                  active ? "border-primary bg-primary/10" : "border-border hover:border-primary/50"
+                } ${usable ? "" : "cursor-not-allowed opacity-50"}`}
+              >
+                <span>
+                  <span className="font-medium">{providerName}</span>
+                  {conn.label ? <span className="text-muted-foreground"> · {conn.label}</span> : null}
+                  <span className="block text-xs text-muted-foreground">
+                    {usable
+                      ? `Connection tested OK${conn.last_checked_at ? ` · ${new Date(conn.last_checked_at).toLocaleDateString()}` : ""}`
+                      : conn.status_message || "Not tested yet — test this connection under Data sources."}
+                  </span>
+                </span>
+                <Badge variant={usable ? "outline" : "destructive"}>{usable ? "Your feed" : conn.status ?? "untested"}</Badge>
+              </button>
+            );
+          })}
+
+          <p className="text-xs text-muted-foreground">
+            Want to use your own feed?{" "}
+            <Link to="/dashboard/data-sources" className="text-primary underline-offset-2 hover:underline">
+              Connect and test it under Data sources
+            </Link>{" "}
+            first — only passing connections can run a backtest.
+          </p>
+        </CardContent>
+      </Card>
+
+
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label>Asset class</Label>
