@@ -224,7 +224,7 @@ function ModelDetail() {
               <Separator />
               <Row label="Live 30d" value={`${fmtNum(Number(data.live_return_30d), 2)}%`} cls={pnlClass(Number(data.live_return_30d))} />
               <Row label="Active users" value={data.active_users.toLocaleString()} />
-              <Row label="Listed" value={fmtDate(data.created_at)} />
+              <Row label="Listed" value={fmtDate(data.listed_at)} />
             </CardContent>
           </Card>
         </aside>
