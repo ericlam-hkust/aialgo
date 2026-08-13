@@ -37,7 +37,7 @@ export async function runExecutionTick(supabase: AnyClient, userId: string): Pro
   const events: TickEvent[] = [];
 
   for (const a of activations ?? []) {
-    const model = a.model as { name: string; slug: string; interface_manifest: unknown } | null;
+    const model = a.model as unknown as { name: string; slug: string; interface_manifest: unknown } | null;
     const manifest = normalizeManifest(model?.interface_manifest);
     const symbols = manifest.instruments.length ? manifest.instruments : FALLBACK_SYMBOLS;
     const symbol = pick(symbols);
