@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowUpDown, LayoutGrid, List, Search, Trophy } from "lucide-react";
+import { ArrowUpDown, GitCompare, LayoutGrid, List, Search, Trophy } from "lucide-react";
 import { listPublicModels, type PublicModel } from "@/lib/models.functions";
 import { ModelCard, type ModelCardModel } from "@/components/marketplace/model-card";
 import { Input } from "@/components/ui/input";
@@ -55,6 +55,11 @@ function Catalog() {
   const [pricing, setPricing] = useState<string>(ALL);
   const [sort, setSort] = useState<SortKey>("popular");
   const [layout, setLayout] = useState<"grid" | "list">("grid");
+  const [compare, setCompare] = useState<string[]>([]);
+
+  const toggleCompare = (slug: string) =>
+    setCompare((prev) => (prev.includes(slug) ? prev.filter((s) => s !== slug) : prev.length >= 3 ? prev : [...prev, slug]));
+
 
   const filtered = useMemo(() => {
     const term = q.trim().toLowerCase();
