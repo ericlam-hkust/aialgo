@@ -11,6 +11,7 @@ import {
   laneOf,
   newNodeId,
   type StrategyEdge,
+  type StrategyLane,
   type StrategyGraph,
   type StrategyNode,
 } from "./strategy-graph";
@@ -263,7 +264,7 @@ type Builder = {
 function addNode(
   b: Builder,
   type: StrategyNode["type"],
-  lane: StrategyNode["lane"],
+  lane: StrategyLane,
   data: StrategyNode["data"],
 ): string {
   const id = newNodeId();
