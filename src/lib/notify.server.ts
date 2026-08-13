@@ -10,7 +10,10 @@ export type NotificationKind =
   | "backtest_passed"
   | "backtest_failed"
   | "revalidation"
-  | "model_unlisted";
+  | "model_unlisted"
+  | "signal_blocked"
+  | "order_executed"
+  | "connection_error";
 
 export type NotificationInput = {
   userId: string;
