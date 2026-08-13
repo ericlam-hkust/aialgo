@@ -187,6 +187,40 @@ export const advanceBacktestJob = createServerFn({ method: "POST" })
     if (!job) throw new Error("Job not found.");
     if (job.status === "completed" || job.status === "failed") return job;
 
+    // Resource gate: oversized bundles are rejected before any bars are replayed.
+    if (job.model_id) {
+      const { data: model } = await supabase
+        .from("ai_models")
+        .select("resources,pipeline")
+        .eq("id", job.model_id)
+        .maybeSingle();
+      if (model?.resources) {
+        const { checkResources } = await import("@/lib/base-models");
+        const violations = checkResources(
+          model.resources as unknown as import("@/lib/base-models").ResourceSpec,
+          (model.pipeline ?? null) as unknown as import("@/lib/base-models").PipelineSpec | null,
+        );
+        if (violations.length) {
+          const { data: rejected } = await supabase
+            .from("backtest_jobs")
+            .update({
+              status: "failed",
+              stage: "failed",
+              progress: 100,
+              stage_message: "Resource limits exceeded",
+              failure_code: violations[0]!.code,
+              failure_reason: `${violations[0]!.message} Remediation: ${violations[0]!.remediation}`,
+              completed_at: new Date().toISOString(),
+            })
+            .eq("id", data.jobId)
+            .select("*")
+            .single();
+          await supabase.from("ai_models").update({ status: "rejected" }).eq("id", job.model_id);
+          return rejected;
+        }
+      }
+    }
+
     const elapsed = (Date.now() - new Date(job.started_at).getTime()) / 1000;
     const total = job.eta_seconds || 120;
     const ratio = Math.min(1, elapsed / total);

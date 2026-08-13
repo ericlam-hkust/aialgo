@@ -25,6 +25,8 @@ export type Database = {
           avg_monthly_fee_per_1k: number | null
           backtest_config: Json
           backtest_ran_at: string | null
+          base_model_id: string | null
+          base_version: string | null
           cagr: number
           consistency_score: number
           contributor_id: string
@@ -38,6 +40,7 @@ export type Database = {
           divergence_flagged: boolean
           executions: number
           fee_able_rate: number | null
+          finetune_method: string | null
           gateway_secret_hash: string | null
           hosting_mode: Database["public"]["Enums"]["hosting_mode"]
           id: string
@@ -60,6 +63,7 @@ export type Database = {
           package_path: string | null
           parameters: Json
           performance_fee_pct: number
+          pipeline: Json | null
           price: number
           pricing_model: Database["public"]["Enums"]["model_pricing_model"]
           pricing_score: number | null
@@ -67,6 +71,7 @@ export type Database = {
           promoted: boolean
           rating: number
           rating_count: number
+          resources: Json | null
           risk_disclosure: string | null
           risk_level: Database["public"]["Enums"]["model_risk_level"]
           sandbox_runs_used: number
@@ -99,6 +104,8 @@ export type Database = {
           avg_monthly_fee_per_1k?: number | null
           backtest_config?: Json
           backtest_ran_at?: string | null
+          base_model_id?: string | null
+          base_version?: string | null
           cagr?: number
           consistency_score?: number
           contributor_id: string
@@ -112,6 +119,7 @@ export type Database = {
           divergence_flagged?: boolean
           executions?: number
           fee_able_rate?: number | null
+          finetune_method?: string | null
           gateway_secret_hash?: string | null
           hosting_mode?: Database["public"]["Enums"]["hosting_mode"]
           id?: string
@@ -134,6 +142,7 @@ export type Database = {
           package_path?: string | null
           parameters?: Json
           performance_fee_pct?: number
+          pipeline?: Json | null
           price?: number
           pricing_model?: Database["public"]["Enums"]["model_pricing_model"]
           pricing_score?: number | null
@@ -141,6 +150,7 @@ export type Database = {
           promoted?: boolean
           rating?: number
           rating_count?: number
+          resources?: Json | null
           risk_disclosure?: string | null
           risk_level?: Database["public"]["Enums"]["model_risk_level"]
           sandbox_runs_used?: number
@@ -173,6 +183,8 @@ export type Database = {
           avg_monthly_fee_per_1k?: number | null
           backtest_config?: Json
           backtest_ran_at?: string | null
+          base_model_id?: string | null
+          base_version?: string | null
           cagr?: number
           consistency_score?: number
           contributor_id?: string
@@ -186,6 +198,7 @@ export type Database = {
           divergence_flagged?: boolean
           executions?: number
           fee_able_rate?: number | null
+          finetune_method?: string | null
           gateway_secret_hash?: string | null
           hosting_mode?: Database["public"]["Enums"]["hosting_mode"]
           id?: string
@@ -208,6 +221,7 @@ export type Database = {
           package_path?: string | null
           parameters?: Json
           performance_fee_pct?: number
+          pipeline?: Json | null
           price?: number
           pricing_model?: Database["public"]["Enums"]["model_pricing_model"]
           pricing_score?: number | null
@@ -215,6 +229,7 @@ export type Database = {
           promoted?: boolean
           rating?: number
           rating_count?: number
+          resources?: Json | null
           risk_disclosure?: string | null
           risk_level?: Database["public"]["Enums"]["model_risk_level"]
           sandbox_runs_used?: number
@@ -238,6 +253,13 @@ export type Database = {
           win_rate?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "ai_models_base_model_id_fkey"
+            columns: ["base_model_id"]
+            isOneToOne: false
+            referencedRelation: "base_models"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "ai_models_contributor_id_fkey"
             columns: ["contributor_id"]
@@ -538,6 +560,78 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      base_models: {
+        Row: {
+          architecture: string
+          baseline_metrics: Json
+          compute_estimate: string
+          created_at: string
+          data_end: string | null
+          data_start: string | null
+          description: string
+          docs: string
+          feature_schema: Json
+          frozen: Json
+          id: string
+          instruments: string[]
+          listing_kind: string
+          name: string
+          package_contents: Json
+          recommended_settings: Json
+          tagline: string
+          timeframes: string[]
+          trainable: Json
+          updated_at: string
+          version: string
+        }
+        Insert: {
+          architecture: string
+          baseline_metrics?: Json
+          compute_estimate?: string
+          created_at?: string
+          data_end?: string | null
+          data_start?: string | null
+          description?: string
+          docs?: string
+          feature_schema?: Json
+          frozen?: Json
+          id: string
+          instruments?: string[]
+          listing_kind?: string
+          name: string
+          package_contents?: Json
+          recommended_settings?: Json
+          tagline?: string
+          timeframes?: string[]
+          trainable?: Json
+          updated_at?: string
+          version?: string
+        }
+        Update: {
+          architecture?: string
+          baseline_metrics?: Json
+          compute_estimate?: string
+          created_at?: string
+          data_end?: string | null
+          data_start?: string | null
+          description?: string
+          docs?: string
+          feature_schema?: Json
+          frozen?: Json
+          id?: string
+          instruments?: string[]
+          listing_kind?: string
+          name?: string
+          package_contents?: Json
+          recommended_settings?: Json
+          tagline?: string
+          timeframes?: string[]
+          trainable?: Json
+          updated_at?: string
+          version?: string
+        }
+        Relationships: []
       }
       broker_connections: {
         Row: {
@@ -1447,6 +1541,80 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      fine_tune_jobs: {
+        Row: {
+          backtest_job_id: string | null
+          base_model_id: string
+          base_version: string
+          completed_at: string | null
+          created_at: string
+          error: string | null
+          id: string
+          instruments: string[]
+          loss_curve: Json
+          model_id: string | null
+          params: Json
+          progress: number
+          stage: string
+          stage_message: string
+          started_at: string
+          status: string
+          timeframe: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          backtest_job_id?: string | null
+          base_model_id: string
+          base_version?: string
+          completed_at?: string | null
+          created_at?: string
+          error?: string | null
+          id?: string
+          instruments?: string[]
+          loss_curve?: Json
+          model_id?: string | null
+          params?: Json
+          progress?: number
+          stage?: string
+          stage_message?: string
+          started_at?: string
+          status?: string
+          timeframe?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          backtest_job_id?: string | null
+          base_model_id?: string
+          base_version?: string
+          completed_at?: string | null
+          created_at?: string
+          error?: string | null
+          id?: string
+          instruments?: string[]
+          loss_curve?: Json
+          model_id?: string | null
+          params?: Json
+          progress?: number
+          stage?: string
+          stage_message?: string
+          started_at?: string
+          status?: string
+          timeframe?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fine_tune_jobs_base_model_id_fkey"
+            columns: ["base_model_id"]
+            isOneToOne: false
+            referencedRelation: "base_models"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       gateway_status: {
         Row: {

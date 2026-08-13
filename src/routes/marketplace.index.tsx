@@ -64,6 +64,7 @@ function Catalog() {
   const [trust, setTrust] = useState<string>(ALL);
   const [frequency, setFrequency] = useState<string>(ALL);
   const [listing, setListing] = useState<string>(ALL);
+  const [baseModel, setBaseModel] = useState<string>(ALL);
   const [sort, setSort] = useState<SortKey>("popular");
   const [layout, setLayout] = useState<"grid" | "list">("grid");
   const [compare, setCompare] = useState<string[]>([]);
@@ -83,6 +84,10 @@ function Catalog() {
       if (trust !== ALL && (m as any).trust_tier !== trust) return false;
       if (frequency !== ALL && (m as any).declared_frequency !== frequency) return false;
       if (listing !== ALL && (m as any).listing_kind !== listing) return false;
+      if (baseModel !== ALL) {
+        const bm = (m as any).base_model_id ?? "none";
+        if (bm !== baseModel) return false;
+      }
       if (!term) return true;
       return (
         m.name.toLowerCase().includes(term) ||
@@ -100,7 +105,15 @@ function Catalog() {
       price: (a, b) => Number(a.price) - Number(b.price),
     };
     return [...rows].sort(by[sort]);
-  }, [data, q, asset, strategy, timeframe, risk, pricing, trust, frequency, listing, sort]);
+  }, [data, q, asset, strategy, timeframe, risk, pricing, trust, frequency, listing, baseModel, sort]);
+
+  const baseModelOptions = useMemo(
+    () =>
+      Array.from(
+        new Set((data as PublicModel[]).map((m) => (m as any).base_model_id).filter(Boolean) as string[]),
+      ).sort(),
+    [data],
+  );
 
   const countFor = (kind: string) =>
     kind === ALL
@@ -178,6 +191,15 @@ function Catalog() {
                 options={TIMEFRAMES.map((t) => ({ value: t, label: t }))}
               />
               <FilterSelect label="Risk" value={risk} onChange={setRisk} options={RISK_LEVELS} />
+              <FilterSelect
+                label="Base model"
+                value={baseModel}
+                onChange={setBaseModel}
+                options={[
+                  { value: "none", label: "From scratch" },
+                  ...baseModelOptions.map((b) => ({ value: b, label: b })),
+                ]}
+              />
               <FilterSelect
                 label="Pricing"
                 value={pricing}

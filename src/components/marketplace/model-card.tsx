@@ -16,6 +16,8 @@ import {
 } from "@/lib/marketplace";
 import { cn } from "@/lib/utils";
 import { FrequencyBadge, LatencyBadge, TrustBadge } from "@/components/marketplace/trust-badges";
+import { LineageBadge } from "@/components/marketplace/lineage-badge";
+import { Boxes, GitBranch } from "lucide-react";
 import type { FrequencyClass, HostingMode, TrustTier } from "@/lib/monetization";
 
 export type ModelCardModel = {
@@ -43,6 +45,10 @@ export type ModelCardModel = {
   measured_latency_ms?: number | null;
   promoted?: boolean | null;
   consistency_score?: number | null;
+  base_model_id?: string | null;
+  base_version?: string | null;
+  finetune_method?: string | null;
+  pipeline?: { enabled?: boolean; type?: string } | null;
   contributor: { display_name: string; avatar_url: string | null; verified: boolean; handle: string } | null;
 };
 
@@ -106,6 +112,17 @@ export function ModelCard({
                 latencyMs={Number(model.measured_latency_ms ?? 0)}
               />
               {model.hosting_mode === "remote" ? <LatencyBadge latencyMs={Number(model.measured_latency_ms ?? 0)} /> : null}
+              <LineageBadge
+                compact
+                baseModelId={model.base_model_id}
+                baseVersion={model.base_version}
+                method={model.finetune_method}
+              />
+              {model.pipeline?.enabled ? (
+                <Badge variant="outline" className="gap-1 text-[11px] font-normal">
+                  <Boxes className="h-3 w-3" aria-hidden /> Multi-model bundle
+                </Badge>
+              ) : null}
               {model.promoted ? (
                 <Badge variant="secondary" className="border-warning/50 text-warning">
                   Promoted

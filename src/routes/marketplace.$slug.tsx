@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { LineageBadge } from "@/components/marketplace/lineage-badge";
+import { PipelineDiagram } from "@/components/marketplace/pipeline-diagram";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { queryOptions, useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -28,7 +30,7 @@ import { ApplyModelDialog } from "@/components/marketplace/apply-model-dialog";
 import { MetricCard } from "@/components/metric-card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { fmtDate, fmtNum, pnlClass } from "@/lib/format";
@@ -225,7 +227,32 @@ function ModelDetail() {
               <TabsTrigger value="reviews">Reviews</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="overview" className="mt-4">
+            <TabsContent value="overview" className="mt-4 space-y-4">
+              <LineageBadge
+                baseModelId={(data as any).base_model_id}
+                baseVersion={(data as any).base_version}
+                method={(data as any).finetune_method}
+              />
+              {(data as any).pipeline?.enabled ? (
+                <Card className="border-border/70">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base">Pipeline architecture</CardTitle>
+                    <CardDescription>
+                      What runs inside this bundle. Any artifact change requires a new version and a new backtest.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <PipelineDiagram pipeline={(data as any).pipeline} />
+                    {(data as any).resources ? (
+                      <p className="mt-3 text-xs text-muted-foreground">
+                        Declared resources: {(data as any).resources.memoryMb} MB ·{" "}
+                        {(data as any).resources.maxInferenceMs} ms max inference ·{" "}
+                        {(data as any).resources.requiresGpu ? "GPU" : "CPU only"}
+                      </p>
+                    ) : null}
+                  </CardContent>
+                </Card>
+              ) : null}
               <Card className="border-border/70">
                 <CardContent className="prose prose-invert max-w-none p-5 text-sm">
                   {(data.description ?? "").split("\n").map((line, i) =>
