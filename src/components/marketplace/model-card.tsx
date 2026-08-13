@@ -34,20 +34,50 @@ export type ModelCardModel = {
   rating: number;
   rating_count: number;
   active_users: number;
+  overfitting_risk?: boolean | null;
+  consistency_score?: number | null;
   contributor: { display_name: string; avatar_url: string | null; verified: boolean; handle: string } | null;
 };
 
-export function ModelCard({ model, layout = "grid" }: { model: ModelCardModel; layout?: "grid" | "list" }) {
+export function ModelCard({
+  model,
+  layout = "grid",
+  selected,
+  onToggleSelect,
+}: {
+  model: ModelCardModel;
+  layout?: "grid" | "list";
+  selected?: boolean;
+  onToggleSelect?: () => void;
+}) {
   const metrics = [
+    { label: "CAGR", value: `${fmtNum(Number(model.cagr), 1)}%` },
     { label: "Sharpe", value: fmtNum(Number(model.sharpe), 2) },
     { label: "Max DD", value: `${fmtNum(Number(model.max_drawdown), 1)}%` },
     { label: "Win rate", value: `${fmtNum(Number(model.win_rate), 1)}%` },
-    { label: "CAGR", value: `${fmtNum(Number(model.cagr), 1)}%` },
   ];
 
   return (
-    <Link to="/models/$slug" params={{ slug: model.slug }} className="group block">
-      <Card className="h-full border-border/70 bg-card/80 transition-colors group-hover:border-primary/50">
+    <Link to="/models/$slug" params={{ slug: model.slug }} className="group relative block">
+      {onToggleSelect ? (
+        <label
+          className="absolute top-3 right-3 z-10 flex cursor-pointer items-center gap-1.5 rounded-md border border-border/70 bg-background/90 px-2 py-1 text-[11px] text-muted-foreground"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onToggleSelect();
+          }}
+        >
+          <input type="checkbox" checked={Boolean(selected)} readOnly className="accent-primary" aria-label={`Compare ${model.name}`} />
+          Compare
+        </label>
+      ) : null}
+      <Card
+        className={cn(
+          "h-full border-border/70 bg-card/80 transition-colors group-hover:border-primary/50",
+          selected && "border-primary",
+        )}
+      >
         <CardContent className={cn("p-4", layout === "list" && "sm:flex sm:items-center sm:gap-6")}>
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-3">
@@ -55,10 +85,11 @@ export function ModelCard({ model, layout = "grid" }: { model: ModelCardModel; l
                 <h3 className="truncate text-base font-semibold tracking-tight">{model.name}</h3>
                 <p className="mt-0.5 line-clamp-2 text-sm text-muted-foreground">{model.tagline}</p>
               </div>
-              <Badge variant="secondary" className="mono shrink-0">
+              <Badge variant="secondary" className={cn("mono shrink-0", onToggleSelect && "mt-7")}>
                 {pricingLabel(model.pricing_model, Number(model.price), model.currency)}
               </Badge>
             </div>
+
 
             <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
               {model.contributor?.avatar_url ? (
