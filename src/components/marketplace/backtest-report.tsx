@@ -4,6 +4,7 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Cell,
   Legend,
   Line,
   ResponsiveContainer,
@@ -11,7 +12,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { ShieldCheck, FlaskConical } from "lucide-react";
+import { ShieldCheck, FlaskConical, TriangleAlert } from "lucide-react";
+
 import type { BacktestReport } from "@/lib/backtest-protocol";
 import { MetricCard } from "@/components/metric-card";
 import { Badge } from "@/components/ui/badge";
