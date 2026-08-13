@@ -58,3 +58,13 @@ Strategies that fail validation stay private as a draft with the reason shown; t
 - **Pricing engine**: new client-safe `src/lib/pricing-suggestion.ts` with `scoreBacktest(metrics)` → `{ score, band, factors[] }`, unit-testable and shared by the wizard and the AI-model flow.
 - **UI**: new route `src/routes/_authenticated/dashboard.strategies.list.$id.tsx` for the wizard, reusing `BacktestConfigForm` (extended with a data-source picker) and `backtest-report.tsx`. Add a `VerifiedBacktestPanel` component used on `src/routes/marketplace.$slug.tsx`.
 - AI model submissions get the same pricing suggestion and data-source attribution on their pricing step, so both contributor types stay equal.
+
+## Everything is persisted, nothing is mock
+
+- The listing itself is a real `ai_models` row: price, pricing model, visibility, status, data-source attribution and suggested price are all written by server functions and read back on every page load.
+- Each backtest is a real `backtest_jobs` row with its full config, protocol and result JSON (equity curve, trade list, per-window walk-forward results) stored server-side; the listing links to it by `backtest_job_id`, so the marketplace shows the stored run, not values recomputed in the browser.
+- Headline metrics (win %, loss %, Sharpe, max drawdown, profit factor, trade count) are also denormalised onto `ai_models` so the catalog can sort and filter on them.
+- Re-running a backtest creates a new job row and keeps the old one, giving a history the contributor and admin can audit; the listing points at the run the contributor chose to publish.
+- Purchases, activations and fee events continue to use the existing tables, so a bought strategy is a durable record, not client state.
+- No hardcoded sample metrics anywhere in the flow: if a listing has no completed backtest, the UI shows "no verified backtest yet" rather than placeholder numbers.
+
