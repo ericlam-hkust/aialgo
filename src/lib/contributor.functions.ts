@@ -174,9 +174,20 @@ export const submitModel = createServerFn({ method: "POST" })
 
 export const publishModelVersion = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { modelId: string; version: string; changelog: string }) => data)
+  .inputValidator((data: { modelId: string; version: string; changelog: string }) => {
+    if (!/^\d+\.\d+(\.\d+)?$/.test(data.version.trim())) throw new Error("Use semantic versions like 1.1 or 1.2.0");
+    if (!data.changelog.trim()) throw new Error("A changelog is required for every release.");
+    return { ...data, version: data.version.trim() };
+  })
   .handler(async ({ data, context }) => {
     const { supabase } = context;
+    const { data: model } = await supabase
+      .from("ai_models")
+      .select("id,name,slug,user_id")
+      .eq("id", data.modelId)
+      .maybeSingle();
+    if (!model) throw new Error("Model not found");
+
     await supabase.from("model_versions").update({ is_current: false }).eq("model_id", data.modelId);
     const { error } = await supabase.from("model_versions").insert({
       model_id: data.modelId,
@@ -184,6 +195,70 @@ export const publishModelVersion = createServerFn({ method: "POST" })
       changelog: data.changelog,
       is_current: true,
     });
+    if (error) throw new Error(error.message);
+
+    // Notify every subscriber running this model.
+    const { data: subscribers } = await supabase
+      .from("model_activations")
+      .select("user_id,pinned_version")
+      .eq("model_id", data.modelId);
+    const userIds = [...new Set((subscribers ?? []).map((s) => s.user_id))];
+    if (userIds.length) {
+      const { notify } = await import("@/lib/notify.server");
+      await notify(
+        userIds.map((userId) => ({
+          userId,
+          kind: "new_version" as const,
+          title: `${model.name} v${data.version} is available`,
+          body: data.changelog,
+          link: `/models/${model.slug}`,
+        })),
+      );
+    }
+
+    return { ok: true, notified: userIds.length };
+  });
+
+/** Payout, KYC and tax-form state for the contributor onboarding screen. */
+export const getPayoutOverview = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data: contributor } = await supabase
+      .from("contributor_profiles")
+      .select("id,handle,display_name,country,payout_email,payout_status,kyc_status,tax_form_status,tax_form_submitted_at,stripe_account_id,verified")
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (!contributor) return null;
+
+    const [{ data: transactions }, { data: payouts }] = await Promise.all([
+      supabase
+        .from("model_transactions")
+        .select("id,model_id,model_name,gross_amount,commission_amount,net_amount,currency,kind,status,created_at")
+        .eq("contributor_id", contributor.id)
+        .order("created_at", { ascending: false })
+        .limit(1000),
+      supabase
+        .from("payout_batches")
+        .select("*")
+        .eq("contributor_id", contributor.id)
+        .order("period", { ascending: false }),
+    ]);
+
+    return { contributor, transactions: transactions ?? [], payouts: payouts ?? [] };
+  });
+
+export const setTaxFormStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { status: "not_started" | "submitted" }) => data)
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("contributor_profiles")
+      .update({
+        tax_form_status: data.status,
+        tax_form_submitted_at: data.status === "submitted" ? new Date().toISOString() : null,
+      })
+      .eq("user_id", context.userId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
