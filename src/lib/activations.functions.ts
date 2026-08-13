@@ -20,16 +20,26 @@ export const listMyActivationsDetailed = createServerFn({ method: "GET" })
 
     const rows = activations ?? [];
     const modelIds = [...new Set(rows.map((r) => r.model_id))];
-    const { data: versions } = modelIds.length
-      ? await supabase
-          .from("model_versions")
-          .select("id,model_id,version,changelog,is_current,released_at")
-          .in("model_id", modelIds)
-          .order("released_at", { ascending: false })
-      : { data: [] as never[] };
+    type VersionRow = {
+      id: string;
+      model_id: string;
+      version: string;
+      changelog: string;
+      is_current: boolean;
+      released_at: string;
+    };
+    let versions: VersionRow[] = [];
+    if (modelIds.length) {
+      const { data } = await supabase
+        .from("model_versions")
+        .select("id,model_id,version,changelog,is_current,released_at")
+        .in("model_id", modelIds)
+        .order("released_at", { ascending: false });
+      versions = (data ?? []) as VersionRow[];
+    }
 
-    const byModel = new Map<string, NonNullable<typeof versions>>();
-    for (const v of versions ?? []) {
+    const byModel = new Map<string, VersionRow[]>();
+    for (const v of versions) {
       const list = byModel.get(v.model_id) ?? [];
       list.push(v);
       byModel.set(v.model_id, list);
