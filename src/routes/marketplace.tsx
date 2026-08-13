@@ -41,8 +41,17 @@ function ModelsLayout() {
         </div>
       </header>
       <Outlet />
-      <footer className="border-t border-border/70 py-8 text-center text-xs text-muted-foreground">
-        Verified metrics are computed out of sample. Trading involves risk of loss.
+      <footer className="border-t border-border/70 px-4 py-8 text-center text-xs text-muted-foreground">
+        <p>Verified metrics are computed out of sample. Trading involves risk of loss.</p>
+        <div className="mt-3 flex items-center justify-center gap-4">
+          <Link to="/marketplace/api-status" className="hover:text-foreground">
+            API status
+          </Link>
+          <span className="text-border">·</span>
+          <Link to="/marketplace/docs" className="hover:text-foreground">
+            Developer docs
+          </Link>
+        </div>
       </footer>
     </div>
   );

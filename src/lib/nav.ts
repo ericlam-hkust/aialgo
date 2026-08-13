@@ -1,5 +1,4 @@
 import {
-  Activity,
   BarChart3,
   Banknote,
   BookOpen,
@@ -21,7 +20,6 @@ import {
   Sparkles,
   Store,
   Upload,
-  Wallet,
   Zap,
   type LucideIcon,
 } from "lucide-react";
