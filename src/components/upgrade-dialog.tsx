@@ -5,22 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StripeEmbeddedCheckout } from "@/components/stripe-embedded-checkout";
 import { PaymentTestModeBanner } from "@/components/payment-test-mode-banner";
-import { PLAN_PRICE_HKD, PLAN_PRICE_IDS, type PlanTier } from "@/lib/entitlements";
+import { PLAN_FEATURES, PLAN_PRICE_USD, PLAN_PRICE_IDS, type PlanTier } from "@/lib/entitlements";
 
-const PLAN_FEATURES: Record<"pro" | "elite", string[]> = {
-  pro: [
-    "25 strategies, 500 backtests / month",
-    "Live market data providers",
-    "Paper trading deployments",
-    "AI assistant & marketplace publishing",
-  ],
-  elite: [
-    "Unlimited strategies & backtests",
-    "Broker connections (IBKR, Futu, Tiger)",
-    "Intraday data sync",
-    "0% marketplace commission",
-  ],
-};
 
 export function UpgradeDialog({
   open,
@@ -80,8 +66,8 @@ export function UpgradeDialog({
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
-              {(["pro", "elite"] as const).map((plan) => {
-                const price = yearly ? PLAN_PRICE_HKD[plan].yearly : PLAN_PRICE_HKD[plan].monthly;
+              {(["pro", "desk"] as const).map((plan) => {
+                const price = yearly ? PLAN_PRICE_USD[plan].yearly : PLAN_PRICE_USD[plan].monthly;
                 const priceId = yearly ? PLAN_PRICE_IDS[plan].yearly : PLAN_PRICE_IDS[plan].monthly;
                 const isCurrent = currentTier === plan;
                 return (
@@ -91,7 +77,7 @@ export function UpgradeDialog({
                       {plan === "pro" ? <Badge>Most popular</Badge> : null}
                     </div>
                     <p className="mono mt-3 text-2xl font-semibold">
-                      HK${price.toLocaleString()}
+                      ${price.toLocaleString()}
                       <span className="ml-1 text-sm font-normal text-muted-foreground">
                         / {yearly ? "year" : "month"}
                       </span>

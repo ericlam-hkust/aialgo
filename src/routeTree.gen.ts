@@ -52,6 +52,7 @@ import { Route as AuthenticatedDashboardTeamsIndexRouteImport } from './routes/_
 import { Route as AuthenticatedDashboardTeamsSlugRouteImport } from './routes/_authenticated/dashboard.teams.$slug'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicV1ModelsRouteImport } from './routes/api/public/v1/models'
+import { Route as ApiPublicV1SignalsRouteImport } from './routes/api/public/v1/signals'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -293,6 +294,11 @@ const ApiPublicV1ModelsRoute = ApiPublicV1ModelsRouteImport.update({
   path: '/api/public/v1/models',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicV1SignalsRoute = ApiPublicV1SignalsRouteImport.update({
+  id: '/api/public/v1/signals',
+  path: '/api/public/v1/signals',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -334,6 +340,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/teams/$slug': typeof AuthenticatedDashboardTeamsSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/v1/models': typeof ApiPublicV1ModelsRoute
+  '/api/public/v1/signals': typeof ApiPublicV1SignalsRoute
   '/dashboard/models/': typeof AuthenticatedDashboardModelsIndexRoute
   '/dashboard/strategies/': typeof AuthenticatedDashboardStrategiesIndexRoute
   '/dashboard/teams/': typeof AuthenticatedDashboardTeamsIndexRoute
@@ -375,6 +382,7 @@ export interface FileRoutesByTo {
   '/dashboard/teams/$slug': typeof AuthenticatedDashboardTeamsSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/v1/models': typeof ApiPublicV1ModelsRoute
+  '/api/public/v1/signals': typeof ApiPublicV1SignalsRoute
   '/dashboard/models': typeof AuthenticatedDashboardModelsIndexRoute
   '/dashboard/strategies': typeof AuthenticatedDashboardStrategiesIndexRoute
   '/dashboard/teams': typeof AuthenticatedDashboardTeamsIndexRoute
@@ -421,6 +429,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/teams/$slug': typeof AuthenticatedDashboardTeamsSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/v1/models': typeof ApiPublicV1ModelsRoute
+  '/api/public/v1/signals': typeof ApiPublicV1SignalsRoute
   '/_authenticated/dashboard/models/': typeof AuthenticatedDashboardModelsIndexRoute
   '/_authenticated/dashboard/strategies/': typeof AuthenticatedDashboardStrategiesIndexRoute
   '/_authenticated/dashboard/teams/': typeof AuthenticatedDashboardTeamsIndexRoute
@@ -467,6 +476,7 @@ export interface FileRouteTypes {
     | '/dashboard/teams/$slug'
     | '/api/public/payments/webhook'
     | '/api/public/v1/models'
+    | '/api/public/v1/signals'
     | '/dashboard/models/'
     | '/dashboard/strategies/'
     | '/dashboard/teams/'
@@ -508,6 +518,7 @@ export interface FileRouteTypes {
     | '/dashboard/teams/$slug'
     | '/api/public/payments/webhook'
     | '/api/public/v1/models'
+    | '/api/public/v1/signals'
     | '/dashboard/models'
     | '/dashboard/strategies'
     | '/dashboard/teams'
@@ -553,6 +564,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/teams/$slug'
     | '/api/public/payments/webhook'
     | '/api/public/v1/models'
+    | '/api/public/v1/signals'
     | '/_authenticated/dashboard/models/'
     | '/_authenticated/dashboard/strategies/'
     | '/_authenticated/dashboard/teams/'
@@ -566,6 +578,7 @@ export interface RootRouteChildren {
   ApiPublicSyncRoute: typeof ApiPublicSyncRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiPublicV1ModelsRoute: typeof ApiPublicV1ModelsRoute
+  ApiPublicV1SignalsRoute: typeof ApiPublicV1SignalsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -871,6 +884,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicV1ModelsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/v1/signals': {
+      id: '/api/public/v1/signals'
+      path: '/api/public/v1/signals'
+      fullPath: '/api/public/v1/signals'
+      preLoaderRoute: typeof ApiPublicV1SignalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1018,6 +1038,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicSyncRoute: ApiPublicSyncRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiPublicV1ModelsRoute: ApiPublicV1ModelsRoute,
+  ApiPublicV1SignalsRoute: ApiPublicV1SignalsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

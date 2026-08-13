@@ -15,6 +15,8 @@ import {
   type ModelStrategyType,
 } from "@/lib/marketplace";
 import { cn } from "@/lib/utils";
+import { FrequencyBadge, LatencyBadge, TrustBadge } from "@/components/marketplace/trust-badges";
+import type { FrequencyClass, HostingMode, TrustTier } from "@/lib/monetization";
 
 export type ModelCardModel = {
   slug: string;
@@ -35,6 +37,11 @@ export type ModelCardModel = {
   rating_count: number;
   active_users: number;
   overfitting_risk?: boolean | null;
+  hosting_mode?: HostingMode | null;
+  trust_tier?: TrustTier | null;
+  declared_frequency?: FrequencyClass | null;
+  measured_latency_ms?: number | null;
+  promoted?: boolean | null;
   consistency_score?: number | null;
   contributor: { display_name: string; avatar_url: string | null; verified: boolean; handle: string } | null;
 };
@@ -90,6 +97,21 @@ export function ModelCard({
               </Badge>
             </div>
 
+
+            <div className="mt-3 flex flex-wrap items-center gap-1.5">
+              <TrustBadge tier={(model.trust_tier ?? "unproven") as TrustTier} />
+              <FrequencyBadge
+                frequency={(model.declared_frequency ?? "swing") as FrequencyClass}
+                hosting={(model.hosting_mode ?? "hosted") as HostingMode}
+                latencyMs={Number(model.measured_latency_ms ?? 0)}
+              />
+              {model.hosting_mode === "remote" ? <LatencyBadge latencyMs={Number(model.measured_latency_ms ?? 0)} /> : null}
+              {model.promoted ? (
+                <Badge variant="secondary" className="border-warning/50 text-warning">
+                  Promoted
+                </Badge>
+              ) : null}
+            </div>
 
             <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
               {model.contributor?.avatar_url ? (

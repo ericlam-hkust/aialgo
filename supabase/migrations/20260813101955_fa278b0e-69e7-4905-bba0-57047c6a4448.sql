@@ -1,0 +1,1 @@
+ALTER TABLE public.ai_models DROP COLUMN IF EXISTS frequency_class;

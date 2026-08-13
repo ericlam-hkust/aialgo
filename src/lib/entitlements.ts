@@ -1,9 +1,18 @@
-export type PlanTier = "free" | "pro" | "elite";
+import { CONSUMER_PLANS, planSpec, type ConsumerPlan } from "./monetization";
+
+export type PlanTier = ConsumerPlan; // "free" | "pro" | "desk"
 
 export type PlanLimits = {
   maxStrategies: number;
   maxBacktestsPerMonth: number;
   maxAiCallsPerMonth: number;
+  /** live execution with real capital */
+  liveExecution: boolean;
+  maxConcurrentLive: number;
+  hftAccess: boolean;
+  realtimeData: boolean;
+  premiumFeeds: boolean;
+  multiAccount: boolean;
   liveDataSources: boolean;
   paperDeployments: boolean;
   brokerConnections: boolean;
@@ -15,59 +24,80 @@ export type PlanLimits = {
 
 export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
   free: {
-    maxStrategies: 1,
-    maxBacktestsPerMonth: 5,
-    maxAiCallsPerMonth: 5,
+    maxStrategies: Number.POSITIVE_INFINITY,
+    maxBacktestsPerMonth: 3,
+    maxAiCallsPerMonth: 20,
+    liveExecution: false,
+    maxConcurrentLive: 0,
+    hftAccess: false,
+    realtimeData: false,
+    premiumFeeds: false,
+    multiAccount: false,
     liveDataSources: false,
-    paperDeployments: false,
-    brokerConnections: false,
-    intradaySync: false,
-    marketplacePublish: false,
-    marketplaceFeeRate: 0.2,
-  },
-  pro: {
-    maxStrategies: 25,
-    maxBacktestsPerMonth: 500,
-    maxAiCallsPerMonth: 300,
-    liveDataSources: true,
     paperDeployments: true,
     brokerConnections: false,
     intradaySync: false,
     marketplacePublish: true,
     marketplaceFeeRate: 0.2,
   },
-  elite: {
+  pro: {
     maxStrategies: Number.POSITIVE_INFINITY,
     maxBacktestsPerMonth: Number.POSITIVE_INFINITY,
-    maxAiCallsPerMonth: Number.POSITIVE_INFINITY,
+    maxAiCallsPerMonth: 1000,
+    liveExecution: true,
+    maxConcurrentLive: 3,
+    hftAccess: true,
+    realtimeData: true,
+    premiumFeeds: false,
+    multiAccount: false,
     liveDataSources: true,
     paperDeployments: true,
     brokerConnections: true,
     intradaySync: true,
     marketplacePublish: true,
-    marketplaceFeeRate: 0,
+    marketplaceFeeRate: 0.2,
+  },
+  desk: {
+    maxStrategies: Number.POSITIVE_INFINITY,
+    maxBacktestsPerMonth: Number.POSITIVE_INFINITY,
+    maxAiCallsPerMonth: Number.POSITIVE_INFINITY,
+    liveExecution: true,
+    maxConcurrentLive: Number.POSITIVE_INFINITY,
+    hftAccess: true,
+    realtimeData: true,
+    premiumFeeds: true,
+    multiAccount: true,
+    liveDataSources: true,
+    paperDeployments: true,
+    brokerConnections: true,
+    intradaySync: true,
+    marketplacePublish: true,
+    marketplaceFeeRate: 0.2,
   },
 };
 
-export const PLAN_LABEL: Record<PlanTier, string> = {
-  free: "Free",
-  pro: "Pro",
-  elite: "Elite",
-};
+export const PLAN_LABEL: Record<PlanTier, string> = { free: "Free", pro: "Pro", desk: "Desk" };
 
 export const PLAN_PRICE_IDS = {
   pro: { monthly: "pro_monthly", yearly: "pro_yearly" },
-  elite: { monthly: "elite_monthly", yearly: "elite_yearly" },
+  desk: { monthly: "desk_monthly", yearly: "desk_yearly" },
 } as const;
 
-export const PLAN_PRICE_HKD = {
-  pro: { monthly: 299, yearly: 2990 },
-  elite: { monthly: 799, yearly: 7990 },
+export const PLAN_PRICE_USD = {
+  pro: { monthly: planSpec("pro").monthly, yearly: planSpec("pro").annual },
+  desk: { monthly: planSpec("desk").monthly, yearly: planSpec("desk").annual },
 } as const;
+
+export const PLAN_FEATURES: Record<Exclude<PlanTier, "free">, string[]> = {
+  pro: planSpec("pro").features,
+  desk: planSpec("desk").features,
+};
+
+export { CONSUMER_PLANS };
 
 export function tierFromPriceId(priceId: string | null | undefined): PlanTier {
   if (!priceId) return "free";
-  if (priceId.startsWith("elite")) return "elite";
+  if (priceId.startsWith("desk") || priceId.startsWith("elite")) return "desk";
   if (priceId.startsWith("pro")) return "pro";
   return "free";
 }
