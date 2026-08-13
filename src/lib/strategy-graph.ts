@@ -79,15 +79,17 @@ const a = (
   description: string,
   params: Record<string, number | string>,
   lanes: StrategyLane[],
+  /** Standing orders (stops/targets) are always-on and take no trigger input. */
+  standing = false,
 ): NodeSpec => ({
   kind,
   label,
   description,
   params,
   category: "action",
-  input: "bool",
+  input: standing ? "none" : "bool",
   output: "none",
-  maxInputs: Number.POSITIVE_INFINITY,
+  maxInputs: standing ? 0 : Number.POSITIVE_INFINITY,
   lanes,
 });
 
@@ -130,9 +132,9 @@ export const NODE_CATALOG: NodeSpec[] = [
   a("sell_market", "Sell Market", "Exit long at the next open.", { size: 100 }, ["exit"]),
   a("sell_limit", "Sell Limit", "Exit long with a limit offset.", { size: 50, offset_pct: 0.5 }, ["exit"]),
   a("close_position", "Close Position", "Flatten the position immediately.", {}, ["exit"]),
-  a("set_stop_loss", "Set Stop Loss", "Protective stop as % below entry.", { percent: 5 }, ["exit"]),
-  a("set_take_profit", "Set Take Profit", "Target exit as % above entry.", { percent: 12 }, ["exit"]),
-  a("trailing_stop", "Trailing Stop", "Stop that follows the highest close.", { percent: 8 }, ["exit"]),
+  a("set_stop_loss", "Set Stop Loss", "Protective stop as % below entry.", { percent: 5 }, ["exit"], true),
+  a("set_take_profit", "Set Take Profit", "Target exit as % above entry.", { percent: 12 }, ["exit"], true),
+  a("trailing_stop", "Trailing Stop", "Stop that follows the highest close.", { percent: 8 }, ["exit"], true),
   // RISK
   r("max_position_size", "Max Position Size", "Cap capital allocated per position.", { percent: 20 }),
   r("max_daily_loss", "Max Daily Loss", "Halt trading after this daily loss.", { percent: 3 }),

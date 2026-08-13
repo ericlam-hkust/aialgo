@@ -464,9 +464,6 @@ function Builder() {
     }
   };
 
-  const highlighted = useMemo(() => new Set(pending ? [...pending.diff.added, ...pending.diff.changed] : []), [pending]);
-  void highlighted;
-
   return (
     <BuilderProvider value={{ issues: issues.byNode, updateParam, removeNode }}>
       <div className="space-y-3">
@@ -506,7 +503,7 @@ function Builder() {
                 </TabsTrigger>
               </TabsList>
             </Tabs>
-            <Button variant="outline" size="icon" className="h-9 w-9" onClick={undo} aria-label="Undo" disabled={!past.current.length && historyTick >= 0 && past.current.length === 0}>
+            <Button variant="outline" size="icon" className="h-9 w-9" onClick={undo} aria-label="Undo" disabled={past.current.length === 0}>
               <Undo2 className="h-4 w-4" aria-hidden />
             </Button>
             <Button variant="outline" size="icon" className="h-9 w-9" onClick={redo} aria-label="Redo">
