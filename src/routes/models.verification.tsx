@@ -81,7 +81,7 @@ function VerificationPage() {
         <h2 className="text-lg font-semibold">Trading frequency classification</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           Contributors declare a frequency at submission. We verify it against the model's measured signal rate and
-          average holding period, and the HFT-Ready label additionally requires sub-100ms measured gateway latency.
+          average holding period, and the HFT-Ready label additionally requires sub-100ms measured signal latency.
         </p>
         <Card className="mt-3 border-border/70">
           <CardContent className="p-0">
