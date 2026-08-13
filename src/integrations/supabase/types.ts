@@ -24,11 +24,15 @@ export type Database = {
           avg_holding_hours: number
           avg_monthly_fee_per_1k: number | null
           backtest_config: Json
+          backtest_ran_at: string | null
           cagr: number
           consistency_score: number
           contributor_id: string
           created_at: string
           currency: string
+          data_source_id: string | null
+          data_source_kind: string
+          data_source_label: string | null
           declared_frequency: Database["public"]["Enums"]["frequency_class"]
           description: string
           divergence_flagged: boolean
@@ -43,6 +47,7 @@ export type Database = {
           listing_kind: Database["public"]["Enums"]["listing_kind"]
           live_return_30d: number
           live_since: string | null
+          loss_rate: number
           max_drawdown: number
           measured_frequency:
             | Database["public"]["Enums"]["frequency_class"]
@@ -57,6 +62,8 @@ export type Database = {
           performance_fee_pct: number
           price: number
           pricing_model: Database["public"]["Enums"]["model_pricing_model"]
+          pricing_score: number | null
+          profit_factor: number
           promoted: boolean
           rating: number
           rating_count: number
@@ -68,10 +75,13 @@ export type Database = {
           status: Database["public"]["Enums"]["model_listing_status"]
           strategy_id: string | null
           strategy_type: Database["public"]["Enums"]["model_strategy_type"]
+          suggested_price: number | null
           tagline: string | null
           tags: string[]
           team_id: string | null
           timeframe: string
+          total_return: number
+          total_trades: number
           trust_tier: Database["public"]["Enums"]["trust_tier"]
           updated_at: string
           user_id: string | null
@@ -88,11 +98,15 @@ export type Database = {
           avg_holding_hours?: number
           avg_monthly_fee_per_1k?: number | null
           backtest_config?: Json
+          backtest_ran_at?: string | null
           cagr?: number
           consistency_score?: number
           contributor_id: string
           created_at?: string
           currency?: string
+          data_source_id?: string | null
+          data_source_kind?: string
+          data_source_label?: string | null
           declared_frequency?: Database["public"]["Enums"]["frequency_class"]
           description?: string
           divergence_flagged?: boolean
@@ -107,6 +121,7 @@ export type Database = {
           listing_kind?: Database["public"]["Enums"]["listing_kind"]
           live_return_30d?: number
           live_since?: string | null
+          loss_rate?: number
           max_drawdown?: number
           measured_frequency?:
             | Database["public"]["Enums"]["frequency_class"]
@@ -121,6 +136,8 @@ export type Database = {
           performance_fee_pct?: number
           price?: number
           pricing_model?: Database["public"]["Enums"]["model_pricing_model"]
+          pricing_score?: number | null
+          profit_factor?: number
           promoted?: boolean
           rating?: number
           rating_count?: number
@@ -132,10 +149,13 @@ export type Database = {
           status?: Database["public"]["Enums"]["model_listing_status"]
           strategy_id?: string | null
           strategy_type?: Database["public"]["Enums"]["model_strategy_type"]
+          suggested_price?: number | null
           tagline?: string | null
           tags?: string[]
           team_id?: string | null
           timeframe?: string
+          total_return?: number
+          total_trades?: number
           trust_tier?: Database["public"]["Enums"]["trust_tier"]
           updated_at?: string
           user_id?: string | null
@@ -152,11 +172,15 @@ export type Database = {
           avg_holding_hours?: number
           avg_monthly_fee_per_1k?: number | null
           backtest_config?: Json
+          backtest_ran_at?: string | null
           cagr?: number
           consistency_score?: number
           contributor_id?: string
           created_at?: string
           currency?: string
+          data_source_id?: string | null
+          data_source_kind?: string
+          data_source_label?: string | null
           declared_frequency?: Database["public"]["Enums"]["frequency_class"]
           description?: string
           divergence_flagged?: boolean
@@ -171,6 +195,7 @@ export type Database = {
           listing_kind?: Database["public"]["Enums"]["listing_kind"]
           live_return_30d?: number
           live_since?: string | null
+          loss_rate?: number
           max_drawdown?: number
           measured_frequency?:
             | Database["public"]["Enums"]["frequency_class"]
@@ -185,6 +210,8 @@ export type Database = {
           performance_fee_pct?: number
           price?: number
           pricing_model?: Database["public"]["Enums"]["model_pricing_model"]
+          pricing_score?: number | null
+          profit_factor?: number
           promoted?: boolean
           rating?: number
           rating_count?: number
@@ -196,10 +223,13 @@ export type Database = {
           status?: Database["public"]["Enums"]["model_listing_status"]
           strategy_id?: string | null
           strategy_type?: Database["public"]["Enums"]["model_strategy_type"]
+          suggested_price?: number | null
           tagline?: string | null
           tags?: string[]
           team_id?: string | null
           timeframe?: string
+          total_return?: number
+          total_trades?: number
           trust_tier?: Database["public"]["Enums"]["trust_tier"]
           updated_at?: string
           user_id?: string | null
@@ -213,6 +243,13 @@ export type Database = {
             columns: ["contributor_id"]
             isOneToOne: false
             referencedRelation: "contributor_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_models_data_source_id_fkey"
+            columns: ["data_source_id"]
+            isOneToOne: false
+            referencedRelation: "data_source_connections"
             referencedColumns: ["id"]
           },
           {
