@@ -25,6 +25,7 @@ import { Route as ModelsApiStatusRouteImport } from './routes/models.api-status'
 import { Route as ModelsCompareRouteImport } from './routes/models.compare'
 import { Route as ModelsDataLibraryRouteImport } from './routes/models.data-library'
 import { Route as ModelsDocsRouteImport } from './routes/models.docs'
+import { Route as ModelsVerificationRouteImport } from './routes/models.verification'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardAccountsRouteImport } from './routes/_authenticated/dashboard.accounts'
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated/dashboard.admin'
@@ -132,6 +133,11 @@ const ModelsDataLibraryRoute = ModelsDataLibraryRouteImport.update({
 const ModelsDocsRoute = ModelsDocsRouteImport.update({
   id: '/docs',
   path: '/docs',
+  getParentRoute: () => ModelsRoute,
+} as any)
+const ModelsVerificationRoute = ModelsVerificationRouteImport.update({
+  id: '/verification',
+  path: '/verification',
   getParentRoute: () => ModelsRoute,
 } as any)
 const AuthenticatedDashboardIndexRoute =
@@ -320,6 +326,7 @@ export interface FileRoutesByFullPath {
   '/models/compare': typeof ModelsCompareRoute
   '/models/data-library': typeof ModelsDataLibraryRoute
   '/models/docs': typeof ModelsDocsRoute
+  '/models/verification': typeof ModelsVerificationRoute
   '/auth/': typeof AuthIndexRoute
   '/models/': typeof ModelsIndexRoute
   '/dashboard/accounts': typeof AuthenticatedDashboardAccountsRoute
@@ -363,6 +370,7 @@ export interface FileRoutesByTo {
   '/models/compare': typeof ModelsCompareRoute
   '/models/data-library': typeof ModelsDataLibraryRoute
   '/models/docs': typeof ModelsDocsRoute
+  '/models/verification': typeof ModelsVerificationRoute
   '/auth': typeof AuthIndexRoute
   '/models': typeof ModelsIndexRoute
   '/dashboard/accounts': typeof AuthenticatedDashboardAccountsRoute
@@ -411,6 +419,7 @@ export interface FileRoutesById {
   '/models/compare': typeof ModelsCompareRoute
   '/models/data-library': typeof ModelsDataLibraryRoute
   '/models/docs': typeof ModelsDocsRoute
+  '/models/verification': typeof ModelsVerificationRoute
   '/auth/': typeof AuthIndexRoute
   '/models/': typeof ModelsIndexRoute
   '/_authenticated/dashboard/accounts': typeof AuthenticatedDashboardAccountsRoute
@@ -459,6 +468,7 @@ export interface FileRouteTypes {
     | '/models/compare'
     | '/models/data-library'
     | '/models/docs'
+    | '/models/verification'
     | '/auth/'
     | '/models/'
     | '/dashboard/accounts'
@@ -502,6 +512,7 @@ export interface FileRouteTypes {
     | '/models/compare'
     | '/models/data-library'
     | '/models/docs'
+    | '/models/verification'
     | '/auth'
     | '/models'
     | '/dashboard/accounts'
@@ -549,6 +560,7 @@ export interface FileRouteTypes {
     | '/models/compare'
     | '/models/data-library'
     | '/models/docs'
+    | '/models/verification'
     | '/auth/'
     | '/models/'
     | '/_authenticated/dashboard/accounts'
@@ -706,6 +718,13 @@ declare module '@tanstack/react-router' {
       path: '/docs'
       fullPath: '/models/docs'
       preLoaderRoute: typeof ModelsDocsRouteImport
+      parentRoute: typeof ModelsRoute
+    }
+    '/models/verification': {
+      id: '/models/verification'
+      path: '/verification'
+      fullPath: '/models/verification'
+      preLoaderRoute: typeof ModelsVerificationRouteImport
       parentRoute: typeof ModelsRoute
     }
     '/_authenticated/dashboard/': {
@@ -1035,6 +1054,7 @@ interface ModelsRouteChildren {
   ModelsCompareRoute: typeof ModelsCompareRoute
   ModelsDataLibraryRoute: typeof ModelsDataLibraryRoute
   ModelsDocsRoute: typeof ModelsDocsRoute
+  ModelsVerificationRoute: typeof ModelsVerificationRoute
   ModelsIndexRoute: typeof ModelsIndexRoute
 }
 
@@ -1044,6 +1064,7 @@ const ModelsRouteChildren: ModelsRouteChildren = {
   ModelsCompareRoute: ModelsCompareRoute,
   ModelsDataLibraryRoute: ModelsDataLibraryRoute,
   ModelsDocsRoute: ModelsDocsRoute,
+  ModelsVerificationRoute: ModelsVerificationRoute,
   ModelsIndexRoute: ModelsIndexRoute,
 }
 
