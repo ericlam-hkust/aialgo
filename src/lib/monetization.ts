@@ -1,6 +1,6 @@
 /**
  * Pure, client-safe monetization model for the aiAlgo marketplace.
- * Hybrid compute: Tier 1 platform-hosted models/algos, Tier 2 remote via Signal Gateway.
+ * Hybrid compute: Tier 1 platform-hosted models/algos, Tier 2 remote execution.
  */
 
 export type HostingMode = "hosted" | "remote";
@@ -40,7 +40,7 @@ export const TRUST_TIERS: Record<TrustTier, { label: string; short: string; hint
   live_verified: {
     label: "Live Verified",
     short: "Tier 2 · remote",
-    hint: "Every signal is timestamped in our gateway before execution, with 90+ days of unfakeable live history.",
+    hint: "Every signal is timestamped on receipt before execution, with 90+ days of unfakeable live history.",
     tone: "border-profit/60 text-profit",
   },
   unproven: {
@@ -101,7 +101,7 @@ export function executionFitNote(hosting: HostingMode, frequency: FrequencyClass
   if (frequency === "hft" && latencyMs < HFT_LATENCY_MS) {
     return `⚡ HFT-Ready — runs on the contributor's low-latency infrastructure (${Math.round(latencyMs)}ms measured).`;
   }
-  return `Remote execution via Signal Gateway (${Math.round(latencyMs)}ms measured routing latency).`;
+  return `Remote execution on the contributor's infrastructure (${Math.round(latencyMs)}ms measured routing latency).`;
 }
 
 export const HFT_APPLY_NOTE =
@@ -181,13 +181,13 @@ export const CONTRIBUTOR_FREE_ITEMS = [
   { key: "listing", label: "Listing & publishing", both: true, hint: "Unlimited listings for AI models and algo strategies." },
   { key: "hosting", label: "Platform compute (Tier 1)", both: true, hint: "Hosted inference for AI models and hosted execution for algos." },
   { key: "gpu", label: "GPU inference", both: false, hint: "Deep-learning inference on our GPUs, no metering, no cap." },
-  { key: "gateway", label: "Signal Gateway (Tier 2)", both: true, hint: "Remote and HFT models connect free with unlimited signal calls." },
+  { key: "remote", label: "Remote execution (Tier 2)", both: true, hint: "Remote and HFT models connect free with unlimited signals." },
   { key: "backtest", label: "Validation backtest pipeline", both: true, hint: "Walk-forward validation, re-validation and live track record." },
   { key: "data", label: "Execution + market data", both: true, hint: "Every feed your model needs to run on our infrastructure." },
 ] as const;
 
 export const CONTRIBUTOR_PROMISE =
-  "Whether you train neural networks or code rule-based algos — free hosting, free gateway, free backtest pipeline, free execution data. The platform earns only when you earn.";
+  "Whether you train neural networks or code rule-based algos — free hosting, free execution, free backtest pipeline, free execution data. The platform earns only when you earn.";
 
 /* --------------------------------------------- performance fee engine */
 
