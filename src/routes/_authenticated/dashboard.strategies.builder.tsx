@@ -548,7 +548,7 @@ function Builder() {
         <ResizablePanelGroup
           key={isWide ? "wide" : "narrow"}
           orientation={isWide ? "horizontal" : "vertical"}
-          className={isWide ? "h-[640px]" : "h-[1180px] flex-col"}
+          style={{ height: isWide ? "min(72vh, 720px)" : 1180 }}
         >
           <ResizablePanel defaultSize={isWide ? "18%" : "22%"} minSize="10%" className="h-full overflow-hidden rounded-xl border border-border bg-card">
             <NodePalette onAdd={(spec) => placeNode(spec)} />
