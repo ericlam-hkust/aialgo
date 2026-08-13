@@ -29,6 +29,7 @@ import { Route as AuthenticatedDashboardPaperTradingRouteImport } from './routes
 import { Route as AuthenticatedDashboardRiskRouteImport } from './routes/_authenticated/dashboard.risk'
 import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
 import { Route as ApiPublicSyncRouteImport } from './routes/api/public/sync'
+import { Route as AuthenticatedDashboardModelsIndexRouteImport } from './routes/_authenticated/dashboard.models.index'
 import { Route as AuthenticatedDashboardStrategiesIndexRouteImport } from './routes/_authenticated/dashboard.strategies.index'
 import { Route as AuthenticatedDashboardStrategiesBacktestRouteImport } from './routes/_authenticated/dashboard.strategies.backtest'
 import { Route as AuthenticatedDashboardStrategiesBuilderRouteImport } from './routes/_authenticated/dashboard.strategies.builder'
@@ -142,6 +143,12 @@ const ApiPublicSyncRoute = ApiPublicSyncRouteImport.update({
   path: '/api/public/sync',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedDashboardModelsIndexRoute =
+  AuthenticatedDashboardModelsIndexRouteImport.update({
+    id: '/models/',
+    path: '/models/',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardStrategiesIndexRoute =
   AuthenticatedDashboardStrategiesIndexRouteImport.update({
     id: '/strategies/',
@@ -197,6 +204,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/dashboard/models/': typeof AuthenticatedDashboardModelsIndexRoute
   '/dashboard/strategies/': typeof AuthenticatedDashboardStrategiesIndexRoute
 }
 export interface FileRoutesByTo {
@@ -220,6 +228,7 @@ export interface FileRoutesByTo {
   '/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/dashboard/models': typeof AuthenticatedDashboardModelsIndexRoute
   '/dashboard/strategies': typeof AuthenticatedDashboardStrategiesIndexRoute
 }
 export interface FileRoutesById {
@@ -248,6 +257,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/_authenticated/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/_authenticated/dashboard/models/': typeof AuthenticatedDashboardModelsIndexRoute
   '/_authenticated/dashboard/strategies/': typeof AuthenticatedDashboardStrategiesIndexRoute
 }
 export interface FileRouteTypes {
@@ -276,6 +286,7 @@ export interface FileRouteTypes {
     | '/dashboard/strategies/builder'
     | '/dashboard/strategies/templates'
     | '/api/public/payments/webhook'
+    | '/dashboard/models/'
     | '/dashboard/strategies/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -299,6 +310,7 @@ export interface FileRouteTypes {
     | '/dashboard/strategies/builder'
     | '/dashboard/strategies/templates'
     | '/api/public/payments/webhook'
+    | '/dashboard/models'
     | '/dashboard/strategies'
   id:
     | '__root__'
@@ -326,6 +338,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/strategies/builder'
     | '/_authenticated/dashboard/strategies/templates'
     | '/api/public/payments/webhook'
+    | '/_authenticated/dashboard/models/'
     | '/_authenticated/dashboard/strategies/'
   fileRoutesById: FileRoutesById
 }
@@ -480,6 +493,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicSyncRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/dashboard/models/': {
+      id: '/_authenticated/dashboard/models/'
+      path: '/models'
+      fullPath: '/dashboard/models/'
+      preLoaderRoute: typeof AuthenticatedDashboardModelsIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/strategies/': {
       id: '/_authenticated/dashboard/strategies/'
       path: '/strategies'
@@ -530,6 +550,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardStrategiesBacktestRoute: typeof AuthenticatedDashboardStrategiesBacktestRoute
   AuthenticatedDashboardStrategiesBuilderRoute: typeof AuthenticatedDashboardStrategiesBuilderRoute
   AuthenticatedDashboardStrategiesTemplatesRoute: typeof AuthenticatedDashboardStrategiesTemplatesRoute
+  AuthenticatedDashboardModelsIndexRoute: typeof AuthenticatedDashboardModelsIndexRoute
   AuthenticatedDashboardStrategiesIndexRoute: typeof AuthenticatedDashboardStrategiesIndexRoute
 }
 
@@ -552,6 +573,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardStrategiesBuilderRoute,
     AuthenticatedDashboardStrategiesTemplatesRoute:
       AuthenticatedDashboardStrategiesTemplatesRoute,
+    AuthenticatedDashboardModelsIndexRoute:
+      AuthenticatedDashboardModelsIndexRoute,
     AuthenticatedDashboardStrategiesIndexRoute:
       AuthenticatedDashboardStrategiesIndexRoute,
   }

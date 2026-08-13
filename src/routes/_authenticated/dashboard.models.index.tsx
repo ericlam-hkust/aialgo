@@ -165,7 +165,7 @@ function ContributorDashboard() {
                 <div>
                   <div className="text-sm font-medium">Submission {s.id.slice(0, 8)}</div>
                   <p className="text-xs text-muted-foreground">
-                    {fmtDate(s.created_at)} {s.notes ? `· ${s.notes}` : ""}
+                    {fmtDate(s.created_at)} {s.reviewer_notes ? `· ${s.reviewer_notes}` : ""}
                   </p>
                 </div>
                 <Badge variant="outline">{String(s.status).replace(/_/g, " ")}</Badge>
