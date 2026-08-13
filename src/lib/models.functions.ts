@@ -89,6 +89,23 @@ export const submitReview = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+
+    // Only traders who have run the model for 7+ days can rate it.
+    const { data: activation } = await supabase
+      .from("model_activations")
+      .select("activated_at")
+      .eq("user_id", userId)
+      .eq("model_id", data.modelId)
+      .order("activated_at", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    const daysActive = activation
+      ? Math.floor((Date.now() - new Date(activation.activated_at).getTime()) / 86_400_000)
+      : 0;
+    if (!activation || daysActive < 7) {
+      throw new Error("You can rate a model after running it for 7 days.");
+    }
+
     const { data: profile } = await supabase.from("profiles").select("full_name,email").eq("id", userId).maybeSingle();
     const { error } = await supabase.from("model_reviews").upsert(
       {
@@ -97,10 +114,23 @@ export const submitReview = createServerFn({ method: "POST" })
         author_name: profile?.full_name || profile?.email?.split("@")[0] || "Trader",
         rating: data.rating,
         comment: data.comment,
+        verified: true,
+        days_active: daysActive,
       },
       { onConflict: "model_id,user_id" },
     );
     if (error) throw new Error(error.message);
+
+    // Refresh aggregate rating on the listing.
+    const { data: all } = await supabase.from("model_reviews").select("rating").eq("model_id", data.modelId);
+    const ratings = (all ?? []).map((r) => Number(r.rating));
+    if (ratings.length) {
+      const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length;
+      await supabase
+        .from("ai_models")
+        .update({ rating: Math.round(avg * 100) / 100, rating_count: ratings.length })
+        .eq("id", data.modelId);
+    }
     return { ok: true };
   });
 
