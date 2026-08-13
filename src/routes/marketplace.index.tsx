@@ -46,6 +46,13 @@ export const Route = createFileRoute("/marketplace/")({
 const ALL = "all";
 type SortKey = "popular" | "live" | "sharpe" | "cagr" | "rating" | "price";
 
+const LISTING_TABS = [
+  { value: ALL, label: "All listings", icon: LayoutGrid },
+  { value: "algo", label: "Algo strategies", icon: Boxes },
+  { value: "ai_model", label: "AI models", icon: Sparkles },
+] as const;
+
+
 function Catalog() {
   const { data } = useSuspenseQuery(modelsQuery);
   const [q, setQ] = useState("");
