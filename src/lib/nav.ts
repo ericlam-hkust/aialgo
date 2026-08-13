@@ -75,9 +75,14 @@ export const NAV_GROUPS: NavGroup[] = [
         ],
       },
       { to: "/dashboard/strategies/templates", key: "nav.templates", icon: BarChart3, exact: true, terms: ["presets"] },
-      { to: "/dashboard/strategies/backtest", key: "nav.backtest", icon: TrendingUp, exact: true, terms: ["history test"] },
-      { to: "/dashboard/models/playground", key: "nav.playground", icon: FlaskConical, exact: true, terms: ["sandbox", "self test"] },
-      { to: "/dashboard/models/backtests", key: "nav.validation", icon: Gauge, exact: true, terms: ["queue", "verify", "jobs"] },
+      {
+        to: "/dashboard/backtest",
+        key: "nav.backtest",
+        icon: FlaskConical,
+        exact: true,
+        terms: ["backtest", "playground", "sandbox", "self test", "verify", "validation", "jobs", "history test"],
+      },
+
       {
         to: "/dashboard/data-sources",
         key: "nav.data",
