@@ -271,6 +271,101 @@ export function BacktestReportView({
         </Card>
       </div>
 
+      {report.walkForward && report.walkForward.windows.length ? (
+        <Card className="border-border/70">
+          <CardHeader>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <CardTitle className="text-base">Walk-forward analysis</CardTitle>
+                <CardDescription>
+                  Rolling {report.walkForward.trainMonths}-month train / {report.walkForward.testMonths}-month test
+                  windows — {report.walkForward.windows.length} windows, {report.walkForward.positiveWindows} profitable.
+                </CardDescription>
+              </div>
+              {report.walkForward.overfittingRisk ? (
+                <Badge variant="outline" className="gap-1.5 border-warning/60 text-warning">
+                  <TriangleAlert className="h-3.5 w-3.5" aria-hidden /> Overfitting Risk
+                </Badge>
+              ) : (
+                <Badge className="gap-1.5 bg-profit/15 text-profit hover:bg-profit/20">
+                  <ShieldCheck className="h-3.5 w-3.5" aria-hidden /> Consistent out of sample
+                </Badge>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-3 sm:grid-cols-4">
+              <MetricCard
+                label="Consistency score"
+                value={`${fmtNum(report.walkForward.consistencyScore, 0)}/100`}
+                tone={report.walkForward.overfittingRisk ? "warning" : "profit"}
+              />
+              <MetricCard label="Mean window return" value={`${fmtNum(report.walkForward.meanReturn, 2)}%`} />
+              <MetricCard label="Std deviation" value={`${fmtNum(report.walkForward.stdReturn, 2)}%`} />
+              <MetricCard label="Train→test efficiency" value={fmtNum(report.walkForward.efficiency, 2)} />
+            </div>
+
+            <div className="h-[220px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={report.walkForward.windows} margin={{ left: 4, right: 8, top: 8, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
+                  <XAxis dataKey="testStart" tick={{ fontSize: 11 }} stroke="var(--color-muted-foreground)" minTickGap={24} />
+                  <YAxis tick={{ fontSize: 11 }} stroke="var(--color-muted-foreground)" width={44} />
+                  <ReTooltip {...chartTooltip} />
+                  <Bar dataKey="ret" name="Test window return %" radius={[4, 4, 0, 0]}>
+                    {report.walkForward.windows.map((w) => (
+                      <Cell key={w.index} fill={w.ret >= 0 ? "var(--color-profit)" : "var(--color-loss)"} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            {report.walkForward.overfittingRisk ? (
+              <p className="rounded-md border border-warning/50 bg-warning/10 p-3 text-xs text-warning">
+                Results vary widely between walk-forward windows, which often indicates parameters fitted to a specific
+                market period rather than a durable edge.
+              </p>
+            ) : null}
+
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>#</TableHead>
+                    <TableHead>Train window</TableHead>
+                    <TableHead>Test window</TableHead>
+                    <TableHead className="text-right">Return</TableHead>
+                    <TableHead className="text-right">Sharpe</TableHead>
+                    <TableHead className="text-right">Max DD</TableHead>
+                    <TableHead className="text-right">Win rate</TableHead>
+                    <TableHead className="text-right">Trades</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {report.walkForward.windows.map((w) => (
+                    <TableRow key={w.index}>
+                      <TableCell className="mono text-muted-foreground">{w.index}</TableCell>
+                      <TableCell className="mono text-xs">
+                        {w.trainStart} → {w.trainEnd}
+                      </TableCell>
+                      <TableCell className="mono text-xs">
+                        {w.testStart} → {w.testEnd}
+                      </TableCell>
+                      <TableCell className={`mono text-right ${pnlClass(w.ret)}`}>{fmtNum(w.ret, 2)}%</TableCell>
+                      <TableCell className="mono text-right">{fmtNum(w.sharpe, 2)}</TableCell>
+                      <TableCell className="mono text-right text-loss">-{fmtNum(w.maxDrawdown, 1)}%</TableCell>
+                      <TableCell className="mono text-right">{fmtNum(w.winRate, 1)}%</TableCell>
+                      <TableCell className="mono text-right">{w.trades}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      ) : null}
+
       <Card className="border-border/70">
         <CardHeader>
           <CardTitle className="text-base">Out-of-sample holdout</CardTitle>
@@ -289,3 +384,4 @@ export function BacktestReportView({
     </div>
   );
 }
+
