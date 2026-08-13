@@ -48,13 +48,15 @@ Algo backtests, validation runs and live execution all read through the existing
 ```text
 Overview
 
-BUILD                        (your own work)
-  My strategies
-  Builder
+BUILD                        (your own work — both kinds)
+  My work            (algo strategies + AI models you own)
+  Algo builder       (visual canvas + AI assist)
+  Upload AI model    (submission wizard)
   Templates
   Backtest
   Playground
   Validation queue
+
 
 DISCOVER                     (things others published)
   Marketplace          (algo strategies + AI models, filterable by kind)
@@ -85,6 +87,25 @@ ACCOUNT
 ```
 
 Groups are collapsible with uppercase headers; the group containing the current route stays open, state persists across reloads, and the icon-only collapsed sidebar keeps icons plus tooltips.
+
+## 6. What is on the BUILD pages
+
+**My work** (`/dashboard/strategies` today, retitled) is the single home for everything you create. A "New" button offers two choices:
+
+- Build an algo strategy → opens the visual builder
+- Upload an AI model → opens the model submission wizard
+
+Below it, one table with a kind column and tabs `All / Algo / AI models`. Each row shows name, kind, status (Draft, Validating, Verified, Listed, Rejected, Paused), visibility (Private / Unlisted / Public), price if listed, and lifetime earnings if listed. Row actions by kind:
+
+- Algo: Edit in builder, Backtest, Duplicate, Playground run, Publish/Manage listing, Share access, Delete
+- AI model: Edit listing, New version, Playground run, Validation status, Manage listing, Share access, Delete
+
+**Algo builder** (`/dashboard/strategies/builder`) stays the drag-and-drop canvas with AI assist and stays algo-only — no model upload here. Two additions: a Backtest button that reuses the shared protocol form, and a Publish button that opens the shared wizard pre-filled from the strategy (only enabled once the strategy has passed validation, otherwise it starts validation first).
+
+**Upload AI model** (`/dashboard/models/new`) stays the six-step wizard, unchanged except that it is now reachable from the same New menu and shares the Interface/Pricing/Backtest steps with algo publishing.
+
+So: yes, both paths live under BUILD, they are separate entry points because the authoring surfaces genuinely differ, but they converge into one list, one validation queue, one playground, and one listing/earnings flow.
+
 
 ## Technical notes
 
