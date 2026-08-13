@@ -5,12 +5,16 @@ import { toast } from "sonner";
 import {
   Area,
   AreaChart,
+  Bar,
+  BarChart,
   CartesianGrid,
+  Legend,
   ResponsiveContainer,
   Tooltip as ReTooltip,
   XAxis,
   YAxis,
 } from "recharts";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ArrowLeft, BadgeCheck, GitCompare, ShieldCheck, Star, TriangleAlert, Users } from "lucide-react";
 import { getPublicModel, submitReview } from "@/lib/models.functions";
 import { getReviewEligibility } from "@/lib/activations.functions";
