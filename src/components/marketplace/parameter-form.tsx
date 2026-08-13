@@ -39,9 +39,9 @@ export function ParameterForm({
             </div>
 
             {p.type === "toggle" ? (
-              <Switch checked={Boolean(value)} onCheckedChange={(v) => set(p.key, v)} disabled={disabled} />
+              <Switch checked={Boolean(value)} onCheckedChange={(v) => set(p.key, v)} disabled={disabled ?? false} />
             ) : p.type === "select" ? (
-              <Select value={String(value)} onValueChange={(v) => set(p.key, v)} disabled={disabled}>
+              <Select value={String(value)} onValueChange={(v) => set(p.key, v)} disabled={disabled ?? false}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -62,14 +62,14 @@ export function ParameterForm({
                   step={p.step ?? 1}
                   value={[Number(value) || 0]}
                   onValueChange={([v]) => set(p.key, Number(v))}
-                  disabled={disabled}
+                  disabled={disabled ?? false}
                 />
                 <Input
                   className="mono w-24"
                   inputMode="decimal"
                   value={String(value)}
                   onChange={(e) => set(p.key, Number(e.target.value) || 0)}
-                  disabled={disabled}
+                  disabled={disabled ?? false}
                 />
               </div>
             )}
