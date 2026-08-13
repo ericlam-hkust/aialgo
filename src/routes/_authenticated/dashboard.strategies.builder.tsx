@@ -44,6 +44,7 @@ import {
   LANE_LABEL,
   laneOf,
   newNodeId,
+  NODE_CATALOG,
   starterGraph,
   validateGraph,
   COLUMN_X,
@@ -281,13 +282,7 @@ function Builder() {
       const payload = event.dataTransfer.getData("application/algoforge-node");
       if (!payload) return;
       const [kind, label] = payload.split("::");
-      const spec = (
-        [] as NodeSpec[]
-      )
-        .concat(...[]) // placeholder to keep types happy
-        .find(() => false);
-      void spec;
-      const found = catalogLookup(kind ?? "", label ?? "");
+      const found = NODE_CATALOG.find((s) => s.kind === kind && s.label === label);
       if (!found) return;
       const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
       placeNode(found, position, laneFromY(position.y));
@@ -658,8 +653,4 @@ function Builder() {
       </div>
     </BuilderProvider>
   );
-}
-
-function catalogLookup(kind: string, label: string): NodeSpec | undefined {
-  return NODE_CATALOG_CACHE.find((s) => s.kind === kind && s.label === label);
 }
