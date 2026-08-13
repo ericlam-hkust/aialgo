@@ -21,7 +21,6 @@ import {
   Sparkles,
   Store,
   Upload,
-  Wallet,
   Zap,
   type LucideIcon,
 } from "lucide-react";
@@ -146,13 +145,11 @@ export const NAV_GROUPS: NavGroup[] = [
       { to: "/dashboard/earnings", key: "nav.earnings", icon: Banknote, exact: true, terms: ["earnings", "commission", "fees", "revenue"] },
       { to: "/dashboard/models/payouts", key: "nav.payouts", icon: Banknote, exact: true, terms: ["stripe", "bank", "revenue"] },
       { to: "/dashboard/teams", key: "nav.teams", icon: Building2, exact: false, terms: ["organization", "namespace", "tokens"] },
-      { to: "/marketplace/api-status", key: "nav.apiStatus", icon: Activity, exact: true, terms: ["uptime", "incidents", "changelog"] },
     ],
   },
   {
     key: "group.account",
     items: [
-      { to: "/dashboard/wallet", key: "nav.wallet", icon: Wallet, exact: true, terms: ["credits", "balance"] },
       { to: "/dashboard/billing", key: "nav.billing", icon: CreditCard, exact: true, terms: ["plan", "subscription", "invoice"] },
       { to: "/dashboard/settings", key: "nav.settings", icon: Settings, exact: true, terms: ["profile", "preferences"] },
       { to: "/dashboard/admin", key: "nav.admin", icon: Gavel, exact: true, terms: ["moderation", "review"] },
