@@ -11,7 +11,7 @@ import {
   updateActivationRisk,
   type ActivationRow,
 } from "@/lib/activations.functions";
-import { setActivationStatus } from "@/lib/models.functions";
+import { setActivationStatus } from "@/lib/marketplace.functions";
 import { EmptyState } from "@/components/empty-state";
 import { MetricCard } from "@/components/metric-card";
 import { Button } from "@/components/ui/button";
@@ -81,7 +81,7 @@ function MyModels() {
           description="Browse the marketplace and deploy a model to paper trading first."
           action={
             <Button asChild>
-              <Link to="/models">Browse models</Link>
+              <Link to="/marketplace">Browse models</Link>
             </Button>
           }
         />

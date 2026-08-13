@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { fmtDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/models/api-status")({
+export const Route = createFileRoute("/marketplace/api-status")({
   head: () => ({
     meta: [
       { title: "API changelog & status — AlgoForge" },

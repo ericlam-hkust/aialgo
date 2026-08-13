@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowUpDown, GitCompare, LayoutGrid, List, Search, Trophy } from "lucide-react";
-import { listPublicModels, type PublicModel } from "@/lib/models.functions";
+import { listPublicModels, type PublicModel } from "@/lib/marketplace.functions";
 import { ModelCard, type ModelCardModel } from "@/components/marketplace/model-card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,7 @@ const modelsQuery = queryOptions({
   queryFn: () => listPublicModels(),
 });
 
-export const Route = createFileRoute("/models/")({
+export const Route = createFileRoute("/marketplace/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(modelsQuery),
   head: () => ({
     meta: [
@@ -251,7 +251,7 @@ function Catalog() {
                   Clear
                 </Button>
                 <Button asChild size="sm" disabled={compare.length < 2}>
-                  <Link to="/models/compare" search={{ models: compare.join(",") }}>
+                  <Link to="/marketplace/compare" search={{ models: compare.join(",") }}>
                     Compare {compare.length}
                   </Link>
                 </Button>
@@ -281,7 +281,7 @@ function Catalog() {
                     <TableRow key={m.slug}>
                       <TableCell className="mono text-muted-foreground">{i + 1}</TableCell>
                       <TableCell>
-                        <Link to="/models/$slug" params={{ slug: m.slug }} className="hover:text-primary">
+                        <Link to="/marketplace/$slug" params={{ slug: m.slug }} className="hover:text-primary">
                           <span className="font-medium">{m.name}</span>
                           <span className="block text-xs text-muted-foreground">{m.contributor?.display_name}</span>
                         </Link>

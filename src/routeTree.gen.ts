@@ -14,20 +14,20 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CreatorsRouteImport } from './routes/creators'
 import { Route as HowWeMakeMoneyRouteImport } from './routes/how-we-make-money'
-import { Route as ModelsRouteImport } from './routes/models'
+import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthIndexRouteImport } from './routes/auth.index'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthRegisterRouteImport } from './routes/auth.register'
-import { Route as ModelsIndexRouteImport } from './routes/models.index'
-import { Route as ModelsSlugRouteImport } from './routes/models.$slug'
-import { Route as ModelsApiStatusRouteImport } from './routes/models.api-status'
-import { Route as ModelsCompareRouteImport } from './routes/models.compare'
-import { Route as ModelsDataLibraryRouteImport } from './routes/models.data-library'
-import { Route as ModelsDocsRouteImport } from './routes/models.docs'
-import { Route as ModelsVerificationRouteImport } from './routes/models.verification'
+import { Route as MarketplaceIndexRouteImport } from './routes/marketplace.index'
+import { Route as MarketplaceSlugRouteImport } from './routes/marketplace.$slug'
+import { Route as MarketplaceApiStatusRouteImport } from './routes/marketplace.api-status'
+import { Route as MarketplaceCompareRouteImport } from './routes/marketplace.compare'
+import { Route as MarketplaceDataLibraryRouteImport } from './routes/marketplace.data-library'
+import { Route as MarketplaceDocsRouteImport } from './routes/marketplace.docs'
+import { Route as MarketplaceVerificationRouteImport } from './routes/marketplace.verification'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardAccountsRouteImport } from './routes/_authenticated/dashboard.accounts'
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated/dashboard.admin'
@@ -83,9 +83,9 @@ const HowWeMakeMoneyRoute = HowWeMakeMoneyRouteImport.update({
   path: '/how-we-make-money',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ModelsRoute = ModelsRouteImport.update({
-  id: '/models',
-  path: '/models',
+const MarketplaceRoute = MarketplaceRouteImport.update({
+  id: '/marketplace',
+  path: '/marketplace',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PricingRoute = PricingRouteImport.update({
@@ -118,40 +118,40 @@ const AuthRegisterRoute = AuthRegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => AuthRoute,
 } as any)
-const ModelsIndexRoute = ModelsIndexRouteImport.update({
+const MarketplaceIndexRoute = MarketplaceIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => ModelsRoute,
+  getParentRoute: () => MarketplaceRoute,
 } as any)
-const ModelsSlugRoute = ModelsSlugRouteImport.update({
+const MarketplaceSlugRoute = MarketplaceSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
-  getParentRoute: () => ModelsRoute,
+  getParentRoute: () => MarketplaceRoute,
 } as any)
-const ModelsApiStatusRoute = ModelsApiStatusRouteImport.update({
+const MarketplaceApiStatusRoute = MarketplaceApiStatusRouteImport.update({
   id: '/api-status',
   path: '/api-status',
-  getParentRoute: () => ModelsRoute,
+  getParentRoute: () => MarketplaceRoute,
 } as any)
-const ModelsCompareRoute = ModelsCompareRouteImport.update({
+const MarketplaceCompareRoute = MarketplaceCompareRouteImport.update({
   id: '/compare',
   path: '/compare',
-  getParentRoute: () => ModelsRoute,
+  getParentRoute: () => MarketplaceRoute,
 } as any)
-const ModelsDataLibraryRoute = ModelsDataLibraryRouteImport.update({
+const MarketplaceDataLibraryRoute = MarketplaceDataLibraryRouteImport.update({
   id: '/data-library',
   path: '/data-library',
-  getParentRoute: () => ModelsRoute,
+  getParentRoute: () => MarketplaceRoute,
 } as any)
-const ModelsDocsRoute = ModelsDocsRouteImport.update({
+const MarketplaceDocsRoute = MarketplaceDocsRouteImport.update({
   id: '/docs',
   path: '/docs',
-  getParentRoute: () => ModelsRoute,
+  getParentRoute: () => MarketplaceRoute,
 } as any)
-const ModelsVerificationRoute = ModelsVerificationRouteImport.update({
+const MarketplaceVerificationRoute = MarketplaceVerificationRouteImport.update({
   id: '/verification',
   path: '/verification',
-  getParentRoute: () => ModelsRoute,
+  getParentRoute: () => MarketplaceRoute,
 } as any)
 const AuthenticatedDashboardIndexRoute =
   AuthenticatedDashboardIndexRouteImport.update({
@@ -337,20 +337,20 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRouteWithChildren
   '/creators': typeof CreatorsRoute
   '/how-we-make-money': typeof HowWeMakeMoneyRoute
-  '/models': typeof ModelsRouteWithChildren
+  '/marketplace': typeof MarketplaceRouteWithChildren
   '/pricing': typeof PricingRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
-  '/models/$slug': typeof ModelsSlugRoute
-  '/models/api-status': typeof ModelsApiStatusRoute
-  '/models/compare': typeof ModelsCompareRoute
-  '/models/data-library': typeof ModelsDataLibraryRoute
-  '/models/docs': typeof ModelsDocsRoute
-  '/models/verification': typeof ModelsVerificationRoute
+  '/marketplace/$slug': typeof MarketplaceSlugRoute
+  '/marketplace/api-status': typeof MarketplaceApiStatusRoute
+  '/marketplace/compare': typeof MarketplaceCompareRoute
+  '/marketplace/data-library': typeof MarketplaceDataLibraryRoute
+  '/marketplace/docs': typeof MarketplaceDocsRoute
+  '/marketplace/verification': typeof MarketplaceVerificationRoute
   '/auth/': typeof AuthIndexRoute
-  '/models/': typeof ModelsIndexRoute
+  '/marketplace/': typeof MarketplaceIndexRoute
   '/dashboard/accounts': typeof AuthenticatedDashboardAccountsRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
@@ -390,14 +390,14 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
-  '/models/$slug': typeof ModelsSlugRoute
-  '/models/api-status': typeof ModelsApiStatusRoute
-  '/models/compare': typeof ModelsCompareRoute
-  '/models/data-library': typeof ModelsDataLibraryRoute
-  '/models/docs': typeof ModelsDocsRoute
-  '/models/verification': typeof ModelsVerificationRoute
+  '/marketplace/$slug': typeof MarketplaceSlugRoute
+  '/marketplace/api-status': typeof MarketplaceApiStatusRoute
+  '/marketplace/compare': typeof MarketplaceCompareRoute
+  '/marketplace/data-library': typeof MarketplaceDataLibraryRoute
+  '/marketplace/docs': typeof MarketplaceDocsRoute
+  '/marketplace/verification': typeof MarketplaceVerificationRoute
   '/auth': typeof AuthIndexRoute
-  '/models': typeof ModelsIndexRoute
+  '/marketplace': typeof MarketplaceIndexRoute
   '/dashboard/accounts': typeof AuthenticatedDashboardAccountsRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
@@ -436,20 +436,20 @@ export interface FileRoutesById {
   '/auth': typeof AuthRouteWithChildren
   '/creators': typeof CreatorsRoute
   '/how-we-make-money': typeof HowWeMakeMoneyRoute
-  '/models': typeof ModelsRouteWithChildren
+  '/marketplace': typeof MarketplaceRouteWithChildren
   '/pricing': typeof PricingRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
-  '/models/$slug': typeof ModelsSlugRoute
-  '/models/api-status': typeof ModelsApiStatusRoute
-  '/models/compare': typeof ModelsCompareRoute
-  '/models/data-library': typeof ModelsDataLibraryRoute
-  '/models/docs': typeof ModelsDocsRoute
-  '/models/verification': typeof ModelsVerificationRoute
+  '/marketplace/$slug': typeof MarketplaceSlugRoute
+  '/marketplace/api-status': typeof MarketplaceApiStatusRoute
+  '/marketplace/compare': typeof MarketplaceCompareRoute
+  '/marketplace/data-library': typeof MarketplaceDataLibraryRoute
+  '/marketplace/docs': typeof MarketplaceDocsRoute
+  '/marketplace/verification': typeof MarketplaceVerificationRoute
   '/auth/': typeof AuthIndexRoute
-  '/models/': typeof ModelsIndexRoute
+  '/marketplace/': typeof MarketplaceIndexRoute
   '/_authenticated/dashboard/accounts': typeof AuthenticatedDashboardAccountsRoute
   '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
@@ -488,20 +488,20 @@ export interface FileRouteTypes {
     | '/auth'
     | '/creators'
     | '/how-we-make-money'
-    | '/models'
+    | '/marketplace'
     | '/pricing'
     | '/dashboard'
     | '/onboarding'
     | '/auth/login'
     | '/auth/register'
-    | '/models/$slug'
-    | '/models/api-status'
-    | '/models/compare'
-    | '/models/data-library'
-    | '/models/docs'
-    | '/models/verification'
+    | '/marketplace/$slug'
+    | '/marketplace/api-status'
+    | '/marketplace/compare'
+    | '/marketplace/data-library'
+    | '/marketplace/docs'
+    | '/marketplace/verification'
     | '/auth/'
-    | '/models/'
+    | '/marketplace/'
     | '/dashboard/accounts'
     | '/dashboard/admin'
     | '/dashboard/billing'
@@ -541,14 +541,14 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/auth/login'
     | '/auth/register'
-    | '/models/$slug'
-    | '/models/api-status'
-    | '/models/compare'
-    | '/models/data-library'
-    | '/models/docs'
-    | '/models/verification'
+    | '/marketplace/$slug'
+    | '/marketplace/api-status'
+    | '/marketplace/compare'
+    | '/marketplace/data-library'
+    | '/marketplace/docs'
+    | '/marketplace/verification'
     | '/auth'
-    | '/models'
+    | '/marketplace'
     | '/dashboard/accounts'
     | '/dashboard/admin'
     | '/dashboard/billing'
@@ -586,20 +586,20 @@ export interface FileRouteTypes {
     | '/auth'
     | '/creators'
     | '/how-we-make-money'
-    | '/models'
+    | '/marketplace'
     | '/pricing'
     | '/_authenticated/dashboard'
     | '/_authenticated/onboarding'
     | '/auth/login'
     | '/auth/register'
-    | '/models/$slug'
-    | '/models/api-status'
-    | '/models/compare'
-    | '/models/data-library'
-    | '/models/docs'
-    | '/models/verification'
+    | '/marketplace/$slug'
+    | '/marketplace/api-status'
+    | '/marketplace/compare'
+    | '/marketplace/data-library'
+    | '/marketplace/docs'
+    | '/marketplace/verification'
     | '/auth/'
-    | '/models/'
+    | '/marketplace/'
     | '/_authenticated/dashboard/accounts'
     | '/_authenticated/dashboard/admin'
     | '/_authenticated/dashboard/billing'
@@ -638,7 +638,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRouteWithChildren
   CreatorsRoute: typeof CreatorsRoute
   HowWeMakeMoneyRoute: typeof HowWeMakeMoneyRoute
-  ModelsRoute: typeof ModelsRouteWithChildren
+  MarketplaceRoute: typeof MarketplaceRouteWithChildren
   PricingRoute: typeof PricingRoute
   ApiPublicSyncRoute: typeof ApiPublicSyncRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
@@ -682,11 +682,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HowWeMakeMoneyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/models': {
-      id: '/models'
-      path: '/models'
-      fullPath: '/models'
-      preLoaderRoute: typeof ModelsRouteImport
+    '/marketplace': {
+      id: '/marketplace'
+      path: '/marketplace'
+      fullPath: '/marketplace'
+      preLoaderRoute: typeof MarketplaceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pricing': {
@@ -731,54 +731,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRegisterRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/models/': {
-      id: '/models/'
+    '/marketplace/': {
+      id: '/marketplace/'
       path: '/'
-      fullPath: '/models/'
-      preLoaderRoute: typeof ModelsIndexRouteImport
-      parentRoute: typeof ModelsRoute
+      fullPath: '/marketplace/'
+      preLoaderRoute: typeof MarketplaceIndexRouteImport
+      parentRoute: typeof MarketplaceRoute
     }
-    '/models/$slug': {
-      id: '/models/$slug'
+    '/marketplace/$slug': {
+      id: '/marketplace/$slug'
       path: '/$slug'
-      fullPath: '/models/$slug'
-      preLoaderRoute: typeof ModelsSlugRouteImport
-      parentRoute: typeof ModelsRoute
+      fullPath: '/marketplace/$slug'
+      preLoaderRoute: typeof MarketplaceSlugRouteImport
+      parentRoute: typeof MarketplaceRoute
     }
-    '/models/api-status': {
-      id: '/models/api-status'
+    '/marketplace/api-status': {
+      id: '/marketplace/api-status'
       path: '/api-status'
-      fullPath: '/models/api-status'
-      preLoaderRoute: typeof ModelsApiStatusRouteImport
-      parentRoute: typeof ModelsRoute
+      fullPath: '/marketplace/api-status'
+      preLoaderRoute: typeof MarketplaceApiStatusRouteImport
+      parentRoute: typeof MarketplaceRoute
     }
-    '/models/compare': {
-      id: '/models/compare'
+    '/marketplace/compare': {
+      id: '/marketplace/compare'
       path: '/compare'
-      fullPath: '/models/compare'
-      preLoaderRoute: typeof ModelsCompareRouteImport
-      parentRoute: typeof ModelsRoute
+      fullPath: '/marketplace/compare'
+      preLoaderRoute: typeof MarketplaceCompareRouteImport
+      parentRoute: typeof MarketplaceRoute
     }
-    '/models/data-library': {
-      id: '/models/data-library'
+    '/marketplace/data-library': {
+      id: '/marketplace/data-library'
       path: '/data-library'
-      fullPath: '/models/data-library'
-      preLoaderRoute: typeof ModelsDataLibraryRouteImport
-      parentRoute: typeof ModelsRoute
+      fullPath: '/marketplace/data-library'
+      preLoaderRoute: typeof MarketplaceDataLibraryRouteImport
+      parentRoute: typeof MarketplaceRoute
     }
-    '/models/docs': {
-      id: '/models/docs'
+    '/marketplace/docs': {
+      id: '/marketplace/docs'
       path: '/docs'
-      fullPath: '/models/docs'
-      preLoaderRoute: typeof ModelsDocsRouteImport
-      parentRoute: typeof ModelsRoute
+      fullPath: '/marketplace/docs'
+      preLoaderRoute: typeof MarketplaceDocsRouteImport
+      parentRoute: typeof MarketplaceRoute
     }
-    '/models/verification': {
-      id: '/models/verification'
+    '/marketplace/verification': {
+      id: '/marketplace/verification'
       path: '/verification'
-      fullPath: '/models/verification'
-      preLoaderRoute: typeof ModelsVerificationRouteImport
-      parentRoute: typeof ModelsRoute
+      fullPath: '/marketplace/verification'
+      preLoaderRoute: typeof MarketplaceVerificationRouteImport
+      parentRoute: typeof MarketplaceRoute
     }
     '/_authenticated/dashboard/': {
       id: '/_authenticated/dashboard/'
@@ -1113,28 +1113,29 @@ const AuthRouteChildren: AuthRouteChildren = {
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
-interface ModelsRouteChildren {
-  ModelsSlugRoute: typeof ModelsSlugRoute
-  ModelsApiStatusRoute: typeof ModelsApiStatusRoute
-  ModelsCompareRoute: typeof ModelsCompareRoute
-  ModelsDataLibraryRoute: typeof ModelsDataLibraryRoute
-  ModelsDocsRoute: typeof ModelsDocsRoute
-  ModelsVerificationRoute: typeof ModelsVerificationRoute
-  ModelsIndexRoute: typeof ModelsIndexRoute
+interface MarketplaceRouteChildren {
+  MarketplaceSlugRoute: typeof MarketplaceSlugRoute
+  MarketplaceApiStatusRoute: typeof MarketplaceApiStatusRoute
+  MarketplaceCompareRoute: typeof MarketplaceCompareRoute
+  MarketplaceDataLibraryRoute: typeof MarketplaceDataLibraryRoute
+  MarketplaceDocsRoute: typeof MarketplaceDocsRoute
+  MarketplaceVerificationRoute: typeof MarketplaceVerificationRoute
+  MarketplaceIndexRoute: typeof MarketplaceIndexRoute
 }
 
-const ModelsRouteChildren: ModelsRouteChildren = {
-  ModelsSlugRoute: ModelsSlugRoute,
-  ModelsApiStatusRoute: ModelsApiStatusRoute,
-  ModelsCompareRoute: ModelsCompareRoute,
-  ModelsDataLibraryRoute: ModelsDataLibraryRoute,
-  ModelsDocsRoute: ModelsDocsRoute,
-  ModelsVerificationRoute: ModelsVerificationRoute,
-  ModelsIndexRoute: ModelsIndexRoute,
+const MarketplaceRouteChildren: MarketplaceRouteChildren = {
+  MarketplaceSlugRoute: MarketplaceSlugRoute,
+  MarketplaceApiStatusRoute: MarketplaceApiStatusRoute,
+  MarketplaceCompareRoute: MarketplaceCompareRoute,
+  MarketplaceDataLibraryRoute: MarketplaceDataLibraryRoute,
+  MarketplaceDocsRoute: MarketplaceDocsRoute,
+  MarketplaceVerificationRoute: MarketplaceVerificationRoute,
+  MarketplaceIndexRoute: MarketplaceIndexRoute,
 }
 
-const ModelsRouteWithChildren =
-  ModelsRoute._addFileChildren(ModelsRouteChildren)
+const MarketplaceRouteWithChildren = MarketplaceRoute._addFileChildren(
+  MarketplaceRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -1142,7 +1143,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRouteWithChildren,
   CreatorsRoute: CreatorsRoute,
   HowWeMakeMoneyRoute: HowWeMakeMoneyRoute,
-  ModelsRoute: ModelsRouteWithChildren,
+  MarketplaceRoute: MarketplaceRouteWithChildren,
   PricingRoute: PricingRoute,
   ApiPublicSyncRoute: ApiPublicSyncRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,

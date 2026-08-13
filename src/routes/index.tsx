@@ -98,7 +98,7 @@ function Landing() {
           </span>
           <nav className="flex items-center gap-1 sm:gap-2">
             <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
-              <Link to="/models">{t("landing.nav.marketplace")}</Link>
+              <Link to="/marketplace">{t("landing.nav.marketplace")}</Link>
             </Button>
             <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
               <Link to="/pricing">{t("landing.nav.pricing")}</Link>
@@ -136,7 +136,7 @@ function Landing() {
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <Link to="/models">{t("landing.ctaSecondary")}</Link>
+              <Link to="/marketplace">{t("landing.ctaSecondary")}</Link>
             </Button>
           </div>
           <dl className="mx-auto mt-14 grid max-w-4xl gap-6 text-left sm:grid-cols-2 lg:grid-cols-4">
@@ -274,7 +274,7 @@ function Landing() {
             <Link to="/how-we-make-money">{t("landing.trust.link1")}</Link>
           </Button>
           <Button asChild variant="outline" size="sm">
-            <Link to="/models/verification">{t("landing.trust.link2")}</Link>
+            <Link to="/marketplace/verification">{t("landing.trust.link2")}</Link>
           </Button>
         </div>
       </section>

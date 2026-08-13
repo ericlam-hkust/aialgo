@@ -16,7 +16,7 @@ import { fmtDate } from "@/lib/format";
 
 const catalogQuery = queryOptions({ queryKey: ["data-catalog"], queryFn: () => listDataCatalog() });
 
-export const Route = createFileRoute("/models/data-library")({
+export const Route = createFileRoute("/marketplace/data-library")({
   loader: ({ context }) => context.queryClient.ensureQueryData(catalogQuery),
   head: () => ({
     meta: [

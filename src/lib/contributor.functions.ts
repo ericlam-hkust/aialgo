@@ -214,7 +214,7 @@ export const publishModelVersion = createServerFn({ method: "POST" })
           kind: "new_version" as const,
           title: `${model.name} v${data.version} is available`,
           body: data.changelog,
-          link: `/models/${model.slug}`,
+          link: `/marketplace/${model.slug}`,
         })),
       );
     }

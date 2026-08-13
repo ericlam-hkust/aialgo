@@ -293,7 +293,7 @@ function ModelRow({
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button asChild variant="ghost" size="sm">
-            <Link to="/models/$slug" params={{ slug: model.slug }}>
+            <Link to="/marketplace/$slug" params={{ slug: model.slug }}>
               <ExternalLink className="mr-1.5 h-3.5 w-3.5" aria-hidden /> View listing
             </Link>
           </Button>

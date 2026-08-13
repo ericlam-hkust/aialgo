@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { AppShell } from "@/components/app-shell";
 import { useAuth } from "@/hooks/use-auth";
 
-export const Route = createFileRoute("/models")({
+export const Route = createFileRoute("/marketplace")({
   component: ModelsLayout,
 });
 
@@ -29,7 +29,7 @@ function ModelsLayout() {
           </Link>
           <nav className="flex items-center gap-2">
             <Button asChild variant="ghost" size="sm">
-              <Link to="/models">Model marketplace</Link>
+              <Link to="/marketplace">Model marketplace</Link>
             </Button>
             <Button asChild variant="ghost" size="sm">
               <Link to="/dashboard">Dashboard</Link>

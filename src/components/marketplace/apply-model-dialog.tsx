@@ -6,7 +6,7 @@ import { ArrowLeft, ArrowRight, CheckCircle2, CreditCard, Loader2, ShieldAlert, 
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { createModelCheckoutSession } from "@/lib/marketplace-payments.functions";
-import { activateModel, getMyModelAccess } from "@/lib/models.functions";
+import { activateModel, getMyModelAccess } from "@/lib/marketplace.functions";
 import { listTradingAccounts } from "@/lib/trading-accounts.functions";
 import { providerLabel } from "@/lib/trading-accounts";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -275,7 +275,7 @@ function PayStep({ model }: { model: { id: string; slug: string } }) {
     const res = await createModelCheckoutSession({
       data: {
         modelId: model.id,
-        returnUrl: `${window.location.origin}/models/${model.slug}?purchase=done`,
+        returnUrl: `${window.location.origin}/marketplace/${model.slug}?purchase=done`,
         environment: getStripeEnvironment(),
       },
     });
