@@ -14,6 +14,125 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_models: {
+        Row: {
+          active_users: number
+          api_auth_encrypted: string | null
+          api_endpoint: string | null
+          asset_class: Database["public"]["Enums"]["asset_class"]
+          cagr: number
+          contributor_id: string
+          created_at: string
+          currency: string
+          description: string
+          executions: number
+          id: string
+          listed_at: string | null
+          live_return_30d: number
+          max_drawdown: number
+          name: string
+          package_kind: string
+          package_path: string | null
+          parameters: Json
+          price: number
+          pricing_model: Database["public"]["Enums"]["model_pricing_model"]
+          rating: number
+          rating_count: number
+          risk_disclosure: string | null
+          risk_level: Database["public"]["Enums"]["model_risk_level"]
+          sharpe: number
+          slug: string
+          status: Database["public"]["Enums"]["model_listing_status"]
+          strategy_type: Database["public"]["Enums"]["model_strategy_type"]
+          tagline: string | null
+          tags: string[]
+          timeframe: string
+          updated_at: string
+          user_id: string | null
+          win_rate: number
+        }
+        Insert: {
+          active_users?: number
+          api_auth_encrypted?: string | null
+          api_endpoint?: string | null
+          asset_class?: Database["public"]["Enums"]["asset_class"]
+          cagr?: number
+          contributor_id: string
+          created_at?: string
+          currency?: string
+          description?: string
+          executions?: number
+          id?: string
+          listed_at?: string | null
+          live_return_30d?: number
+          max_drawdown?: number
+          name: string
+          package_kind?: string
+          package_path?: string | null
+          parameters?: Json
+          price?: number
+          pricing_model?: Database["public"]["Enums"]["model_pricing_model"]
+          rating?: number
+          rating_count?: number
+          risk_disclosure?: string | null
+          risk_level?: Database["public"]["Enums"]["model_risk_level"]
+          sharpe?: number
+          slug: string
+          status?: Database["public"]["Enums"]["model_listing_status"]
+          strategy_type?: Database["public"]["Enums"]["model_strategy_type"]
+          tagline?: string | null
+          tags?: string[]
+          timeframe?: string
+          updated_at?: string
+          user_id?: string | null
+          win_rate?: number
+        }
+        Update: {
+          active_users?: number
+          api_auth_encrypted?: string | null
+          api_endpoint?: string | null
+          asset_class?: Database["public"]["Enums"]["asset_class"]
+          cagr?: number
+          contributor_id?: string
+          created_at?: string
+          currency?: string
+          description?: string
+          executions?: number
+          id?: string
+          listed_at?: string | null
+          live_return_30d?: number
+          max_drawdown?: number
+          name?: string
+          package_kind?: string
+          package_path?: string | null
+          parameters?: Json
+          price?: number
+          pricing_model?: Database["public"]["Enums"]["model_pricing_model"]
+          rating?: number
+          rating_count?: number
+          risk_disclosure?: string | null
+          risk_level?: Database["public"]["Enums"]["model_risk_level"]
+          sharpe?: number
+          slug?: string
+          status?: Database["public"]["Enums"]["model_listing_status"]
+          strategy_type?: Database["public"]["Enums"]["model_strategy_type"]
+          tagline?: string | null
+          tags?: string[]
+          timeframe?: string
+          updated_at?: string
+          user_id?: string | null
+          win_rate?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_models_contributor_id_fkey"
+            columns: ["contributor_id"]
+            isOneToOne: false
+            referencedRelation: "contributor_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -304,6 +423,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      contributor_profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          country: string | null
+          created_at: string
+          display_name: string
+          handle: string
+          id: string
+          payout_email: string | null
+          payout_status: string
+          stripe_account_id: string | null
+          updated_at: string
+          user_id: string | null
+          verified: boolean
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          country?: string | null
+          created_at?: string
+          display_name: string
+          handle: string
+          id?: string
+          payout_email?: string | null
+          payout_status?: string
+          stripe_account_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+          verified?: boolean
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          country?: string | null
+          created_at?: string
+          display_name?: string
+          handle?: string
+          id?: string
+          payout_email?: string | null
+          payout_status?: string
+          stripe_account_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+          verified?: boolean
+        }
+        Relationships: []
       }
       creator_payouts: {
         Row: {
@@ -609,6 +776,362 @@ export type Database = {
           },
         ]
       }
+      model_activations: {
+        Row: {
+          activated_at: string
+          broker_connection_id: string | null
+          capital_allocation: number
+          daily_loss_limit_pct: number
+          id: string
+          max_position_size_pct: number
+          mode: string
+          model_id: string
+          parameters: Json
+          pnl: number
+          pnl_pct: number
+          purchase_id: string | null
+          status: string
+          stop_loss_pct: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activated_at?: string
+          broker_connection_id?: string | null
+          capital_allocation?: number
+          daily_loss_limit_pct?: number
+          id?: string
+          max_position_size_pct?: number
+          mode?: string
+          model_id: string
+          parameters?: Json
+          pnl?: number
+          pnl_pct?: number
+          purchase_id?: string | null
+          status?: string
+          stop_loss_pct?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activated_at?: string
+          broker_connection_id?: string | null
+          capital_allocation?: number
+          daily_loss_limit_pct?: number
+          id?: string
+          max_position_size_pct?: number
+          mode?: string
+          model_id?: string
+          parameters?: Json
+          pnl?: number
+          pnl_pct?: number
+          purchase_id?: string | null
+          status?: string
+          stop_loss_pct?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "model_activations_broker_connection_id_fkey"
+            columns: ["broker_connection_id"]
+            isOneToOne: false
+            referencedRelation: "broker_connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "model_activations_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "ai_models"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "model_activations_purchase_id_fkey"
+            columns: ["purchase_id"]
+            isOneToOne: false
+            referencedRelation: "model_purchases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      model_metrics: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          model_id: string
+          monthly_returns: Json
+          series: Json
+          stats: Json
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind?: string
+          model_id: string
+          monthly_returns?: Json
+          series?: Json
+          stats?: Json
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          model_id?: string
+          monthly_returns?: Json
+          series?: Json
+          stats?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "model_metrics_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "ai_models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      model_purchases: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          environment: string
+          id: string
+          model_id: string
+          pricing_model: Database["public"]["Enums"]["model_pricing_model"]
+          status: string
+          stripe_session_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          environment?: string
+          id?: string
+          model_id: string
+          pricing_model: Database["public"]["Enums"]["model_pricing_model"]
+          status?: string
+          stripe_session_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          environment?: string
+          id?: string
+          model_id?: string
+          pricing_model?: Database["public"]["Enums"]["model_pricing_model"]
+          status?: string
+          stripe_session_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "model_purchases_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "ai_models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      model_reviews: {
+        Row: {
+          author_name: string
+          comment: string
+          created_at: string
+          id: string
+          model_id: string
+          rating: number
+          user_id: string | null
+        }
+        Insert: {
+          author_name?: string
+          comment?: string
+          created_at?: string
+          id?: string
+          model_id: string
+          rating: number
+          user_id?: string | null
+        }
+        Update: {
+          author_name?: string
+          comment?: string
+          created_at?: string
+          id?: string
+          model_id?: string
+          rating?: number
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "model_reviews_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "ai_models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      model_submissions: {
+        Row: {
+          created_at: string
+          id: string
+          model_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          reviewer_notes: string | null
+          status: Database["public"]["Enums"]["model_listing_status"]
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          model_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_notes?: string | null
+          status?: Database["public"]["Enums"]["model_listing_status"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          model_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_notes?: string | null
+          status?: Database["public"]["Enums"]["model_listing_status"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "model_submissions_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "ai_models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      model_transactions: {
+        Row: {
+          buyer_id: string | null
+          commission_amount: number
+          commission_rate: number
+          contributor_id: string | null
+          created_at: string
+          currency: string
+          gross_amount: number
+          id: string
+          kind: string
+          model_id: string | null
+          model_name: string | null
+          net_amount: number
+          payout_batch_id: string | null
+          status: string
+        }
+        Insert: {
+          buyer_id?: string | null
+          commission_amount?: number
+          commission_rate?: number
+          contributor_id?: string | null
+          created_at?: string
+          currency?: string
+          gross_amount?: number
+          id?: string
+          kind?: string
+          model_id?: string | null
+          model_name?: string | null
+          net_amount?: number
+          payout_batch_id?: string | null
+          status?: string
+        }
+        Update: {
+          buyer_id?: string | null
+          commission_amount?: number
+          commission_rate?: number
+          contributor_id?: string | null
+          created_at?: string
+          currency?: string
+          gross_amount?: number
+          id?: string
+          kind?: string
+          model_id?: string | null
+          model_name?: string | null
+          net_amount?: number
+          payout_batch_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "model_transactions_contributor_id_fkey"
+            columns: ["contributor_id"]
+            isOneToOne: false
+            referencedRelation: "contributor_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "model_transactions_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "ai_models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      model_versions: {
+        Row: {
+          changelog: string
+          created_at: string
+          id: string
+          is_current: boolean
+          model_id: string
+          released_at: string
+          version: string
+        }
+        Insert: {
+          changelog?: string
+          created_at?: string
+          id?: string
+          is_current?: boolean
+          model_id: string
+          released_at?: string
+          version: string
+        }
+        Update: {
+          changelog?: string
+          created_at?: string
+          id?: string
+          is_current?: boolean
+          model_id?: string
+          released_at?: string
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "model_versions_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "ai_models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       paper_positions: {
         Row: {
           avg_entry_price: number
@@ -741,6 +1264,68 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      payout_batches: {
+        Row: {
+          amount: number
+          contributor_id: string
+          created_at: string
+          currency: string
+          id: string
+          paid_at: string | null
+          period: string
+          status: Database["public"]["Enums"]["payout_status"]
+          stripe_transfer_id: string | null
+        }
+        Insert: {
+          amount?: number
+          contributor_id: string
+          created_at?: string
+          currency?: string
+          id?: string
+          paid_at?: string | null
+          period: string
+          status?: Database["public"]["Enums"]["payout_status"]
+          stripe_transfer_id?: string | null
+        }
+        Update: {
+          amount?: number
+          contributor_id?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          paid_at?: string | null
+          period?: string
+          status?: Database["public"]["Enums"]["payout_status"]
+          stripe_transfer_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payout_batches_contributor_id_fkey"
+            columns: ["contributor_id"]
+            isOneToOne: false
+            referencedRelation: "contributor_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      platform_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value?: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -1060,6 +1645,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_wallets: {
+        Row: {
+          balance: number
+          currency: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          currency?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          currency?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -1079,6 +1685,24 @@ export type Database = {
     }
     Enums: {
       app_role: "free" | "pro" | "admin"
+      asset_class: "stocks" | "crypto" | "forex" | "futures"
+      model_listing_status:
+        | "draft"
+        | "pending_review"
+        | "backtest_validation"
+        | "paper_trading"
+        | "live"
+        | "rejected"
+        | "paused"
+        | "delisted"
+      model_pricing_model: "one_time" | "subscription" | "per_signal"
+      model_risk_level: "low" | "medium" | "high"
+      model_strategy_type:
+        | "momentum"
+        | "mean_reversion"
+        | "ml_signal"
+        | "arbitrage"
+      payout_status: "pending" | "processing" | "paid" | "failed"
       plan_tier: "free" | "pro" | "elite"
       risk_tolerance: "conservative" | "moderate" | "aggressive"
     }
@@ -1209,6 +1833,26 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["free", "pro", "admin"],
+      asset_class: ["stocks", "crypto", "forex", "futures"],
+      model_listing_status: [
+        "draft",
+        "pending_review",
+        "backtest_validation",
+        "paper_trading",
+        "live",
+        "rejected",
+        "paused",
+        "delisted",
+      ],
+      model_pricing_model: ["one_time", "subscription", "per_signal"],
+      model_risk_level: ["low", "medium", "high"],
+      model_strategy_type: [
+        "momentum",
+        "mean_reversion",
+        "ml_signal",
+        "arbitrage",
+      ],
+      payout_status: ["pending", "processing", "paid", "failed"],
       plan_tier: ["free", "pro", "elite"],
       risk_tolerance: ["conservative", "moderate", "aggressive"],
     },
