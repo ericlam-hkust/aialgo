@@ -13,9 +13,14 @@
 
 ## Not changed
 
-- Historical SQL migration files (already-applied text; existing template rows keep `provider = 'AlgoForge'`). If you want existing seeded template rows relabelled, a small data update migration can be added — say the word.
-- Archived plan documents under `.lovable/plan/`.
+- Archived plan documents under `.lovable/plan/` (historical records).
+
+## Also renamed (non-visible parts)
+
+- **Historical migration files** are left as-is (already applied), but a new migration updates existing rows: `strategy_templates.provider = 'AlgoForge'` becomes `'aiAlgo'`, and any stored `data_source_label` values containing "AlgoForge" are rewritten to "aiAlgo".
+- Comments, system prompts, generated code headers, README text, and any other internal string containing "AlgoForge".
 
 ## Technical notes
 
-Pure string replacement across the listed files, no logic or schema change. After the edits a repo-wide search for "AlgoForge" should return only migrations and archived plans.
+String replacement across all source files plus one small data-update migration. After the change a repo-wide search for "AlgoForge" returns only the historical migration files and archived plans.
+
