@@ -186,13 +186,30 @@ function ModelDetail() {
               </Card>
             </TabsContent>
 
-            <TabsContent value="backtest" className="mt-4">
-              <EquityCard title="Out-of-sample equity curve" series={backtestSeries} />
+            <TabsContent value="backtest" className="mt-4 space-y-4">
+              {data.verifiedBacktest?.results ? (
+                <BacktestReportView
+                  report={data.verifiedBacktest.results as unknown as BacktestReport}
+                  variant="verified"
+                  title={`Version ${data.verifiedBacktest.model_version ?? "1.0.0"}`}
+                />
+              ) : (
+                <EquityCard title="Out-of-sample equity curve" series={backtestSeries} />
+              )}
             </TabsContent>
 
-            <TabsContent value="live" className="mt-4">
-              <EquityCard title="Live performance since listing" series={liveSeries} />
+            <TabsContent value="live" className="mt-4 space-y-4">
+              {data.divergence_flagged ? (
+                <div className="rounded-md border border-warning/50 bg-warning/10 p-3 text-sm text-warning">
+                  Live performance has diverged materially from the verified backtest. Subscribers have been notified.
+                </div>
+              ) : null}
+              <div className="grid gap-4 lg:grid-cols-2">
+                <EquityCard title="Verified backtest" series={backtestSeries} />
+                <EquityCard title="Live performance since listing" series={liveSeries} />
+              </div>
             </TabsContent>
+
 
             <TabsContent value="versions" className="mt-4 space-y-3">
               {data.versions.length > 1 ? (
