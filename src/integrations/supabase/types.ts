@@ -2783,6 +2783,8 @@ export type Database = {
       strategies: {
         Row: {
           category: string
+          code: string | null
+          code_mode: string
           created_at: string
           creator_name: string | null
           description: string | null
@@ -2803,6 +2805,8 @@ export type Database = {
         }
         Insert: {
           category?: string
+          code?: string | null
+          code_mode?: string
           created_at?: string
           creator_name?: string | null
           description?: string | null
@@ -2823,6 +2827,8 @@ export type Database = {
         }
         Update: {
           category?: string
+          code?: string | null
+          code_mode?: string
           created_at?: string
           creator_name?: string | null
           description?: string | null
