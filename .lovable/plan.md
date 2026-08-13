@@ -58,4 +58,5 @@ End-to-end simulated path: open Base Model Library → `meanrev-gbm-base` → Cl
 - Backend: migration adding `base_models` table (seeded with the three bases via literal INSERTs, public read for anon/authenticated) and lineage columns on `ai_models` (`base_model_id`, `base_version`, `finetune_method`), plus a `fine_tune_jobs` table for cloud runs. GRANTs + RLS on all new tables.
 - Server functions in `src/lib/base-models.functions.ts` (public list/detail + derivatives tree) and `src/lib/fine-tune.functions.ts` (start job, poll progress, publish derivative), reusing `submitForValidation` from `backtest-validation.functions.ts` so derivatives hit the same pipeline.
 - Training is simulated server-side (staged progress + synthetic loss curve), matching how the existing sandbox backtests work.
+- Pipeline bundles extend the interface manifest with `pipeline` and `resources` blocks, add a resource gate at the head of the validation job, and apply stricter walk-forward settings for multi-stage types.
 - Reuses existing marketplace card, trust badge, backtest report, and fee components; no changes to fee/watermark/trust-tier logic.
