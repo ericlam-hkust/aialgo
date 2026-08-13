@@ -130,6 +130,32 @@ async function fulfillModelPurchase(session: any, env: StripeEnv) {
     .update({ active_users: Number(model.active_users ?? 0) + 1 })
     .eq("id", model.id);
 
+  const { notify } = await import("@/lib/notify.server");
+  const notifications = [
+    {
+      userId: meta.userId as string,
+      kind: "model_purchase" as const,
+      title: `Purchase confirmed — ${model.name}`,
+      body: "Your model is ready. Configure risk limits and activate it from My models.",
+      link: "/dashboard/my-models",
+    },
+  ];
+  const { data: contributor } = await supabase
+    .from("contributor_profiles")
+    .select("user_id")
+    .eq("id", model.contributor_id)
+    .maybeSingle();
+  if (contributor?.user_id) {
+    notifications.push({
+      userId: contributor.user_id,
+      kind: "model_purchase" as const,
+      title: `New sale — ${model.name}`,
+      body: `Net earnings ${Math.round((gross - commission) * 100) / 100} ${model.currency ?? "HKD"}.`,
+      link: "/dashboard/models",
+    });
+  }
+  await notify(notifications);
+
   console.log("Model purchase fulfilled", { modelId: model.id, purchaseId: purchase?.id });
 }
 
