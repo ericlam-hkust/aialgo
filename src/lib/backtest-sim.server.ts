@@ -182,6 +182,15 @@ export function simulateBacktest(input: {
     worstMonth: round(Math.min(...monthly.map((m) => m.ret))),
   };
 
+  const walkForward = walkForwardAnalysis({
+    equity: equitySeries,
+    protocol,
+    rand,
+    baseSharpe: sharpe,
+    baseWinRate: winRate,
+    totalTrades: trades,
+  });
+
   let failureCode = input.forceFailure;
   if (!failureCode) {
     if (metrics.trades < protocol.minTrades) failureCode = "too_few_trades";
@@ -204,6 +213,8 @@ export function simulateBacktest(input: {
     tradeDistribution,
     regimes,
     years: yearly,
+    walkForward,
+
     passed: !failureCode,
     failureCode,
     protocol,
