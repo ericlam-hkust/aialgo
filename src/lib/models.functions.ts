@@ -20,7 +20,7 @@ function publicClient() {
 }
 
 const MODEL_COLUMNS =
-  "id,slug,name,tagline,description,risk_disclosure,tags,asset_class,strategy_type,timeframe,risk_level,status,pricing_model,price,currency,parameters,sharpe,max_drawdown,win_rate,cagr,live_return_30d,rating,rating_count,active_users,executions,listed_at,contributor_id,divergence_flagged,last_validated_at,validation_job_id,backtest_config,overfitting_risk,consistency_score";
+  "id,slug,name,tagline,description,risk_disclosure,tags,asset_class,strategy_type,timeframe,risk_level,status,pricing_model,price,currency,parameters,sharpe,max_drawdown,win_rate,cagr,live_return_30d,rating,rating_count,active_users,executions,listed_at,contributor_id,divergence_flagged,last_validated_at,validation_job_id,backtest_config,overfitting_risk,consistency_score,interface_manifest";
 
 export const listPublicModels = createServerFn({ method: "GET" }).handler(async () => {
   const supabase = publicClient();
@@ -224,6 +224,9 @@ export const activateModel = createServerFn({ method: "POST" })
       maxPositionSizePct: number;
       dailyLossLimitPct: number;
       stopLossPct: number;
+      maxOpenPositions?: number;
+      killSwitchDrawdownPct?: number;
+      parameters?: Record<string, string | number | boolean>;
     }) => data,
   )
   .handler(async ({ data, context }) => {
@@ -251,6 +254,10 @@ export const activateModel = createServerFn({ method: "POST" })
         max_position_size_pct: data.maxPositionSizePct,
         daily_loss_limit_pct: data.dailyLossLimitPct,
         stop_loss_pct: data.stopLossPct,
+        max_open_positions: data.maxOpenPositions ?? 5,
+        kill_switch_drawdown_pct: data.killSwitchDrawdownPct ?? 20,
+        peak_equity: data.capitalAllocation,
+        parameters: (data.parameters ?? {}) as never,
         status: "active",
       })
       .select("id")

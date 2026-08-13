@@ -5,6 +5,7 @@ import { CreditCard, ExternalLink, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ModelUsageCard } from "@/components/model-usage-card";
 import { Progress } from "@/components/ui/progress";
 import { UpgradeDialog } from "@/components/upgrade-dialog";
 import { PaymentTestModeBanner } from "@/components/payment-test-mode-banner";
@@ -142,6 +143,8 @@ function BillingPage() {
             </CardContent>
           </Card>
         </div>
+
+        <ModelUsageCard />
       </div>
 
       <UpgradeDialog
