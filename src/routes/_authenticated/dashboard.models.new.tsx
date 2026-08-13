@@ -4,6 +4,9 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ArrowLeft, ArrowRight, CheckCircle2, Circle, Loader2 } from "lucide-react";
 import { submitModel, type ModelDraft } from "@/lib/contributor.functions";
+import { submitForValidation } from "@/lib/backtest-validation.functions";
+import { BacktestConfigForm, emptyBacktestConfig } from "@/components/marketplace/backtest-config-form";
+import type { BacktestConfig } from "@/lib/backtest-protocol";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,12 +35,13 @@ export const Route = createFileRoute("/_authenticated/dashboard/models/new")({
   component: UploadWizard,
 });
 
-const STEPS = ["Metadata", "Package", "Interface", "Pricing", "Review"] as const;
+const STEPS = ["Metadata", "Package", "Interface", "Pricing", "Backtest", "Review"] as const;
 
 function UploadWizard() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
+  const [config, setConfig] = useState<BacktestConfig>(emptyBacktestConfig());
   const [draft, setDraft] = useState<ModelDraft>({
     name: "",
     slug: "",
@@ -60,9 +64,13 @@ function UploadWizard() {
   const set = <K extends keyof ModelDraft>(k: K, v: ModelDraft[K]) => setDraft((d) => ({ ...d, [k]: v }));
 
   const submit = useMutation({
-    mutationFn: () => submitModel({ data: draft }),
+    mutationFn: async () => {
+      const model = await submitModel({ data: draft });
+      await submitForValidation({ data: { modelId: model.id, config } });
+      return model;
+    },
     onSuccess: () => {
-      toast.success("Submitted for review");
+      toast.success("Submitted — platform backtest validation started");
       setSubmitted(true);
     },
     onError: (e: Error) => toast.error(e.message),
@@ -88,7 +96,7 @@ function UploadWizard() {
             </div>
           ))}
         </div>
-        <Button onClick={() => void navigate({ to: "/dashboard/models" })}>Back to contributor dashboard</Button>
+        <Button onClick={() => void navigate({ to: "/dashboard/models/backtests" })}>Track validation progress</Button>
       </div>
     );
   }
@@ -97,7 +105,7 @@ function UploadWizard() {
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Submit a model</h1>
-        <p className="text-sm text-muted-foreground">Five steps. You can edit everything before the final submit.</p>
+        <p className="text-sm text-muted-foreground">Six steps. You can edit everything before the final submit.</p>
       </div>
 
       <ol className="flex flex-wrap gap-2">
@@ -120,7 +128,8 @@ function UploadWizard() {
                 "Register a live API endpoint or upload a model package.",
                 "Define the tunable parameters buyers can configure.",
                 "Choose how you charge. Platform commission is 20%.",
-                "Review everything before submitting for review.",
+                "Declare what your model trades and confirm the platform holds the data it needs.",
+                "Review everything before submitting for validation.",
               ][step]
             }
           </CardDescription>
@@ -285,7 +294,9 @@ function UploadWizard() {
             </>
           ) : null}
 
-          {step === 4 ? (
+          {step === 4 ? <BacktestConfigForm value={config} onChange={setConfig} /> : null}
+
+          {step === 5 ? (
             <div className="space-y-2 text-sm">
               <Summary label="Name" value={draft.name} />
               <Summary label="Slug" value={draft.slug} />
@@ -294,6 +305,9 @@ function UploadWizard() {
               <Summary label="Delivery" value={draft.packageKind === "api" ? draft.apiEndpoint || "API" : draft.packagePath || "Package"} />
               <Summary label="Parameters" value={draft.parameters.map((p) => p.name).filter(Boolean).join(", ") || "—"} />
               <Summary label="Pricing" value={`${draft.pricingModel} · ${fmtMoney(draft.price)}`} />
+              <Summary label="Universe" value={config.universe.join(", ") || "—"} />
+              <Summary label="Backtest inputs" value={`${config.timeframe} · ${config.signalFrequency} · ${config.dataInputs.join(", ")}`} />
+              <Summary label="Minimum capital" value={fmtMoney(config.minimumCapital, "USD")} />
             </div>
           ) : null}
 
@@ -306,9 +320,9 @@ function UploadWizard() {
                 Continue <ArrowRight className="ml-1.5 h-4 w-4" aria-hidden />
               </Button>
             ) : (
-              <Button onClick={() => submit.mutate()} disabled={submit.isPending}>
+              <Button onClick={() => submit.mutate()} disabled={submit.isPending || config.universe.length === 0}>
                 {submit.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden /> : null}
-                Submit for review
+                Submit for validation
               </Button>
             )}
           </div>

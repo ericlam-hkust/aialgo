@@ -15,6 +15,8 @@ import { ArrowLeft, BadgeCheck, ShieldCheck, Star, Users } from "lucide-react";
 import { getPublicModel, submitReview } from "@/lib/models.functions";
 import { getReviewEligibility } from "@/lib/activations.functions";
 import { daysSince, modelBadges } from "@/lib/model-badges";
+import { BacktestReportView } from "@/components/marketplace/backtest-report";
+import type { BacktestReport } from "@/lib/backtest-protocol";
 import { useAuth } from "@/hooks/use-auth";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -115,8 +117,18 @@ function ModelDetail() {
               </Badge>
             </div>
             <h1 className="mt-3 text-3xl font-semibold tracking-tight">{data.name}</h1>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {data.verifiedBacktest ? (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/15 px-2.5 py-1 text-xs font-medium text-primary">
+                  <ShieldCheck className="h-3.5 w-3.5" aria-hidden />
+                  Platform Verified Backtest
+                  {data.last_validated_at ? ` · ${new Date(data.last_validated_at).toISOString().slice(0, 10)}` : ""}
+                </span>
+              ) : null}
+            </div>
             {badges.length ? (
               <div className="mt-3 flex flex-wrap gap-2">
+
                 {badges.map((b) => (
                   <span
                     key={b.key}
@@ -186,13 +198,30 @@ function ModelDetail() {
               </Card>
             </TabsContent>
 
-            <TabsContent value="backtest" className="mt-4">
-              <EquityCard title="Out-of-sample equity curve" series={backtestSeries} />
+            <TabsContent value="backtest" className="mt-4 space-y-4">
+              {data.verifiedBacktest?.results ? (
+                <BacktestReportView
+                  report={data.verifiedBacktest.results as unknown as BacktestReport}
+                  variant="verified"
+                  title={`Version ${data.verifiedBacktest.model_version ?? "1.0.0"}`}
+                />
+              ) : (
+                <EquityCard title="Out-of-sample equity curve" series={backtestSeries} />
+              )}
             </TabsContent>
 
-            <TabsContent value="live" className="mt-4">
-              <EquityCard title="Live performance since listing" series={liveSeries} />
+            <TabsContent value="live" className="mt-4 space-y-4">
+              {data.divergence_flagged ? (
+                <div className="rounded-md border border-warning/50 bg-warning/10 p-3 text-sm text-warning">
+                  Live performance has diverged materially from the verified backtest. Subscribers have been notified.
+                </div>
+              ) : null}
+              <div className="grid gap-4 lg:grid-cols-2">
+                <EquityCard title="Verified backtest" series={backtestSeries} />
+                <EquityCard title="Live performance since listing" series={liveSeries} />
+              </div>
             </TabsContent>
+
 
             <TabsContent value="versions" className="mt-4 space-y-3">
               {data.versions.length > 1 ? (

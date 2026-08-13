@@ -20,7 +20,7 @@ function publicClient() {
 }
 
 const MODEL_COLUMNS =
-  "id,slug,name,tagline,description,risk_disclosure,tags,asset_class,strategy_type,timeframe,risk_level,status,pricing_model,price,currency,parameters,sharpe,max_drawdown,win_rate,cagr,live_return_30d,rating,rating_count,active_users,executions,listed_at,contributor_id";
+  "id,slug,name,tagline,description,risk_disclosure,tags,asset_class,strategy_type,timeframe,risk_level,status,pricing_model,price,currency,parameters,sharpe,max_drawdown,win_rate,cagr,live_return_30d,rating,rating_count,active_users,executions,listed_at,contributor_id,divergence_flagged,last_validated_at,validation_job_id,backtest_config";
 
 export const listPublicModels = createServerFn({ method: "GET" }).handler(async () => {
   const supabase = publicClient();
@@ -69,8 +69,19 @@ export const getPublicModel = createServerFn({ method: "GET" })
         .limit(50),
     ]);
 
+    const { data: verifiedJob } = await supabase
+      .from("backtest_jobs")
+      .select("id,model_version,results,completed_at")
+      .eq("model_id", model.id)
+      .eq("kind", "validation")
+      .eq("status", "completed")
+      .order("completed_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
     return {
       ...model,
+      verifiedBacktest: verifiedJob ?? null,
       contributor: contributor ?? null,
       versions: versions ?? [],
       backtest: metrics?.find((m) => m.kind === "backtest") ?? null,

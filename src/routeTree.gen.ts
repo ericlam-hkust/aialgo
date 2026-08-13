@@ -20,6 +20,8 @@ import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthRegisterRouteImport } from './routes/auth.register'
 import { Route as ModelsIndexRouteImport } from './routes/models.index'
 import { Route as ModelsSlugRouteImport } from './routes/models.$slug'
+import { Route as ModelsDataLibraryRouteImport } from './routes/models.data-library'
+import { Route as ModelsDocsRouteImport } from './routes/models.docs'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated/dashboard.admin'
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
@@ -32,9 +34,12 @@ import { Route as AuthenticatedDashboardRiskRouteImport } from './routes/_authen
 import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
 import { Route as AuthenticatedDashboardWalletRouteImport } from './routes/_authenticated/dashboard.wallet'
 import { Route as ApiPublicSyncRouteImport } from './routes/api/public/sync'
+import { Route as AuthenticatedDashboardAdminBacktestRouteImport } from './routes/_authenticated/dashboard.admin.backtest'
 import { Route as AuthenticatedDashboardModelsIndexRouteImport } from './routes/_authenticated/dashboard.models.index'
+import { Route as AuthenticatedDashboardModelsBacktestsRouteImport } from './routes/_authenticated/dashboard.models.backtests'
 import { Route as AuthenticatedDashboardModelsNewRouteImport } from './routes/_authenticated/dashboard.models.new'
 import { Route as AuthenticatedDashboardModelsPayoutsRouteImport } from './routes/_authenticated/dashboard.models.payouts'
+import { Route as AuthenticatedDashboardModelsPlaygroundRouteImport } from './routes/_authenticated/dashboard.models.playground'
 import { Route as AuthenticatedDashboardStrategiesIndexRouteImport } from './routes/_authenticated/dashboard.strategies.index'
 import { Route as AuthenticatedDashboardStrategiesBacktestRouteImport } from './routes/_authenticated/dashboard.strategies.backtest'
 import { Route as AuthenticatedDashboardStrategiesBuilderRouteImport } from './routes/_authenticated/dashboard.strategies.builder'
@@ -93,6 +98,16 @@ const ModelsIndexRoute = ModelsIndexRouteImport.update({
 const ModelsSlugRoute = ModelsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
+  getParentRoute: () => ModelsRoute,
+} as any)
+const ModelsDataLibraryRoute = ModelsDataLibraryRouteImport.update({
+  id: '/data-library',
+  path: '/data-library',
+  getParentRoute: () => ModelsRoute,
+} as any)
+const ModelsDocsRoute = ModelsDocsRouteImport.update({
+  id: '/docs',
+  path: '/docs',
   getParentRoute: () => ModelsRoute,
 } as any)
 const AuthenticatedDashboardIndexRoute =
@@ -166,10 +181,22 @@ const ApiPublicSyncRoute = ApiPublicSyncRouteImport.update({
   path: '/api/public/sync',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedDashboardAdminBacktestRoute =
+  AuthenticatedDashboardAdminBacktestRouteImport.update({
+    id: '/backtest',
+    path: '/backtest',
+    getParentRoute: () => AuthenticatedDashboardAdminRoute,
+  } as any)
 const AuthenticatedDashboardModelsIndexRoute =
   AuthenticatedDashboardModelsIndexRouteImport.update({
     id: '/models/',
     path: '/models/',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardModelsBacktestsRoute =
+  AuthenticatedDashboardModelsBacktestsRouteImport.update({
+    id: '/models/backtests',
+    path: '/models/backtests',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardModelsNewRoute =
@@ -182,6 +209,12 @@ const AuthenticatedDashboardModelsPayoutsRoute =
   AuthenticatedDashboardModelsPayoutsRouteImport.update({
     id: '/models/payouts',
     path: '/models/payouts',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardModelsPlaygroundRoute =
+  AuthenticatedDashboardModelsPlaygroundRouteImport.update({
+    id: '/models/playground',
+    path: '/models/playground',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardStrategiesIndexRoute =
@@ -224,9 +257,11 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/models/$slug': typeof ModelsSlugRoute
+  '/models/data-library': typeof ModelsDataLibraryRoute
+  '/models/docs': typeof ModelsDocsRoute
   '/auth/': typeof AuthIndexRoute
   '/models/': typeof ModelsIndexRoute
-  '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
+  '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
   '/dashboard/data-sources': typeof AuthenticatedDashboardDataSourcesRoute
@@ -238,8 +273,11 @@ export interface FileRoutesByFullPath {
   '/dashboard/wallet': typeof AuthenticatedDashboardWalletRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/admin/backtest': typeof AuthenticatedDashboardAdminBacktestRoute
+  '/dashboard/models/backtests': typeof AuthenticatedDashboardModelsBacktestsRoute
   '/dashboard/models/new': typeof AuthenticatedDashboardModelsNewRoute
   '/dashboard/models/payouts': typeof AuthenticatedDashboardModelsPayoutsRoute
+  '/dashboard/models/playground': typeof AuthenticatedDashboardModelsPlaygroundRoute
   '/dashboard/strategies/backtest': typeof AuthenticatedDashboardStrategiesBacktestRoute
   '/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
@@ -253,9 +291,11 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/models/$slug': typeof ModelsSlugRoute
+  '/models/data-library': typeof ModelsDataLibraryRoute
+  '/models/docs': typeof ModelsDocsRoute
   '/auth': typeof AuthIndexRoute
   '/models': typeof ModelsIndexRoute
-  '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
+  '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
   '/dashboard/data-sources': typeof AuthenticatedDashboardDataSourcesRoute
@@ -267,8 +307,11 @@ export interface FileRoutesByTo {
   '/dashboard/wallet': typeof AuthenticatedDashboardWalletRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/admin/backtest': typeof AuthenticatedDashboardAdminBacktestRoute
+  '/dashboard/models/backtests': typeof AuthenticatedDashboardModelsBacktestsRoute
   '/dashboard/models/new': typeof AuthenticatedDashboardModelsNewRoute
   '/dashboard/models/payouts': typeof AuthenticatedDashboardModelsPayoutsRoute
+  '/dashboard/models/playground': typeof AuthenticatedDashboardModelsPlaygroundRoute
   '/dashboard/strategies/backtest': typeof AuthenticatedDashboardStrategiesBacktestRoute
   '/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
@@ -287,9 +330,11 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/models/$slug': typeof ModelsSlugRoute
+  '/models/data-library': typeof ModelsDataLibraryRoute
+  '/models/docs': typeof ModelsDocsRoute
   '/auth/': typeof AuthIndexRoute
   '/models/': typeof ModelsIndexRoute
-  '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
+  '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/_authenticated/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
   '/_authenticated/dashboard/data-sources': typeof AuthenticatedDashboardDataSourcesRoute
@@ -301,8 +346,11 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/wallet': typeof AuthenticatedDashboardWalletRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/_authenticated/dashboard/admin/backtest': typeof AuthenticatedDashboardAdminBacktestRoute
+  '/_authenticated/dashboard/models/backtests': typeof AuthenticatedDashboardModelsBacktestsRoute
   '/_authenticated/dashboard/models/new': typeof AuthenticatedDashboardModelsNewRoute
   '/_authenticated/dashboard/models/payouts': typeof AuthenticatedDashboardModelsPayoutsRoute
+  '/_authenticated/dashboard/models/playground': typeof AuthenticatedDashboardModelsPlaygroundRoute
   '/_authenticated/dashboard/strategies/backtest': typeof AuthenticatedDashboardStrategiesBacktestRoute
   '/_authenticated/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/_authenticated/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
@@ -321,6 +369,8 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/models/$slug'
+    | '/models/data-library'
+    | '/models/docs'
     | '/auth/'
     | '/models/'
     | '/dashboard/admin'
@@ -335,8 +385,11 @@ export interface FileRouteTypes {
     | '/dashboard/wallet'
     | '/api/public/sync'
     | '/dashboard/'
+    | '/dashboard/admin/backtest'
+    | '/dashboard/models/backtests'
     | '/dashboard/models/new'
     | '/dashboard/models/payouts'
+    | '/dashboard/models/playground'
     | '/dashboard/strategies/backtest'
     | '/dashboard/strategies/builder'
     | '/dashboard/strategies/templates'
@@ -350,6 +403,8 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/models/$slug'
+    | '/models/data-library'
+    | '/models/docs'
     | '/auth'
     | '/models'
     | '/dashboard/admin'
@@ -364,8 +419,11 @@ export interface FileRouteTypes {
     | '/dashboard/wallet'
     | '/api/public/sync'
     | '/dashboard'
+    | '/dashboard/admin/backtest'
+    | '/dashboard/models/backtests'
     | '/dashboard/models/new'
     | '/dashboard/models/payouts'
+    | '/dashboard/models/playground'
     | '/dashboard/strategies/backtest'
     | '/dashboard/strategies/builder'
     | '/dashboard/strategies/templates'
@@ -383,6 +441,8 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/models/$slug'
+    | '/models/data-library'
+    | '/models/docs'
     | '/auth/'
     | '/models/'
     | '/_authenticated/dashboard/admin'
@@ -397,8 +457,11 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/wallet'
     | '/api/public/sync'
     | '/_authenticated/dashboard/'
+    | '/_authenticated/dashboard/admin/backtest'
+    | '/_authenticated/dashboard/models/backtests'
     | '/_authenticated/dashboard/models/new'
     | '/_authenticated/dashboard/models/payouts'
+    | '/_authenticated/dashboard/models/playground'
     | '/_authenticated/dashboard/strategies/backtest'
     | '/_authenticated/dashboard/strategies/builder'
     | '/_authenticated/dashboard/strategies/templates'
@@ -495,6 +558,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ModelsSlugRouteImport
       parentRoute: typeof ModelsRoute
     }
+    '/models/data-library': {
+      id: '/models/data-library'
+      path: '/data-library'
+      fullPath: '/models/data-library'
+      preLoaderRoute: typeof ModelsDataLibraryRouteImport
+      parentRoute: typeof ModelsRoute
+    }
+    '/models/docs': {
+      id: '/models/docs'
+      path: '/docs'
+      fullPath: '/models/docs'
+      preLoaderRoute: typeof ModelsDocsRouteImport
+      parentRoute: typeof ModelsRoute
+    }
     '/_authenticated/dashboard/': {
       id: '/_authenticated/dashboard/'
       path: '/'
@@ -579,11 +656,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicSyncRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/dashboard/admin/backtest': {
+      id: '/_authenticated/dashboard/admin/backtest'
+      path: '/backtest'
+      fullPath: '/dashboard/admin/backtest'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminBacktestRouteImport
+      parentRoute: typeof AuthenticatedDashboardAdminRoute
+    }
     '/_authenticated/dashboard/models/': {
       id: '/_authenticated/dashboard/models/'
       path: '/models'
       fullPath: '/dashboard/models/'
       preLoaderRoute: typeof AuthenticatedDashboardModelsIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/models/backtests': {
+      id: '/_authenticated/dashboard/models/backtests'
+      path: '/models/backtests'
+      fullPath: '/dashboard/models/backtests'
+      preLoaderRoute: typeof AuthenticatedDashboardModelsBacktestsRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
     '/_authenticated/dashboard/models/new': {
@@ -598,6 +689,13 @@ declare module '@tanstack/react-router' {
       path: '/models/payouts'
       fullPath: '/dashboard/models/payouts'
       preLoaderRoute: typeof AuthenticatedDashboardModelsPayoutsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/models/playground': {
+      id: '/_authenticated/dashboard/models/playground'
+      path: '/models/playground'
+      fullPath: '/dashboard/models/playground'
+      preLoaderRoute: typeof AuthenticatedDashboardModelsPlaygroundRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
     '/_authenticated/dashboard/strategies/': {
@@ -638,8 +736,23 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedDashboardAdminRouteChildren {
+  AuthenticatedDashboardAdminBacktestRoute: typeof AuthenticatedDashboardAdminBacktestRoute
+}
+
+const AuthenticatedDashboardAdminRouteChildren: AuthenticatedDashboardAdminRouteChildren =
+  {
+    AuthenticatedDashboardAdminBacktestRoute:
+      AuthenticatedDashboardAdminBacktestRoute,
+  }
+
+const AuthenticatedDashboardAdminRouteWithChildren =
+  AuthenticatedDashboardAdminRoute._addFileChildren(
+    AuthenticatedDashboardAdminRouteChildren,
+  )
+
 interface AuthenticatedDashboardRouteChildren {
-  AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRoute
+  AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRouteWithChildren
   AuthenticatedDashboardBillingRoute: typeof AuthenticatedDashboardBillingRoute
   AuthenticatedDashboardBrokersRoute: typeof AuthenticatedDashboardBrokersRoute
   AuthenticatedDashboardDataSourcesRoute: typeof AuthenticatedDashboardDataSourcesRoute
@@ -650,8 +763,10 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardSettingsRoute: typeof AuthenticatedDashboardSettingsRoute
   AuthenticatedDashboardWalletRoute: typeof AuthenticatedDashboardWalletRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
+  AuthenticatedDashboardModelsBacktestsRoute: typeof AuthenticatedDashboardModelsBacktestsRoute
   AuthenticatedDashboardModelsNewRoute: typeof AuthenticatedDashboardModelsNewRoute
   AuthenticatedDashboardModelsPayoutsRoute: typeof AuthenticatedDashboardModelsPayoutsRoute
+  AuthenticatedDashboardModelsPlaygroundRoute: typeof AuthenticatedDashboardModelsPlaygroundRoute
   AuthenticatedDashboardStrategiesBacktestRoute: typeof AuthenticatedDashboardStrategiesBacktestRoute
   AuthenticatedDashboardStrategiesBuilderRoute: typeof AuthenticatedDashboardStrategiesBuilderRoute
   AuthenticatedDashboardStrategiesTemplatesRoute: typeof AuthenticatedDashboardStrategiesTemplatesRoute
@@ -661,7 +776,8 @@ interface AuthenticatedDashboardRouteChildren {
 
 const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
   {
-    AuthenticatedDashboardAdminRoute: AuthenticatedDashboardAdminRoute,
+    AuthenticatedDashboardAdminRoute:
+      AuthenticatedDashboardAdminRouteWithChildren,
     AuthenticatedDashboardBillingRoute: AuthenticatedDashboardBillingRoute,
     AuthenticatedDashboardBrokersRoute: AuthenticatedDashboardBrokersRoute,
     AuthenticatedDashboardDataSourcesRoute:
@@ -675,9 +791,13 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardSettingsRoute: AuthenticatedDashboardSettingsRoute,
     AuthenticatedDashboardWalletRoute: AuthenticatedDashboardWalletRoute,
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
+    AuthenticatedDashboardModelsBacktestsRoute:
+      AuthenticatedDashboardModelsBacktestsRoute,
     AuthenticatedDashboardModelsNewRoute: AuthenticatedDashboardModelsNewRoute,
     AuthenticatedDashboardModelsPayoutsRoute:
       AuthenticatedDashboardModelsPayoutsRoute,
+    AuthenticatedDashboardModelsPlaygroundRoute:
+      AuthenticatedDashboardModelsPlaygroundRoute,
     AuthenticatedDashboardStrategiesBacktestRoute:
       AuthenticatedDashboardStrategiesBacktestRoute,
     AuthenticatedDashboardStrategiesBuilderRoute:
@@ -724,11 +844,15 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface ModelsRouteChildren {
   ModelsSlugRoute: typeof ModelsSlugRoute
+  ModelsDataLibraryRoute: typeof ModelsDataLibraryRoute
+  ModelsDocsRoute: typeof ModelsDocsRoute
   ModelsIndexRoute: typeof ModelsIndexRoute
 }
 
 const ModelsRouteChildren: ModelsRouteChildren = {
   ModelsSlugRoute: ModelsSlugRoute,
+  ModelsDataLibraryRoute: ModelsDataLibraryRoute,
+  ModelsDocsRoute: ModelsDocsRoute,
   ModelsIndexRoute: ModelsIndexRoute,
 }
 
