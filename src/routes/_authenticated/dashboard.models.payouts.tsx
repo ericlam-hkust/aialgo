@@ -311,6 +311,8 @@ function PayoutsPage() {
         </CardContent>
       </Card>
 
+      <SubscriberUsageCard />
+
       <div className="flex justify-end">
         <Badge variant="outline">Payout batches run monthly</Badge>
       </div>
