@@ -434,6 +434,8 @@ export const runScheduledRevalidations = createServerFn({ method: "POST" })
         .update({
           last_validated_at: new Date().toISOString(),
           next_revalidation_at: next.toISOString(),
+          overfitting_risk: Boolean(report.walkForward?.overfittingRisk),
+          consistency_score: report.walkForward?.consistencyScore ?? 0,
           ...(badFail ? { status: "delisted" as const } : {}),
         })
         .eq("id", model.id);
