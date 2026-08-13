@@ -616,9 +616,12 @@ function Builder() {
                 onRegenerate={regenerate}
               />
             )}
-          </main>
+          </ResizablePanel>
 
-          <aside className="order-3 flex h-[640px] flex-col overflow-hidden rounded-xl border border-border bg-card">
+          <ResizableHandle withHandle className="mx-1.5 my-1.5 bg-transparent" />
+
+          <ResizablePanel defaultSize={isWide ? 26 : 30} minSize={12} className="flex flex-col overflow-hidden rounded-xl border border-border bg-card">
+
             <Tabs value={sidePanel} onValueChange={(v) => setSidePanel(v as "ai" | "properties")} className="flex h-full flex-col">
               <TabsList className="m-2 grid grid-cols-2">
                 <TabsTrigger value="ai" className="text-xs">
