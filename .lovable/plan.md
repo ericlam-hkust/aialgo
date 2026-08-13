@@ -1,59 +1,50 @@
-# Unify into one "Backtest Playground"
+# One "Backtest Playground"
 
-Today there are three overlapping pages: a quick strategy backtest (`/dashboard/strategies/backtest`), a model sandbox (`/dashboard/models/playground`), and the validation job queue (`/dashboard/models/backtests`). The first two do the same job for different asset types and get merged into a single **Backtest Playground**; the queue stays as the read-only history/validation list.
+Today three pages overlap: a quick strategy backtest (`/dashboard/strategies/backtest`), a model sandbox (`/dashboard/models/playground`), and the validation job queue (`/dashboard/models/backtests`). All three collapse into a single page at `/dashboard/backtest` — **Backtest Playground** — with two tabs: **Run** and **Runs history**.
 
-## The unified page
+## Run tab
 
-One route, `/dashboard/backtest`, with a single run form that works for both contributor asset types:
-
-1. **What to test** — one picker listing everything the contributor owns, grouped into "Algo strategies" and "AI models". Selecting either drives the rest of the form (asset class, timeframe and universe prefill from the item).
-2. **Data source** — required choice before a run can start:
-   - *Platform data* — feeds from the data library, already verified.
-   - *My connected source* — only connections the contributor has created under Data → Data sources, and only those whose last connection test passed. Sources that are unconfigured, untested or failing are shown greyed out with a "Connect under Data sources" link, so the connection genuinely has to exist first.
-   - The chosen source is stamped onto the run (kind, id, label) and later onto the listing, so buyers always see which feed produced the numbers.
-3. **Universe & period** — symbols from the selected feed, timeframe, start/end date, plus a data-availability check that reports coverage and gaps per symbol before the run is allowed.
+1. **What to test** — one picker listing everything the contributor owns, grouped "Algo strategies" and "AI models". The selection prefills asset class, timeframe and universe.
+2. **Data source** — required before a run can start:
+   - *Platform data* — verified feeds from the data library.
+   - *My connected source* — only connections the contributor created under Data → Data sources whose last connection test passed. Unconfigured, untested or failing sources appear disabled with a "Connect under Data sources" link, so the connection must genuinely exist first.
+   - The chosen feed (kind, id, label) is stamped on the run and later on the public listing.
+3. **Universe & period** — symbols from that feed, timeframe, start/end dates, plus a coverage check reporting history and gaps per symbol before the run is allowed.
 4. **Execution assumptions** — starting capital, commission, slippage, spread, position size, max positions, max leverage.
 5. **Run mode**:
-   - *Self-test (sandbox)* — free-form, unlimited parameters, results private, never shown on a listing.
-   - *Validation run* — uses the locked platform protocol (fixed in-sample/holdout split, walk-forward windows, thresholds) and produces the verified report a public listing requires.
-6. **Results** — the existing report view: equity curve vs benchmark, drawdown, monthly/annual returns, trade distribution, regime breakdown, walk-forward window table with consistency score and overfitting flag, plus pass/fail against the platform thresholds.
-7. **Run history** — every run is a saved job row; the contributor can reopen, compare and pick which run to attach to a listing.
+   - *Self-test* — free parameters, private, never used for listing.
+   - *Verification run* — locked platform protocol (fixed in-sample/holdout split, walk-forward windows, thresholds); this is the run that can qualify a listing.
+6. **Live progress** — the stage/progress bar that used to live in the queue is shown inline while the run executes.
 
-## Requirements for a "thoughtful" backtest
+## Results and verification
 
-These are enforced by the page, with clear inline reasons when a run is blocked:
+When a run completes, the report shows equity curve vs benchmark, drawdown, monthly/annual returns, trade distribution, regime breakdown, walk-forward windows with consistency score and overfitting flag, and a **verification checklist** listing each public-listing criterion as pass or fail:
 
-- A selected strategy or model that produces signals in the expected format.
-- A data source that is connected and passing (platform feed or contributor connection).
-- Enough history: minimum coverage for the universe/timeframe, no unexplained gaps.
-- An out-of-sample holdout period untouched by the in-sample window.
-- Realistic costs: commission, slippage and spread must be non-zero for a validation run.
-- Risk bounds declared: capital, position sizing, max positions, leverage, drawdown limit.
-- A benchmark for comparison.
-- Minimum sample size: enough trades and enough calendar history to be meaningful.
-- Walk-forward stability across rolling windows, with an overfitting warning when variance is high.
+- Verification-mode run on the locked protocol
+- Data source recorded (platform feed or a passing contributor connection)
+- Sufficient history and out-of-sample holdout untouched by the in-sample window
+- Realistic costs applied (commission, slippage, spread all non-zero)
+- Minimum trade count and calendar history
+- Sharpe at or above the platform minimum
+- Max drawdown within the platform limit
+- Walk-forward consistency above threshold / no overfitting flag
 
-## Private vs public
+All criteria pass → the run is stamped **Successfully verified** and the strategy or model becomes eligible to go public; the listing wizard picks up that run's metrics and data-source attribution. Any criterion fails → the report explains exactly what to improve and public listing stays blocked. Private/draft work needs no backtest at all.
 
-- **Private / draft**: any run is optional. Contributors can iterate freely in self-test mode.
-- **Public listing**: blocked until a *validation* run on the locked protocol has completed and passed, with its data source recorded. The listing wizard reads that run; without one it shows "no verified backtest yet" instead of numbers.
+## Runs history tab
+
+Replaces the old queue: every run (self-test and verification) as a row with status, mode, data source, headline metrics and a verified badge. From here the contributor can reopen a report, compare runs, appeal a failed verification (appeals move here), and choose which verified run to attach to a listing. Re-running keeps the old rows, so there is a full audit trail.
 
 ## Navigation
 
-BUILD section becomes:
-
-```text
-Backtest Playground   /dashboard/backtest      (run tests — algo + AI model)
-Validation jobs       /dashboard/backtest/jobs (queue, history, appeals)
-```
-
-The old `/dashboard/strategies/backtest` and `/dashboard/models/playground` paths redirect to the new one.
+BUILD keeps one entry: **Backtest Playground** → `/dashboard/backtest`. The old `/dashboard/strategies/backtest`, `/dashboard/models/playground` and `/dashboard/models/backtests` paths redirect to it.
 
 ## Technical notes
 
-- New route `src/routes/_authenticated/dashboard.backtest.tsx` absorbing both existing pages; `dashboard.models.backtests.tsx` moves to `dashboard.backtest.jobs.tsx`. Old routes become redirects.
-- `BacktestConfigForm` gains a data-source picker fed by `listDataCatalog()` (platform) and `listDataSources()` (contributor, filtered on passing status), writing `dataSourceKind` / `dataSourceId` / `dataSourceLabel` already present in `BacktestConfig`.
-- Runs go through the existing `runSandboxBacktest` (self-test) and `submitForValidation` (verified) server functions; both already persist a `backtest_jobs` row with config, protocol and full result JSON.
-- Target picker unions `listMyModels()` with the contributor's `strategies` rows; algo strategies run through the same job pipeline so the report format is identical.
-- Publish gating reuses `algo-listing.functions.ts`: public visibility requires a completed passing validation job id.
-- No mock metrics anywhere — jobs, results and data-source attribution are all read back from the database.
+- New route `src/routes/_authenticated/dashboard.backtest.tsx` absorbing all three pages, with tabbed Run / History; old routes become redirects and nav entries collapse to one.
+- `BacktestConfigForm` gains a data-source picker fed by `listDataCatalog()` (platform) and `listDataSources()` (contributor, filtered to passing status), writing the existing `dataSourceKind` / `dataSourceId` / `dataSourceLabel` fields on `BacktestConfig`.
+- Runs use existing `runSandboxBacktest` (self-test) and `submitForValidation` (verification); both already persist a `backtest_jobs` row with config, protocol and full result JSON. Progress polling and appeals move from the queue page into this page.
+- New client-safe `verificationChecklist(report, protocol)` helper deriving the pass/fail list from stored job results, used by both the report panel and the publish gate.
+- Target picker unions `listMyModels()` with the contributor's `strategies` rows; algo strategies run the same pipeline so reports are identical.
+- Publish gating in `algo-listing.functions.ts` requires a completed, passing verification job id — re-checked server-side, not just in the UI.
+- Nothing mocked: jobs, metrics and data-source attribution are read back from the database.
