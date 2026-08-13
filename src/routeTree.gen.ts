@@ -20,6 +20,7 @@ import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthRegisterRouteImport } from './routes/auth.register'
 import { Route as ModelsIndexRouteImport } from './routes/models.index'
 import { Route as ModelsSlugRouteImport } from './routes/models.$slug'
+import { Route as ModelsApiStatusRouteImport } from './routes/models.api-status'
 import { Route as ModelsCompareRouteImport } from './routes/models.compare'
 import { Route as ModelsDataLibraryRouteImport } from './routes/models.data-library'
 import { Route as ModelsDocsRouteImport } from './routes/models.docs'
@@ -104,6 +105,11 @@ const ModelsIndexRoute = ModelsIndexRouteImport.update({
 const ModelsSlugRoute = ModelsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
+  getParentRoute: () => ModelsRoute,
+} as any)
+const ModelsApiStatusRoute = ModelsApiStatusRouteImport.update({
+  id: '/api-status',
+  path: '/api-status',
   getParentRoute: () => ModelsRoute,
 } as any)
 const ModelsCompareRoute = ModelsCompareRouteImport.update({
@@ -297,6 +303,7 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/models/$slug': typeof ModelsSlugRoute
+  '/models/api-status': typeof ModelsApiStatusRoute
   '/models/compare': typeof ModelsCompareRoute
   '/models/data-library': typeof ModelsDataLibraryRoute
   '/models/docs': typeof ModelsDocsRoute
@@ -337,6 +344,7 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/models/$slug': typeof ModelsSlugRoute
+  '/models/api-status': typeof ModelsApiStatusRoute
   '/models/compare': typeof ModelsCompareRoute
   '/models/data-library': typeof ModelsDataLibraryRoute
   '/models/docs': typeof ModelsDocsRoute
@@ -382,6 +390,7 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/models/$slug': typeof ModelsSlugRoute
+  '/models/api-status': typeof ModelsApiStatusRoute
   '/models/compare': typeof ModelsCompareRoute
   '/models/data-library': typeof ModelsDataLibraryRoute
   '/models/docs': typeof ModelsDocsRoute
@@ -427,6 +436,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/models/$slug'
+    | '/models/api-status'
     | '/models/compare'
     | '/models/data-library'
     | '/models/docs'
@@ -467,6 +477,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/models/$slug'
+    | '/models/api-status'
     | '/models/compare'
     | '/models/data-library'
     | '/models/docs'
@@ -511,6 +522,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/models/$slug'
+    | '/models/api-status'
     | '/models/compare'
     | '/models/data-library'
     | '/models/docs'
@@ -633,6 +645,13 @@ declare module '@tanstack/react-router' {
       path: '/$slug'
       fullPath: '/models/$slug'
       preLoaderRoute: typeof ModelsSlugRouteImport
+      parentRoute: typeof ModelsRoute
+    }
+    '/models/api-status': {
+      id: '/models/api-status'
+      path: '/api-status'
+      fullPath: '/models/api-status'
+      preLoaderRoute: typeof ModelsApiStatusRouteImport
       parentRoute: typeof ModelsRoute
     }
     '/models/compare': {
@@ -972,6 +991,7 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface ModelsRouteChildren {
   ModelsSlugRoute: typeof ModelsSlugRoute
+  ModelsApiStatusRoute: typeof ModelsApiStatusRoute
   ModelsCompareRoute: typeof ModelsCompareRoute
   ModelsDataLibraryRoute: typeof ModelsDataLibraryRoute
   ModelsDocsRoute: typeof ModelsDocsRoute
@@ -980,6 +1000,7 @@ interface ModelsRouteChildren {
 
 const ModelsRouteChildren: ModelsRouteChildren = {
   ModelsSlugRoute: ModelsSlugRoute,
+  ModelsApiStatusRoute: ModelsApiStatusRoute,
   ModelsCompareRoute: ModelsCompareRoute,
   ModelsDataLibraryRoute: ModelsDataLibraryRoute,
   ModelsDocsRoute: ModelsDocsRoute,
