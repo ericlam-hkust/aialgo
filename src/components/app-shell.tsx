@@ -22,6 +22,7 @@ import {
   LogOut,
   Moon,
   PlugZap,
+  Zap,
   Settings,
   ShieldAlert,
   Store,

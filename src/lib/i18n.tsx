@@ -253,6 +253,8 @@ const zhHans: Dict = {
   "nav.admin": "管理",
   "nav.risk": "风险中心",
   "nav.brokers": "券商",
+  "nav.execution": "执行监控",
+  "nav.accounts": "已连接账户",
   "nav.dataSources": "数据源",
   "nav.billing": "账单",
   "nav.settings": "设置",
