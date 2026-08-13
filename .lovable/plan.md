@@ -39,6 +39,18 @@ A "Verified backtest" block on the marketplace detail page and card:
 
 Contributor-supplied data sources are clearly labelled as unverified so buyers can weigh the evidence.
 
+## Going public = live in the marketplace
+
+Publishing sets the listing to public visibility and, once the backtest passes review, to live status. From that moment the strategy:
+
+- Appears in `/marketplace` alongside AI models, matched by the "Algo strategies" filter, search, sort and comparison tool.
+- Has its own public detail page with the verified backtest block and the price the contributor set.
+- Is purchasable/subscribable by consumers through the existing checkout, and activatable to paper trading or a connected broker like any AI model.
+- Feeds the same revenue split and performance-fee engine, so earnings show up in the contributor's Earnings dashboard.
+
+Strategies that fail validation stay private as a draft with the reason shown; the contributor can fix and re-run. The contributor can unlist at any time, which hides it from the marketplace while existing subscribers keep running their pinned version.
+
+
 ## Technical notes
 
 - **Database**: add to `ai_models` the backtest attribution fields — `backtest_job_id`, `data_source_kind` (`platform` | `contributor`), `data_source_label`, `backtest_ran_at`, `win_rate`, `loss_rate`, `profit_factor`, `total_trades`, `suggested_price`, `pricing_score` (only add what is missing; several perf columns already exist). Migration includes GRANTs; RLS follows the existing `ai_models` policies. Add `data_source_kind` / `data_source_id` to `backtest_jobs` config so the run records its own feed.
