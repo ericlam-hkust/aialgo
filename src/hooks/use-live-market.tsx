@@ -25,7 +25,14 @@ export function useLiveMarket() {
         busy.current = true;
         try {
           setStatus("connecting");
-          const result = await getQuotes({ data: { symbols: WATCHED } });
+          let result: Awaited<ReturnType<typeof getQuotes>>;
+          try {
+            result = await getQuotes({ data: { symbols: WATCHED } });
+          } catch {
+            // Transient dev-server / cold-start failure: retry once before flagging an error.
+            await new Promise((r) => setTimeout(r, 1500));
+            result = await getQuotes({ data: { symbols: WATCHED } });
+          }
           if (!cancelled) {
             setQuotes(result.quotes, result.errors);
             if (Object.keys(result.quotes).length > 0) {
@@ -38,6 +45,7 @@ export function useLiveMarket() {
           busy.current = false;
         }
       }
+
       if (!cancelled) timer = setTimeout(tick, pollIntervalMs());
     };
 
