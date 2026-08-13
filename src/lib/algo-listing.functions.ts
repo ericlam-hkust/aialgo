@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { verificationChecklist } from "@/lib/backtest-verification";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { slugifyName } from "@/lib/listing-utils";
 import type { ModelPricingModel, ModelRiskLevel } from "@/lib/marketplace";
@@ -215,6 +216,19 @@ export const publishListingPublicly = createServerFn({ method: "POST" })
     }
     if (listing.status !== "live") {
       throw new Error("The backtest has not passed validation yet.");
+    }
+
+    const { data: job } = await supabase
+      .from("backtest_jobs")
+      .select("kind,results")
+      .eq("id", listing.validation_job_id)
+      .maybeSingle();
+    const verification = verificationChecklist((job?.results ?? null) as never, job?.kind);
+    if (!verification.verified) {
+      const missing = verification.items.filter((i) => !i.ok).map((i) => i.label);
+      throw new Error(
+        `This run is not stamped "Successfully verified" yet. Outstanding: ${missing.join("; ")}.`,
+      );
     }
 
     const { error } = await supabase
