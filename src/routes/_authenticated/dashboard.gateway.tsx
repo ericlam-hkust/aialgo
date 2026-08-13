@@ -2,8 +2,8 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Activity, Copy, KeyRound, Loader2, Pause, Play, Radio, Zap } from "lucide-react";
-import { getGatewayConsole, rotateGatewaySecret, setGatewayPaused, setSignalPlan } from "@/lib/gateway.functions";
+import { Activity, Copy, Gift, KeyRound, Loader2, Pause, Play, Radio } from "lucide-react";
+import { getGatewayConsole, rotateGatewaySecret, setGatewayPaused } from "@/lib/gateway.functions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,14 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { EmptyState } from "@/components/empty-state";
 import { TrustBadge } from "@/components/marketplace/trust-badges";
-import {
-  HFT_LATENCY_MS,
-  SIGNAL_INCLUDED_CALLS,
-  SIGNAL_PLANS,
-  signalOverage,
-  usd,
-  type SignalPlanKey,
-} from "@/lib/monetization";
+import { CONTRIBUTOR_FREE_ITEMS, HFT_LATENCY_MS } from "@/lib/monetization";
 
 export const Route = createFileRoute("/_authenticated/dashboard/gateway")({
   component: GatewayPage,
@@ -60,19 +53,8 @@ function GatewayPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const plan = useMutation({
-    mutationFn: (p: SignalPlanKey) => setSignalPlan({ data: { plan: p } }),
-    onSuccess: () => {
-      toast.success("Signal API plan updated");
-      void qc.invalidateQueries({ queryKey: ["gateway-console"] });
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-
   const data = console_.data;
-  const currentPlan = (data?.billing?.signal_plan ?? "metered") as SignalPlanKey;
   const calls = Number(data?.usage?.calls ?? 0);
-  const overage = signalOverage(calls, currentPlan);
 
   return (
     <div className="space-y-6">
@@ -93,9 +75,7 @@ function GatewayPage() {
             <CardTitle className="mono text-2xl">{calls.toLocaleString()}</CardTitle>
           </CardHeader>
           <CardContent className="text-xs text-muted-foreground">
-            {currentPlan === "metered"
-              ? `${SIGNAL_INCLUDED_CALLS.toLocaleString()} included · overage ${usd(overage)}`
-              : "Unlimited on your current plan"}
+            Unlimited signal calls, always free — including HFT.
           </CardContent>
         </Card>
         <Card className="border-border/70">
@@ -116,40 +96,27 @@ function GatewayPage() {
         </Card>
       </div>
 
-      <Card className="border-border/70">
+      <Card className="border-profit/40">
         <CardHeader>
-          <CardTitle className="text-base">Signal API plan</CardTitle>
-          <CardDescription>HFT-classified models require the Remote HFT tier for dedicated capacity.</CardDescription>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Gift className="h-4 w-4 text-profit" aria-hidden /> Gateway access is free
+          </CardTitle>
+          <CardDescription>
+            No plans, no metering, no overage — remote models including latency-sensitive HFT connect free with
+            unlimited signal calls. The platform earns only from performance fees on your subscribers&apos; winning
+            trades.
+          </CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-3 md:grid-cols-3">
-          {SIGNAL_PLANS.map((p) => (
-            <div
-              key={p.key}
-              className={`rounded-lg border p-4 ${p.key === currentPlan ? "border-primary/60 bg-primary/5" : "border-border/70"}`}
-            >
+        <CardContent className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {CONTRIBUTOR_FREE_ITEMS.map((item) => (
+            <div key={item.key} className="rounded-lg border border-border/60 bg-muted/20 p-3">
               <div className="flex items-center justify-between">
-                <p className="font-medium">{p.name}</p>
-                {p.hftOnly ? (
-                  <Badge className="gap-1">
-                    <Zap className="h-3 w-3" aria-hidden /> HFT
-                  </Badge>
-                ) : null}
+                <span className="text-sm font-medium">{item.label}</span>
+                <Badge variant="outline" className="mono border-profit/50 text-profit">
+                  $0
+                </Badge>
               </div>
-              <p className="mono mt-1 text-xl font-semibold">{p.price === 0 ? "Metered" : `${usd(p.price, 0)}/mo`}</p>
-              <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
-                {p.features.map((f) => (
-                  <li key={f}>· {f}</li>
-                ))}
-              </ul>
-              <Button
-                className="mt-3 w-full"
-                size="sm"
-                variant={p.key === currentPlan ? "secondary" : "outline"}
-                disabled={p.key === currentPlan || plan.isPending}
-                onClick={() => plan.mutate(p.key)}
-              >
-                {p.key === currentPlan ? "Current plan" : "Switch"}
-              </Button>
+              <p className="mt-1 text-xs text-muted-foreground">{item.hint}</p>
             </div>
           ))}
         </CardContent>
