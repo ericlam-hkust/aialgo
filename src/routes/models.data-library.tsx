@@ -53,7 +53,7 @@ function DataLibrary() {
         (d) =>
           (asset === "all" || d.asset_class === asset) &&
           (q.trim() === "" ||
-            `${d.symbol} ${d.name} ${d.provider}`.toLowerCase().includes(q.trim().toLowerCase())),
+            `${d.symbol} ${d.display_name} ${d.provider}`.toLowerCase().includes(q.trim().toLowerCase())),
       ),
     [data, asset, q],
   );
@@ -120,7 +120,7 @@ function DataLibrary() {
                 <TableRow key={d.id}>
                   <TableCell>
                     <div className="mono font-medium">{d.symbol}</div>
-                    <div className="text-xs text-muted-foreground">{d.name}</div>
+                    <div className="text-xs text-muted-foreground">{d.display_name}</div>
                   </TableCell>
                   <TableCell className="capitalize">{d.asset_class}</TableCell>
                   <TableCell className="flex flex-wrap gap-1">
@@ -131,7 +131,7 @@ function DataLibrary() {
                     ))}
                   </TableCell>
                   <TableCell className="mono text-xs">
-                    {fmtDate(d.start_date)} → {fmtDate(d.end_date)}
+                    {fmtDate(d.coverage_start)} → {fmtDate(d.coverage_end)}
                   </TableCell>
                   <TableCell className="text-xs text-muted-foreground">{d.update_frequency}</TableCell>
                   <TableCell className="text-xs text-muted-foreground">{d.provider}</TableCell>
@@ -181,12 +181,18 @@ function DataLibrary() {
 }
 
 function RequestDataForm() {
-  const [form, setForm] = useState({ assetClass: "crypto", symbol: "", timeframe: "1h", notes: "" });
+  type AssetClass = "crypto" | "stocks" | "forex" | "futures";
+  const [form, setForm] = useState<{ assetClass: AssetClass; symbol: string; timeframe: string; reason: string }>({
+    assetClass: "crypto",
+    symbol: "",
+    timeframe: "1h",
+    reason: "",
+  });
   const submit = useMutation({
     mutationFn: () => requestDataFeed({ data: form }),
     onSuccess: () => {
       toast.success("Request received — we'll email you when the feed is live.");
-      setForm({ assetClass: "crypto", symbol: "", timeframe: "1h", notes: "" });
+      setForm({ assetClass: "crypto", symbol: "", timeframe: "1h", reason: "" });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -200,12 +206,12 @@ function RequestDataForm() {
       <CardContent className="grid gap-4 sm:grid-cols-3">
         <div className="space-y-1.5">
           <Label>Asset class</Label>
-          <Select value={form.assetClass} onValueChange={(v) => setForm({ ...form, assetClass: v })}>
+          <Select value={form.assetClass} onValueChange={(v) => setForm({ ...form, assetClass: v as AssetClass })}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {["crypto", "stocks", "forex", "futures", "options"].map((a) => (
+              {["crypto", "stocks", "forex", "futures"].map((a) => (
                 <SelectItem key={a} value={a}>
                   {a}
                 </SelectItem>
@@ -234,7 +240,7 @@ function RequestDataForm() {
         </div>
         <div className="space-y-1.5 sm:col-span-3">
           <Label>Why do you need it?</Label>
-          <Textarea rows={3} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
+          <Textarea rows={3} value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} />
         </div>
         <div>
           <Button onClick={() => submit.mutate()} disabled={submit.isPending || form.symbol.trim() === ""}>
