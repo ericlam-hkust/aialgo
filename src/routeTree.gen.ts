@@ -35,6 +35,7 @@ import { Route as AuthenticatedDashboardBacktestRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
 import { Route as AuthenticatedDashboardBrokersRouteImport } from './routes/_authenticated/dashboard.brokers'
 import { Route as AuthenticatedDashboardDataSourcesRouteImport } from './routes/_authenticated/dashboard.data-sources'
+import { Route as AuthenticatedDashboardEarningsRouteImport } from './routes/_authenticated/dashboard.earnings'
 import { Route as AuthenticatedDashboardExecutionRouteImport } from './routes/_authenticated/dashboard.execution'
 import { Route as AuthenticatedDashboardMyModelsRouteImport } from './routes/_authenticated/dashboard.my-models'
 import { Route as AuthenticatedDashboardPaperTradingRouteImport } from './routes/_authenticated/dashboard.paper-trading'
@@ -193,6 +194,12 @@ const AuthenticatedDashboardDataSourcesRoute =
   AuthenticatedDashboardDataSourcesRouteImport.update({
     id: '/data-sources',
     path: '/data-sources',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardEarningsRoute =
+  AuthenticatedDashboardEarningsRouteImport.update({
+    id: '/earnings',
+    path: '/earnings',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardExecutionRoute =
@@ -356,6 +363,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
   '/dashboard/data-sources': typeof AuthenticatedDashboardDataSourcesRoute
+  '/dashboard/earnings': typeof AuthenticatedDashboardEarningsRoute
   '/dashboard/execution': typeof AuthenticatedDashboardExecutionRoute
   '/dashboard/my-models': typeof AuthenticatedDashboardMyModelsRoute
   '/dashboard/paper-trading': typeof AuthenticatedDashboardPaperTradingRoute
@@ -403,6 +411,7 @@ export interface FileRoutesByTo {
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
   '/dashboard/data-sources': typeof AuthenticatedDashboardDataSourcesRoute
+  '/dashboard/earnings': typeof AuthenticatedDashboardEarningsRoute
   '/dashboard/execution': typeof AuthenticatedDashboardExecutionRoute
   '/dashboard/my-models': typeof AuthenticatedDashboardMyModelsRoute
   '/dashboard/paper-trading': typeof AuthenticatedDashboardPaperTradingRoute
@@ -455,6 +464,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/_authenticated/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
   '/_authenticated/dashboard/data-sources': typeof AuthenticatedDashboardDataSourcesRoute
+  '/_authenticated/dashboard/earnings': typeof AuthenticatedDashboardEarningsRoute
   '/_authenticated/dashboard/execution': typeof AuthenticatedDashboardExecutionRoute
   '/_authenticated/dashboard/my-models': typeof AuthenticatedDashboardMyModelsRoute
   '/_authenticated/dashboard/paper-trading': typeof AuthenticatedDashboardPaperTradingRoute
@@ -507,6 +517,7 @@ export interface FileRouteTypes {
     | '/dashboard/billing'
     | '/dashboard/brokers'
     | '/dashboard/data-sources'
+    | '/dashboard/earnings'
     | '/dashboard/execution'
     | '/dashboard/my-models'
     | '/dashboard/paper-trading'
@@ -554,6 +565,7 @@ export interface FileRouteTypes {
     | '/dashboard/billing'
     | '/dashboard/brokers'
     | '/dashboard/data-sources'
+    | '/dashboard/earnings'
     | '/dashboard/execution'
     | '/dashboard/my-models'
     | '/dashboard/paper-trading'
@@ -605,6 +617,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/billing'
     | '/_authenticated/dashboard/brokers'
     | '/_authenticated/dashboard/data-sources'
+    | '/_authenticated/dashboard/earnings'
     | '/_authenticated/dashboard/execution'
     | '/_authenticated/dashboard/my-models'
     | '/_authenticated/dashboard/paper-trading'
@@ -828,6 +841,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardDataSourcesRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/earnings': {
+      id: '/_authenticated/dashboard/earnings'
+      path: '/earnings'
+      fullPath: '/dashboard/earnings'
+      preLoaderRoute: typeof AuthenticatedDashboardEarningsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/execution': {
       id: '/_authenticated/dashboard/execution'
       path: '/execution'
@@ -998,6 +1018,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardBillingRoute: typeof AuthenticatedDashboardBillingRoute
   AuthenticatedDashboardBrokersRoute: typeof AuthenticatedDashboardBrokersRoute
   AuthenticatedDashboardDataSourcesRoute: typeof AuthenticatedDashboardDataSourcesRoute
+  AuthenticatedDashboardEarningsRoute: typeof AuthenticatedDashboardEarningsRoute
   AuthenticatedDashboardExecutionRoute: typeof AuthenticatedDashboardExecutionRoute
   AuthenticatedDashboardMyModelsRoute: typeof AuthenticatedDashboardMyModelsRoute
   AuthenticatedDashboardPaperTradingRoute: typeof AuthenticatedDashboardPaperTradingRoute
@@ -1027,6 +1048,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardBrokersRoute: AuthenticatedDashboardBrokersRoute,
     AuthenticatedDashboardDataSourcesRoute:
       AuthenticatedDashboardDataSourcesRoute,
+    AuthenticatedDashboardEarningsRoute: AuthenticatedDashboardEarningsRoute,
     AuthenticatedDashboardExecutionRoute: AuthenticatedDashboardExecutionRoute,
     AuthenticatedDashboardMyModelsRoute: AuthenticatedDashboardMyModelsRoute,
     AuthenticatedDashboardPaperTradingRoute:
