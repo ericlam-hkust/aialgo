@@ -26,6 +26,7 @@ import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_aut
 import { Route as AuthenticatedDashboardBrokersRouteImport } from './routes/_authenticated/dashboard.brokers'
 import { Route as AuthenticatedDashboardDataSourcesRouteImport } from './routes/_authenticated/dashboard.data-sources'
 import { Route as AuthenticatedDashboardMarketplaceRouteImport } from './routes/_authenticated/dashboard.marketplace'
+import { Route as AuthenticatedDashboardMyModelsRouteImport } from './routes/_authenticated/dashboard.my-models'
 import { Route as AuthenticatedDashboardPaperTradingRouteImport } from './routes/_authenticated/dashboard.paper-trading'
 import { Route as AuthenticatedDashboardRiskRouteImport } from './routes/_authenticated/dashboard.risk'
 import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
@@ -33,6 +34,7 @@ import { Route as AuthenticatedDashboardWalletRouteImport } from './routes/_auth
 import { Route as ApiPublicSyncRouteImport } from './routes/api/public/sync'
 import { Route as AuthenticatedDashboardModelsIndexRouteImport } from './routes/_authenticated/dashboard.models.index'
 import { Route as AuthenticatedDashboardModelsNewRouteImport } from './routes/_authenticated/dashboard.models.new'
+import { Route as AuthenticatedDashboardModelsPayoutsRouteImport } from './routes/_authenticated/dashboard.models.payouts'
 import { Route as AuthenticatedDashboardStrategiesIndexRouteImport } from './routes/_authenticated/dashboard.strategies.index'
 import { Route as AuthenticatedDashboardStrategiesBacktestRouteImport } from './routes/_authenticated/dashboard.strategies.backtest'
 import { Route as AuthenticatedDashboardStrategiesBuilderRouteImport } from './routes/_authenticated/dashboard.strategies.builder'
@@ -129,6 +131,12 @@ const AuthenticatedDashboardMarketplaceRoute =
     path: '/marketplace',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardMyModelsRoute =
+  AuthenticatedDashboardMyModelsRouteImport.update({
+    id: '/my-models',
+    path: '/my-models',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardPaperTradingRoute =
   AuthenticatedDashboardPaperTradingRouteImport.update({
     id: '/paper-trading',
@@ -168,6 +176,12 @@ const AuthenticatedDashboardModelsNewRoute =
   AuthenticatedDashboardModelsNewRouteImport.update({
     id: '/models/new',
     path: '/models/new',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardModelsPayoutsRoute =
+  AuthenticatedDashboardModelsPayoutsRouteImport.update({
+    id: '/models/payouts',
+    path: '/models/payouts',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardStrategiesIndexRoute =
@@ -217,6 +231,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
   '/dashboard/data-sources': typeof AuthenticatedDashboardDataSourcesRoute
   '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
+  '/dashboard/my-models': typeof AuthenticatedDashboardMyModelsRoute
   '/dashboard/paper-trading': typeof AuthenticatedDashboardPaperTradingRoute
   '/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
@@ -224,6 +239,7 @@ export interface FileRoutesByFullPath {
   '/api/public/sync': typeof ApiPublicSyncRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/models/new': typeof AuthenticatedDashboardModelsNewRoute
+  '/dashboard/models/payouts': typeof AuthenticatedDashboardModelsPayoutsRoute
   '/dashboard/strategies/backtest': typeof AuthenticatedDashboardStrategiesBacktestRoute
   '/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
@@ -244,6 +260,7 @@ export interface FileRoutesByTo {
   '/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
   '/dashboard/data-sources': typeof AuthenticatedDashboardDataSourcesRoute
   '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
+  '/dashboard/my-models': typeof AuthenticatedDashboardMyModelsRoute
   '/dashboard/paper-trading': typeof AuthenticatedDashboardPaperTradingRoute
   '/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
@@ -251,6 +268,7 @@ export interface FileRoutesByTo {
   '/api/public/sync': typeof ApiPublicSyncRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/models/new': typeof AuthenticatedDashboardModelsNewRoute
+  '/dashboard/models/payouts': typeof AuthenticatedDashboardModelsPayoutsRoute
   '/dashboard/strategies/backtest': typeof AuthenticatedDashboardStrategiesBacktestRoute
   '/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
@@ -276,6 +294,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
   '/_authenticated/dashboard/data-sources': typeof AuthenticatedDashboardDataSourcesRoute
   '/_authenticated/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
+  '/_authenticated/dashboard/my-models': typeof AuthenticatedDashboardMyModelsRoute
   '/_authenticated/dashboard/paper-trading': typeof AuthenticatedDashboardPaperTradingRoute
   '/_authenticated/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
   '/_authenticated/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
@@ -283,6 +302,7 @@ export interface FileRoutesById {
   '/api/public/sync': typeof ApiPublicSyncRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/models/new': typeof AuthenticatedDashboardModelsNewRoute
+  '/_authenticated/dashboard/models/payouts': typeof AuthenticatedDashboardModelsPayoutsRoute
   '/_authenticated/dashboard/strategies/backtest': typeof AuthenticatedDashboardStrategiesBacktestRoute
   '/_authenticated/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/_authenticated/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
@@ -308,6 +328,7 @@ export interface FileRouteTypes {
     | '/dashboard/brokers'
     | '/dashboard/data-sources'
     | '/dashboard/marketplace'
+    | '/dashboard/my-models'
     | '/dashboard/paper-trading'
     | '/dashboard/risk'
     | '/dashboard/settings'
@@ -315,6 +336,7 @@ export interface FileRouteTypes {
     | '/api/public/sync'
     | '/dashboard/'
     | '/dashboard/models/new'
+    | '/dashboard/models/payouts'
     | '/dashboard/strategies/backtest'
     | '/dashboard/strategies/builder'
     | '/dashboard/strategies/templates'
@@ -335,6 +357,7 @@ export interface FileRouteTypes {
     | '/dashboard/brokers'
     | '/dashboard/data-sources'
     | '/dashboard/marketplace'
+    | '/dashboard/my-models'
     | '/dashboard/paper-trading'
     | '/dashboard/risk'
     | '/dashboard/settings'
@@ -342,6 +365,7 @@ export interface FileRouteTypes {
     | '/api/public/sync'
     | '/dashboard'
     | '/dashboard/models/new'
+    | '/dashboard/models/payouts'
     | '/dashboard/strategies/backtest'
     | '/dashboard/strategies/builder'
     | '/dashboard/strategies/templates'
@@ -366,6 +390,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/brokers'
     | '/_authenticated/dashboard/data-sources'
     | '/_authenticated/dashboard/marketplace'
+    | '/_authenticated/dashboard/my-models'
     | '/_authenticated/dashboard/paper-trading'
     | '/_authenticated/dashboard/risk'
     | '/_authenticated/dashboard/settings'
@@ -373,6 +398,7 @@ export interface FileRouteTypes {
     | '/api/public/sync'
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/models/new'
+    | '/_authenticated/dashboard/models/payouts'
     | '/_authenticated/dashboard/strategies/backtest'
     | '/_authenticated/dashboard/strategies/builder'
     | '/_authenticated/dashboard/strategies/templates'
@@ -511,6 +537,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardMarketplaceRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/my-models': {
+      id: '/_authenticated/dashboard/my-models'
+      path: '/my-models'
+      fullPath: '/dashboard/my-models'
+      preLoaderRoute: typeof AuthenticatedDashboardMyModelsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/paper-trading': {
       id: '/_authenticated/dashboard/paper-trading'
       path: '/paper-trading'
@@ -560,6 +593,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardModelsNewRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/models/payouts': {
+      id: '/_authenticated/dashboard/models/payouts'
+      path: '/models/payouts'
+      fullPath: '/dashboard/models/payouts'
+      preLoaderRoute: typeof AuthenticatedDashboardModelsPayoutsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/strategies/': {
       id: '/_authenticated/dashboard/strategies/'
       path: '/strategies'
@@ -604,12 +644,14 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardBrokersRoute: typeof AuthenticatedDashboardBrokersRoute
   AuthenticatedDashboardDataSourcesRoute: typeof AuthenticatedDashboardDataSourcesRoute
   AuthenticatedDashboardMarketplaceRoute: typeof AuthenticatedDashboardMarketplaceRoute
+  AuthenticatedDashboardMyModelsRoute: typeof AuthenticatedDashboardMyModelsRoute
   AuthenticatedDashboardPaperTradingRoute: typeof AuthenticatedDashboardPaperTradingRoute
   AuthenticatedDashboardRiskRoute: typeof AuthenticatedDashboardRiskRoute
   AuthenticatedDashboardSettingsRoute: typeof AuthenticatedDashboardSettingsRoute
   AuthenticatedDashboardWalletRoute: typeof AuthenticatedDashboardWalletRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
   AuthenticatedDashboardModelsNewRoute: typeof AuthenticatedDashboardModelsNewRoute
+  AuthenticatedDashboardModelsPayoutsRoute: typeof AuthenticatedDashboardModelsPayoutsRoute
   AuthenticatedDashboardStrategiesBacktestRoute: typeof AuthenticatedDashboardStrategiesBacktestRoute
   AuthenticatedDashboardStrategiesBuilderRoute: typeof AuthenticatedDashboardStrategiesBuilderRoute
   AuthenticatedDashboardStrategiesTemplatesRoute: typeof AuthenticatedDashboardStrategiesTemplatesRoute
@@ -626,6 +668,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardDataSourcesRoute,
     AuthenticatedDashboardMarketplaceRoute:
       AuthenticatedDashboardMarketplaceRoute,
+    AuthenticatedDashboardMyModelsRoute: AuthenticatedDashboardMyModelsRoute,
     AuthenticatedDashboardPaperTradingRoute:
       AuthenticatedDashboardPaperTradingRoute,
     AuthenticatedDashboardRiskRoute: AuthenticatedDashboardRiskRoute,
@@ -633,6 +676,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardWalletRoute: AuthenticatedDashboardWalletRoute,
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
     AuthenticatedDashboardModelsNewRoute: AuthenticatedDashboardModelsNewRoute,
+    AuthenticatedDashboardModelsPayoutsRoute:
+      AuthenticatedDashboardModelsPayoutsRoute,
     AuthenticatedDashboardStrategiesBacktestRoute:
       AuthenticatedDashboardStrategiesBacktestRoute,
     AuthenticatedDashboardStrategiesBuilderRoute:
