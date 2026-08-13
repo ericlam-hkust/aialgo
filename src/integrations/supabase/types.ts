@@ -2144,36 +2144,63 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          base_currency: string
+          bio: string | null
+          country: string | null
           created_at: string
           email: string | null
           full_name: string | null
           id: string
+          notify_fills: boolean
+          notify_payouts: boolean
+          notify_risk: boolean
           onboarding_completed: boolean
+          preferred_language: string
           risk_tolerance: Database["public"]["Enums"]["risk_tolerance"]
           subscription_tier: string
+          timezone: string
           updated_at: string
+          website: string | null
         }
         Insert: {
           avatar_url?: string | null
+          base_currency?: string
+          bio?: string | null
+          country?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
           id: string
+          notify_fills?: boolean
+          notify_payouts?: boolean
+          notify_risk?: boolean
           onboarding_completed?: boolean
+          preferred_language?: string
           risk_tolerance?: Database["public"]["Enums"]["risk_tolerance"]
           subscription_tier?: string
+          timezone?: string
           updated_at?: string
+          website?: string | null
         }
         Update: {
           avatar_url?: string | null
+          base_currency?: string
+          bio?: string | null
+          country?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
           id?: string
+          notify_fills?: boolean
+          notify_payouts?: boolean
+          notify_risk?: boolean
           onboarding_completed?: boolean
+          preferred_language?: string
           risk_tolerance?: Database["public"]["Enums"]["risk_tolerance"]
           subscription_tier?: string
+          timezone?: string
           updated_at?: string
+          website?: string | null
         }
         Relationships: []
       }
