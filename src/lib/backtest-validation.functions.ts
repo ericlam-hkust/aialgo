@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { DEFAULT_PROTOCOL, type BacktestConfig, type BacktestProtocol } from "@/lib/backtest-protocol";
+import { DEFAULT_PROTOCOL, FAILURE_REASONS as FAILURE_REASONS_MAP, type BacktestConfig, type BacktestProtocol } from "@/lib/backtest-protocol";
 
 /** Reads the admin-configured global protocol, falling back to defaults. */
 export const getBacktestProtocol = createServerFn({ method: "GET" }).handler(async () => {
@@ -218,7 +218,7 @@ export const advanceBacktestJob = createServerFn({ method: "POST" })
         progress: 100,
         stage_message: failed ? "Validation failed" : "Report generated",
         failure_code: report.failureCode ?? null,
-        failure_reason: report.failureCode ? (await import("@/lib/backtest-protocol")).FAILURE_REASONS[report.failureCode] ?? null : null,
+        failure_reason: report.failureCode ? (FAILURE_REASONS_MAP[report.failureCode] ?? null) : null,
         results: report as never,
         completed_at: new Date().toISOString(),
       })
@@ -355,4 +355,101 @@ export const listMyAppeals = createServerFn({ method: "GET" })
       .eq("user_id", context.userId)
       .order("created_at", { ascending: false });
     return data ?? [];
+  });
+
+/**
+ * Quarterly re-validation plus continuous divergence monitoring. Models whose
+ * live 30d return deviates badly from the verified backtest are flagged, and
+ * badly failing re-validations are auto-unlisted with an appeals path.
+ */
+export const runScheduledRevalidations = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Forbidden");
+
+    const protocol = await getBacktestProtocol();
+    const { data: models } = await supabase
+      .from("ai_models")
+      .select("id,name,user_id,cagr,live_return_30d,backtest_config,next_revalidation_at,status")
+      .eq("status", "live");
+
+    const { simulateBacktest } = await import("@/lib/backtest-sim.server");
+    const { notify } = await import("@/lib/notify.server");
+    const revalidated: string[] = [];
+    const unlisted: string[] = [];
+    const flagged: string[] = [];
+
+    for (const model of models ?? []) {
+      const expected30d = Number(model.cagr) / 12;
+      const live30d = Number(model.live_return_30d);
+      const deviation = Math.abs(expected30d) > 0.01 ? ((expected30d - live30d) / Math.abs(expected30d)) * 100 : 0;
+      if (deviation > protocol.divergenceThresholdPct) {
+        flagged.push(model.name);
+        await supabase.from("ai_models").update({ divergence_flagged: true }).eq("id", model.id);
+      }
+
+      const due = !model.next_revalidation_at || new Date(model.next_revalidation_at) <= new Date();
+      if (!due) continue;
+
+      const config = (model.backtest_config ?? {}) as unknown as BacktestConfig;
+      const seed = `${model.id}-${new Date().toISOString().slice(0, 7)}`;
+      const report = simulateBacktest({
+        seed,
+        config: { assetClass: "stocks", universe: ["SPY"], timeframe: "1d", signalFrequency: "daily", minimumCapital: 1000, dataInputs: ["ohlcv"], ...config },
+        protocol,
+        bias: biasFor(seed),
+      });
+
+      const { data: job } = await supabase
+        .from("backtest_jobs")
+        .insert({
+          model_id: model.id,
+          user_id: model.user_id ?? userId,
+          kind: "revalidation",
+          status: report.passed ? "completed" : "failed",
+          stage: report.passed ? "results" : "failed",
+          progress: 100,
+          stage_message: report.passed ? "Re-validation passed" : "Re-validation failed",
+          failure_code: report.failureCode ?? null,
+          failure_reason: report.failureCode ? FAILURE_REASONS_MAP[report.failureCode] ?? null : null,
+          config: config as never,
+          protocol: protocol as never,
+          results: report as never,
+          completed_at: new Date().toISOString(),
+        })
+        .select("id")
+        .single();
+
+      const next = new Date();
+      next.setMonth(next.getMonth() + (protocol.revalidationMonths || 3));
+      const badFail = !report.passed && report.metrics.maxDrawdown > protocol.maxAllowedDrawdownPct * 1.2;
+
+      await supabase
+        .from("ai_models")
+        .update({
+          last_validated_at: new Date().toISOString(),
+          next_revalidation_at: next.toISOString(),
+          ...(badFail ? { status: "delisted" as const } : {}),
+        })
+        .eq("id", model.id);
+
+      revalidated.push(model.name);
+      if (badFail) unlisted.push(model.name);
+
+      if (model.user_id) {
+        await notify({
+          userId: model.user_id,
+          kind: badFail ? "model_unlisted" : "revalidation",
+          title: badFail ? `${model.name} was auto-unlisted` : `${model.name} re-validation ${report.passed ? "passed" : "failed"}`,
+          body: badFail
+            ? "Live risk exceeded the platform limit during re-validation. You can appeal from the backtest queue."
+            : `Sharpe ${report.metrics.sharpe} · max drawdown ${report.metrics.maxDrawdown}%.`,
+          link: `/dashboard/models/backtests?job=${job?.id ?? ""}`,
+        });
+      }
+    }
+
+    return { revalidated, unlisted, flagged };
   });
