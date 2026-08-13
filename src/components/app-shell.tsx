@@ -65,6 +65,8 @@ const NAV = [
   { to: "/dashboard/wallet", key: "nav.wallet", icon: Wallet, exact: true },
   { to: "/dashboard/admin", key: "nav.admin", icon: Gavel, exact: true },
   { to: "/dashboard/risk", key: "nav.risk", icon: ShieldAlert, exact: true },
+  { to: "/dashboard/execution", key: "nav.execution", icon: Zap, exact: true },
+  { to: "/dashboard/accounts", key: "nav.accounts", icon: PlugZap, exact: true },
   { to: "/dashboard/brokers", key: "nav.brokers", icon: PlugZap, exact: true },
   { to: "/dashboard/data-sources", key: "nav.dataSources", icon: Database, exact: true },
   { to: "/dashboard/billing", key: "nav.billing", icon: CreditCard, exact: true },

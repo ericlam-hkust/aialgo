@@ -442,6 +442,7 @@ function ModelDetail() {
           pricing_model: data.pricing_model,
           price: Number(data.price),
           currency: data.currency,
+          interface_manifest: data.interface_manifest,
         }}
       />
     </main>

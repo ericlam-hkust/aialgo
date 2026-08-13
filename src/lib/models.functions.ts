@@ -20,7 +20,7 @@ function publicClient() {
 }
 
 const MODEL_COLUMNS =
-  "id,slug,name,tagline,description,risk_disclosure,tags,asset_class,strategy_type,timeframe,risk_level,status,pricing_model,price,currency,parameters,sharpe,max_drawdown,win_rate,cagr,live_return_30d,rating,rating_count,active_users,executions,listed_at,contributor_id,divergence_flagged,last_validated_at,validation_job_id,backtest_config,overfitting_risk,consistency_score";
+  "id,slug,name,tagline,description,risk_disclosure,tags,asset_class,strategy_type,timeframe,risk_level,status,pricing_model,price,currency,parameters,sharpe,max_drawdown,win_rate,cagr,live_return_30d,rating,rating_count,active_users,executions,listed_at,contributor_id,divergence_flagged,last_validated_at,validation_job_id,backtest_config,overfitting_risk,consistency_score,interface_manifest";
 
 export const listPublicModels = createServerFn({ method: "GET" }).handler(async () => {
   const supabase = publicClient();
