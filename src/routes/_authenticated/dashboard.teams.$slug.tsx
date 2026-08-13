@@ -298,7 +298,7 @@ function AddMemberCard({ teamId, onDone }: { teamId: string; onDone: () => void 
     <Card className="border-border/70">
       <CardHeader className="pb-3">
         <CardTitle className="text-base">Invite a member</CardTitle>
-        <CardDescription>They need an AlgoForge account with this email.</CardDescription>
+        <CardDescription>They need an aiAlgo account with this email.</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-wrap items-end gap-3">
         <div className="min-w-56 flex-1 space-y-1.5">

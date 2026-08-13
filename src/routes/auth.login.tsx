@@ -14,9 +14,9 @@ import { Separator } from "@/components/ui/separator";
 export const Route = createFileRoute("/auth/login")({
   head: () => ({
     meta: [
-      { title: "Sign in — AlgoForge" },
-      { name: "description", content: "Sign in to your AlgoForge algorithmic trading workspace." },
-      { property: "og:title", content: "Sign in — AlgoForge" },
+      { title: "Sign in — aiAlgo" },
+      { name: "description", content: "Sign in to your aiAlgo algorithmic trading workspace." },
+      { property: "og:title", content: "Sign in — aiAlgo" },
       { property: "og:description", content: "Access your strategies, backtests and paper trading desk." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -118,7 +118,7 @@ function LoginPage() {
         </Button>
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
-          New to AlgoForge?{" "}
+          New to aiAlgo?{" "}
           <Link to="/auth/register" className="font-medium text-primary hover:underline">
             Create an account
           </Link>

@@ -30,7 +30,7 @@ import { FLAT_NAV, NAV_GROUPS, type NavItem } from "@/lib/nav";
 import { cn } from "@/lib/utils";
 
 
-const OPEN_KEY = "algoforge.nav.open";
+const OPEN_KEY = "aialgo.nav.open";
 
 function isActive(item: NavItem, pathname: string) {
   return item.exact === false ? pathname.startsWith(item.to) : pathname === item.to;
@@ -137,7 +137,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="flex h-14 items-center justify-between gap-2 border-b border-sidebar-border px-4">
           <div className="flex items-center gap-2 overflow-hidden">
             <Wallet className="h-5 w-5 shrink-0 text-primary" aria-hidden />
-            {!collapsed ? <span className="text-sm font-semibold tracking-tight">AlgoForge</span> : null}
+            {!collapsed ? <span className="text-sm font-semibold tracking-tight">aiAlgo</span> : null}
           </div>
           <Button
             variant="ghost"
@@ -275,7 +275,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <header className="sticky top-0 z-20 flex h-14 items-center justify-between gap-4 border-b border-border bg-background/85 px-4 backdrop-blur">
           <nav aria-label={t("shell.breadcrumb")} className="flex min-w-0 items-center gap-1.5 text-sm">
             <Link to="/dashboard" className="text-muted-foreground hover:text-foreground">
-              AlgoForge
+              aiAlgo
             </Link>
             {crumbs.slice(1).map((c, i) => (
               <span key={c + i} className="flex items-center gap-1.5 truncate">

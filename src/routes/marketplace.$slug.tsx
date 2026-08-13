@@ -48,10 +48,10 @@ export const Route = createFileRoute("/marketplace/$slug")({
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
-      return { meta: [{ title: "Model not found — AlgoForge" }, { name: "robots", content: "noindex" }] };
+      return { meta: [{ title: "Model not found — aiAlgo" }, { name: "robots", content: "noindex" }] };
     }
-    const title = `${loaderData.name} — AI trading model | AlgoForge`;
-    const description = (loaderData.tagline ?? "Verified AI trading model on AlgoForge.").slice(0, 155);
+    const title = `${loaderData.name} — AI trading model | aiAlgo`;
+    const description = (loaderData.tagline ?? "Verified AI trading model on aiAlgo.").slice(0, 155);
     return {
       meta: [
         { title },
@@ -209,7 +209,7 @@ function ModelDetail() {
           {data.backtest_ran_at ? (
             <div className="rounded-lg border border-border bg-card/60 p-3 text-xs text-muted-foreground">
               <span className="font-medium text-foreground">Backtest data source: </span>
-              {data.data_source_label ?? "AlgoForge platform market data"}
+              {data.data_source_label ?? "aiAlgo platform market data"}
               {data.data_source_kind === "contributor" ? " (contributor-supplied feed)" : " (platform feed)"} · run on{" "}
               {new Date(data.backtest_ran_at).toISOString().slice(0, 10)}
             </div>

@@ -61,7 +61,7 @@ export function NodePalette({ onAdd }: { onAdd: (spec: NodeSpec) => void }) {
                     type="button"
                     draggable
                     onDragStart={(e) => {
-                      e.dataTransfer.setData("application/algoforge-node", `${spec.kind}::${spec.label}`);
+                      e.dataTransfer.setData("application/aialgo-node", `${spec.kind}::${spec.label}`);
                       e.dataTransfer.effectAllowed = "move";
                     }}
                     onClick={() => onAdd(spec)}

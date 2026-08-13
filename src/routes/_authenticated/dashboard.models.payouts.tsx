@@ -123,7 +123,7 @@ function PayoutsPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `algoforge-statement-${period}.csv`;
+    a.download = `aialgo-statement-${period}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };

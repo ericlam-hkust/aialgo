@@ -45,14 +45,14 @@ export const Route = createFileRoute("/marketplace/compare")({
   validateSearch: (search: Record<string, unknown>) => ({ models: typeof search["models"] === "string" ? (search["models"] as string) : "" }),
   head: () => ({
     meta: [
-      { title: "Compare AI trading models — AlgoForge" },
+      { title: "Compare AI trading models — aiAlgo" },
       {
         name: "description",
         content:
           "Compare up to three verified AI trading models side by side: overlaid equity curves, full metrics table, walk-forward consistency and market-regime breakdown.",
       },
-      { property: "og:title", content: "Compare AI trading models — AlgoForge" },
-      { property: "og:description", content: "Side-by-side verified backtest comparison for AlgoForge marketplace models." },
+      { property: "og:title", content: "Compare AI trading models — aiAlgo" },
+      { property: "og:description", content: "Side-by-side verified backtest comparison for aiAlgo marketplace models." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

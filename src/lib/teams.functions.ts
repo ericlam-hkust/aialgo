@@ -150,7 +150,7 @@ export const addTeamMember = createServerFn({ method: "POST" })
       .select("id")
       .ilike("email", data.email)
       .maybeSingle();
-    if (!profile) throw new Error("No AlgoForge account uses that email yet");
+    if (!profile) throw new Error("No aiAlgo account uses that email yet");
 
     const { error } = await context.supabase
       .from("team_members")

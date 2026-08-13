@@ -11,9 +11,9 @@ export const Route = createFileRoute("/_authenticated/dashboard/admin/revenue")(
   component: AdminRevenuePage,
   head: () => ({
     meta: [
-      { title: "Platform revenue — AlgoForge admin" },
+      { title: "Platform revenue — aiAlgo admin" },
       { name: "description", content: "Revenue by stream across commissions, data feeds and referrals." },
-      { property: "og:title", content: "Platform revenue — AlgoForge admin" },
+      { property: "og:title", content: "Platform revenue — aiAlgo admin" },
       { property: "og:description", content: "Admin view of aiAlgo platform economics and MRR trend." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

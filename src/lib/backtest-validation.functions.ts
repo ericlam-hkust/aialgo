@@ -115,7 +115,7 @@ export const submitForValidation = createServerFn({ method: "POST" })
         backtest_config: data.config as never,
         validation_job_id: job.id,
         data_source_kind: data.config.dataSourceKind ?? "platform",
-        data_source_label: data.config.dataSourceLabel ?? "AlgoForge platform market data",
+        data_source_label: data.config.dataSourceLabel ?? "aiAlgo platform market data",
         data_source_id: data.config.dataSourceId ?? null,
       })
       .eq("id", data.modelId);

@@ -5,7 +5,7 @@ import { NODE_CATALOG, type StrategyGraph } from "./strategy-graph";
 
 type ChatTurn = { role: "user" | "assistant"; content: string };
 
-const SYSTEM = `You are AlgoForge's algo strategy compiler. You turn a retail trader's plain English into a visual strategy graph made of entry rules, exit rules and risk guards.
+const SYSTEM = `You are aiAlgo's algo strategy compiler. You turn a retail trader's plain English into a visual strategy graph made of entry rules, exit rules and risk guards.
 
 Available nodes (category -> kind / label / default params):
 ${NODE_CATALOG.map((n) => `- ${n.category}: kind="${n.kind}", label="${n.label}", params=${JSON.stringify(n.params)}`).join("\n")}

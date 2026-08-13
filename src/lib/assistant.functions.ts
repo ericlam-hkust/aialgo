@@ -6,7 +6,7 @@ import { GLOSSARY, SYMBOLS } from "./market";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
 
-const SYSTEM = `You are AlgoForge's AI trading assistant — a friendly, plain-spoken guide for retail traders in Hong Kong and global markets.
+const SYSTEM = `You are aiAlgo's AI trading assistant — a friendly, plain-spoken guide for retail traders in Hong Kong and global markets.
 
 You help with two things:
 1. Answering questions about the platform (strategy builder, backtesting, paper trading, risk centre, marketplace, broker connections) and about trading concepts.

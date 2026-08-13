@@ -10,16 +10,16 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/marketplace/api-status")({
   head: () => ({
     meta: [
-      { title: "API changelog & status — AlgoForge" },
+      { title: "API changelog & status — aiAlgo" },
       {
         name: "description",
         content:
-          "AlgoForge /v1 API stability guarantees, deprecation notices, release changelog, uptime and incident history.",
+          "aiAlgo /v1 API stability guarantees, deprecation notices, release changelog, uptime and incident history.",
       },
-      { property: "og:title", content: "API changelog & status — AlgoForge" },
+      { property: "og:title", content: "API changelog & status — aiAlgo" },
       {
         property: "og:description",
-        content: "Versioning policy, deprecation timeline, uptime and incident history for the AlgoForge /v1 API.",
+        content: "Versioning policy, deprecation timeline, uptime and incident history for the aiAlgo /v1 API.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

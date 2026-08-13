@@ -25,13 +25,13 @@ export const Route = createFileRoute("/marketplace/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(modelsQuery),
   head: () => ({
     meta: [
-      { title: "AI Trading Model Marketplace — AlgoForge" },
+      { title: "AI Trading Model Marketplace — aiAlgo" },
       {
         name: "description",
         content:
           "Browse verified AI trading models for stocks, crypto, forex and futures. Compare Sharpe, drawdown, win rate and live performance before you deploy.",
       },
-      { property: "og:title", content: "AI Trading Model Marketplace — AlgoForge" },
+      { property: "og:title", content: "AI Trading Model Marketplace — aiAlgo" },
       {
         property: "og:description",
         content: "Verified AI trading models with live performance, transparent pricing and one-click deployment.",

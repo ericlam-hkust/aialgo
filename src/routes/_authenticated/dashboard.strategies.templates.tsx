@@ -13,7 +13,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export const Route = createFileRoute("/_authenticated/dashboard/strategies/templates")({
   head: () => ({
     meta: [
-      { title: "Strategy templates — AlgoForge" },
+      { title: "Strategy templates — aiAlgo" },
       { name: "description", content: "Proven starting points: mean reversion, trend following, grid and more." },
     ],
   }),

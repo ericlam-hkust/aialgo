@@ -28,9 +28,9 @@ export const Route = createFileRoute("/_authenticated/dashboard/accounts")({
   component: AccountsPage,
   head: () => ({
     meta: [
-      { title: "Trading Accounts — AlgoForge" },
+      { title: "Trading Accounts — aiAlgo" },
       { name: "description", content: "Link your broker and exchange accounts, or trade models risk-free on the built-in paper account." },
-      { property: "og:title", content: "Trading Accounts — AlgoForge" },
+      { property: "og:title", content: "Trading Accounts — aiAlgo" },
       { property: "og:description", content: "Link brokers and exchanges with trade-only API keys, or use the paper account." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

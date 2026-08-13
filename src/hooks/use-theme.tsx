@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const KEY = "algoforge-theme";
+const KEY = "aialgo-theme";
 
 export function useTheme() {
   const [theme, setTheme] = useState<"dark" | "light">("dark");
