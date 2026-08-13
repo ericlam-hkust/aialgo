@@ -47,6 +47,10 @@ export function useLiveMarket() {
         }
       }
 
+      // After repeated failures the loaded bundle is stale (dev reload / new deploy).
+      // Stop polling entirely instead of emitting 500s every tick until the page reloads.
+      if (failures >= 3) return;
+
       if (!cancelled) {
         const base = pollIntervalMs();
         const delay = failures > 0 ? Math.min(base * 2 ** failures, 60_000) : base;
