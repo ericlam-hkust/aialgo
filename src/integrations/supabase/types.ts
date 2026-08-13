@@ -1369,6 +1369,48 @@ export type Database = {
         }
         Relationships: []
       }
+      market_data_intraday: {
+        Row: {
+          close: number
+          created_at: string
+          high: number
+          id: string
+          interval: string
+          low: number
+          open: number
+          provider: string | null
+          symbol: string
+          ts: string
+          volume: number
+        }
+        Insert: {
+          close: number
+          created_at?: string
+          high: number
+          id?: string
+          interval: string
+          low: number
+          open: number
+          provider?: string | null
+          symbol: string
+          ts: string
+          volume?: number
+        }
+        Update: {
+          close?: number
+          created_at?: string
+          high?: number
+          id?: string
+          interval?: string
+          low?: number
+          open?: number
+          provider?: string | null
+          symbol?: string
+          ts?: string
+          volume?: number
+        }
+        Relationships: []
+      }
       market_quotes: {
         Row: {
           change_pct: number | null
