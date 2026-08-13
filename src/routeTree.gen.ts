@@ -31,6 +31,7 @@ import { Route as AuthenticatedDashboardAccountsRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated/dashboard.admin'
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
 import { Route as AuthenticatedDashboardBrokersRouteImport } from './routes/_authenticated/dashboard.brokers'
+import { Route as AuthenticatedDashboardComputeRouteImport } from './routes/_authenticated/dashboard.compute'
 import { Route as AuthenticatedDashboardDataSourcesRouteImport } from './routes/_authenticated/dashboard.data-sources'
 import { Route as AuthenticatedDashboardExecutionRouteImport } from './routes/_authenticated/dashboard.execution'
 import { Route as AuthenticatedDashboardGatewayRouteImport } from './routes/_authenticated/dashboard.gateway'
@@ -169,6 +170,12 @@ const AuthenticatedDashboardBrokersRoute =
   AuthenticatedDashboardBrokersRouteImport.update({
     id: '/brokers',
     path: '/brokers',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardComputeRoute =
+  AuthenticatedDashboardComputeRouteImport.update({
+    id: '/compute',
+    path: '/compute',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardDataSourcesRoute =
@@ -340,6 +347,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
+  '/dashboard/compute': typeof AuthenticatedDashboardComputeRoute
   '/dashboard/data-sources': typeof AuthenticatedDashboardDataSourcesRoute
   '/dashboard/execution': typeof AuthenticatedDashboardExecutionRoute
   '/dashboard/gateway': typeof AuthenticatedDashboardGatewayRoute
@@ -385,6 +393,7 @@ export interface FileRoutesByTo {
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
+  '/dashboard/compute': typeof AuthenticatedDashboardComputeRoute
   '/dashboard/data-sources': typeof AuthenticatedDashboardDataSourcesRoute
   '/dashboard/execution': typeof AuthenticatedDashboardExecutionRoute
   '/dashboard/gateway': typeof AuthenticatedDashboardGatewayRoute
@@ -435,6 +444,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/_authenticated/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
+  '/_authenticated/dashboard/compute': typeof AuthenticatedDashboardComputeRoute
   '/_authenticated/dashboard/data-sources': typeof AuthenticatedDashboardDataSourcesRoute
   '/_authenticated/dashboard/execution': typeof AuthenticatedDashboardExecutionRoute
   '/_authenticated/dashboard/gateway': typeof AuthenticatedDashboardGatewayRoute
@@ -485,6 +495,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin'
     | '/dashboard/billing'
     | '/dashboard/brokers'
+    | '/dashboard/compute'
     | '/dashboard/data-sources'
     | '/dashboard/execution'
     | '/dashboard/gateway'
@@ -530,6 +541,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin'
     | '/dashboard/billing'
     | '/dashboard/brokers'
+    | '/dashboard/compute'
     | '/dashboard/data-sources'
     | '/dashboard/execution'
     | '/dashboard/gateway'
@@ -579,6 +591,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/admin'
     | '/_authenticated/dashboard/billing'
     | '/_authenticated/dashboard/brokers'
+    | '/_authenticated/dashboard/compute'
     | '/_authenticated/dashboard/data-sources'
     | '/_authenticated/dashboard/execution'
     | '/_authenticated/dashboard/gateway'
@@ -773,6 +786,13 @@ declare module '@tanstack/react-router' {
       path: '/brokers'
       fullPath: '/dashboard/brokers'
       preLoaderRoute: typeof AuthenticatedDashboardBrokersRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/compute': {
+      id: '/_authenticated/dashboard/compute'
+      path: '/compute'
+      fullPath: '/dashboard/compute'
+      preLoaderRoute: typeof AuthenticatedDashboardComputeRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
     '/_authenticated/dashboard/data-sources': {
@@ -973,6 +993,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRouteWithChildren
   AuthenticatedDashboardBillingRoute: typeof AuthenticatedDashboardBillingRoute
   AuthenticatedDashboardBrokersRoute: typeof AuthenticatedDashboardBrokersRoute
+  AuthenticatedDashboardComputeRoute: typeof AuthenticatedDashboardComputeRoute
   AuthenticatedDashboardDataSourcesRoute: typeof AuthenticatedDashboardDataSourcesRoute
   AuthenticatedDashboardExecutionRoute: typeof AuthenticatedDashboardExecutionRoute
   AuthenticatedDashboardGatewayRoute: typeof AuthenticatedDashboardGatewayRoute
@@ -1003,6 +1024,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardAdminRouteWithChildren,
     AuthenticatedDashboardBillingRoute: AuthenticatedDashboardBillingRoute,
     AuthenticatedDashboardBrokersRoute: AuthenticatedDashboardBrokersRoute,
+    AuthenticatedDashboardComputeRoute: AuthenticatedDashboardComputeRoute,
     AuthenticatedDashboardDataSourcesRoute:
       AuthenticatedDashboardDataSourcesRoute,
     AuthenticatedDashboardExecutionRoute: AuthenticatedDashboardExecutionRoute,
