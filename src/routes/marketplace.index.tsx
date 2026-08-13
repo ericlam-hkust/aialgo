@@ -162,15 +162,6 @@ function Catalog() {
                   label: FREQUENCY_CLASSES[f].label,
                 }))}
               />
-              <FilterSelect
-                label="Type"
-                value={listing}
-                onChange={setListing}
-                options={[
-                  { value: "ai_model", label: "AI model" },
-                  { value: "algo", label: "Algo strategy" },
-                ]}
-              />
               <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
                 <SelectTrigger className="w-[170px]" aria-label="Sort by">
                   <ArrowUpDown className="mr-1.5 h-3.5 w-3.5" aria-hidden />
