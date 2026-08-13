@@ -69,19 +69,27 @@ export const getPublicModel = createServerFn({ method: "GET" })
         .limit(50),
     ]);
 
-    const { data: verifiedJob } = await supabase
+    // Every non-sandbox completed run, so the page can show one verified report
+    // per model version plus the evolution across versions.
+    const { data: jobs } = await supabase
       .from("backtest_jobs")
-      .select("id,model_version,results,completed_at")
+      .select("id,model_version,results,completed_at,kind")
       .eq("model_id", model.id)
-      .eq("kind", "validation")
       .eq("status", "completed")
-      .order("completed_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+      .neq("kind", "sandbox")
+      .order("completed_at", { ascending: false });
+
+    const byVersion = new Map<string, (typeof jobs extends null ? never : NonNullable<typeof jobs>[number])>();
+    for (const job of jobs ?? []) {
+      const key = job.model_version ?? "1.0.0";
+      if (!byVersion.has(key)) byVersion.set(key, job);
+    }
+    const versionReports = [...byVersion.entries()].map(([version, job]) => ({ version, job }));
 
     return {
       ...model,
-      verifiedBacktest: verifiedJob ?? null,
+      verifiedBacktest: jobs?.[0] ?? null,
+      versionReports,
       contributor: contributor ?? null,
       versions: versions ?? [],
       backtest: metrics?.find((m) => m.kind === "backtest") ?? null,
@@ -91,6 +99,42 @@ export const getPublicModel = createServerFn({ method: "GET" })
   });
 
 export type PublicModelDetail = NonNullable<Awaited<ReturnType<typeof getPublicModel>>>;
+
+/** Loads up to 3 live models plus their latest verified reports for side-by-side comparison. */
+export const compareModelsData = createServerFn({ method: "GET" })
+  .inputValidator((data: { slugs: string[] }) => {
+    const slugs = data.slugs.filter((s) => /^[a-z0-9-]{1,80}$/.test(s)).slice(0, 3);
+    return { slugs };
+  })
+  .handler(async ({ data }) => {
+    if (!data.slugs.length) return [];
+    const supabase = publicClient();
+    const { data: models } = await supabase
+      .from("ai_models")
+      .select(MODEL_COLUMNS)
+      .in("slug", data.slugs)
+      .eq("status", "live");
+
+    const rows = models ?? [];
+    const { data: jobs } = await supabase
+      .from("backtest_jobs")
+      .select("model_id,model_version,results,completed_at")
+      .in("model_id", rows.length ? rows.map((m) => m.id) : ["00000000-0000-0000-0000-000000000000"])
+      .eq("status", "completed")
+      .neq("kind", "sandbox")
+      .order("completed_at", { ascending: false });
+
+    const latest = new Map<string, NonNullable<typeof jobs>[number]>();
+    for (const j of jobs ?? []) if (j.model_id && !latest.has(j.model_id)) latest.set(j.model_id, j);
+
+    return data.slugs
+      .map((slug) => rows.find((m) => m.slug === slug))
+      .filter((m): m is NonNullable<typeof m> => Boolean(m))
+      .map((m) => ({ ...m, report: latest.get(m.id) ?? null }));
+  });
+
+export type CompareModelRow = Awaited<ReturnType<typeof compareModelsData>>[number];
+
 
 export const submitReview = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
