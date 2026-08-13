@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CreatorsRouteImport } from './routes/creators'
+import { Route as HowWeMakeMoneyRouteImport } from './routes/how-we-make-money'
 import { Route as ModelsRouteImport } from './routes/models'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -71,6 +73,16 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreatorsRoute = CreatorsRouteImport.update({
+  id: '/creators',
+  path: '/creators',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HowWeMakeMoneyRoute = HowWeMakeMoneyRouteImport.update({
+  id: '/how-we-make-money',
+  path: '/how-we-make-money',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ModelsRoute = ModelsRouteImport.update({
@@ -336,6 +348,8 @@ const ApiPublicV1SignalsRoute = ApiPublicV1SignalsRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
+  '/creators': typeof CreatorsRoute
+  '/how-we-make-money': typeof HowWeMakeMoneyRoute
   '/models': typeof ModelsRouteWithChildren
   '/pricing': typeof PricingRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
@@ -385,6 +399,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/creators': typeof CreatorsRoute
+  '/how-we-make-money': typeof HowWeMakeMoneyRoute
   '/pricing': typeof PricingRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/auth/login': typeof AuthLoginRoute
@@ -435,6 +451,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/creators': typeof CreatorsRoute
+  '/how-we-make-money': typeof HowWeMakeMoneyRoute
   '/models': typeof ModelsRouteWithChildren
   '/pricing': typeof PricingRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
@@ -487,6 +505,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/creators'
+    | '/how-we-make-money'
     | '/models'
     | '/pricing'
     | '/dashboard'
@@ -536,6 +556,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/creators'
+    | '/how-we-make-money'
     | '/pricing'
     | '/onboarding'
     | '/auth/login'
@@ -585,6 +607,8 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/creators'
+    | '/how-we-make-money'
     | '/models'
     | '/pricing'
     | '/_authenticated/dashboard'
@@ -637,6 +661,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
+  CreatorsRoute: typeof CreatorsRoute
+  HowWeMakeMoneyRoute: typeof HowWeMakeMoneyRoute
   ModelsRoute: typeof ModelsRouteWithChildren
   PricingRoute: typeof PricingRoute
   ApiPublicSyncRoute: typeof ApiPublicSyncRoute
@@ -666,6 +692,20 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/creators': {
+      id: '/creators'
+      path: '/creators'
+      fullPath: '/creators'
+      preLoaderRoute: typeof CreatorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/how-we-make-money': {
+      id: '/how-we-make-money'
+      path: '/how-we-make-money'
+      fullPath: '/how-we-make-money'
+      preLoaderRoute: typeof HowWeMakeMoneyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/models': {
@@ -1142,6 +1182,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
+  CreatorsRoute: CreatorsRoute,
+  HowWeMakeMoneyRoute: HowWeMakeMoneyRoute,
   ModelsRoute: ModelsRouteWithChildren,
   PricingRoute: PricingRoute,
   ApiPublicSyncRoute: ApiPublicSyncRoute,

@@ -20,7 +20,9 @@ export type Database = {
           api_auth_encrypted: string | null
           api_endpoint: string | null
           asset_class: Database["public"]["Enums"]["asset_class"]
+          avg_fee_per_trade: number | null
           avg_holding_hours: number
+          avg_monthly_fee_per_1k: number | null
           backtest_config: Json
           cagr: number
           consistency_score: number
@@ -31,6 +33,7 @@ export type Database = {
           description: string
           divergence_flagged: boolean
           executions: number
+          fee_able_rate: number | null
           gateway_secret_hash: string | null
           hosting_mode: Database["public"]["Enums"]["hosting_mode"]
           id: string
@@ -51,6 +54,7 @@ export type Database = {
           package_kind: string
           package_path: string | null
           parameters: Json
+          performance_fee_pct: number
           price: number
           pricing_model: Database["public"]["Enums"]["model_pricing_model"]
           promoted: boolean
@@ -80,7 +84,9 @@ export type Database = {
           api_auth_encrypted?: string | null
           api_endpoint?: string | null
           asset_class?: Database["public"]["Enums"]["asset_class"]
+          avg_fee_per_trade?: number | null
           avg_holding_hours?: number
+          avg_monthly_fee_per_1k?: number | null
           backtest_config?: Json
           cagr?: number
           consistency_score?: number
@@ -91,6 +97,7 @@ export type Database = {
           description?: string
           divergence_flagged?: boolean
           executions?: number
+          fee_able_rate?: number | null
           gateway_secret_hash?: string | null
           hosting_mode?: Database["public"]["Enums"]["hosting_mode"]
           id?: string
@@ -111,6 +118,7 @@ export type Database = {
           package_kind?: string
           package_path?: string | null
           parameters?: Json
+          performance_fee_pct?: number
           price?: number
           pricing_model?: Database["public"]["Enums"]["model_pricing_model"]
           promoted?: boolean
@@ -140,7 +148,9 @@ export type Database = {
           api_auth_encrypted?: string | null
           api_endpoint?: string | null
           asset_class?: Database["public"]["Enums"]["asset_class"]
+          avg_fee_per_trade?: number | null
           avg_holding_hours?: number
+          avg_monthly_fee_per_1k?: number | null
           backtest_config?: Json
           cagr?: number
           consistency_score?: number
@@ -151,6 +161,7 @@ export type Database = {
           description?: string
           divergence_flagged?: boolean
           executions?: number
+          fee_able_rate?: number | null
           gateway_secret_hash?: string | null
           hosting_mode?: Database["public"]["Enums"]["hosting_mode"]
           id?: string
@@ -171,6 +182,7 @@ export type Database = {
           package_kind?: string
           package_path?: string | null
           parameters?: Json
+          performance_fee_pct?: number
           price?: number
           pricing_model?: Database["public"]["Enums"]["model_pricing_model"]
           promoted?: boolean
@@ -832,6 +844,27 @@ export type Database = {
           },
         ]
       }
+      consumer_fee_settings: {
+        Row: {
+          auto_pause_on_cap: boolean
+          monthly_cap: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auto_pause_on_cap?: boolean
+          monthly_cap?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auto_pause_on_cap?: boolean
+          monthly_cap?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       contributor_billing: {
         Row: {
           compute_plan: Database["public"]["Enums"]["compute_plan"]
@@ -1335,6 +1368,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      fee_batches: {
+        Row: {
+          amount: number
+          attempts: number
+          charged_at: string | null
+          created_at: string
+          id: string
+          last_error: string | null
+          period_end: string | null
+          period_start: string | null
+          status: string
+          trigger: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          attempts?: number
+          charged_at?: string | null
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          status?: string
+          trigger?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          attempts?: number
+          charged_at?: string | null
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          status?: string
+          trigger?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       gateway_status: {
         Row: {
@@ -2244,6 +2319,86 @@ export type Database = {
           },
         ]
       }
+      performance_fees: {
+        Row: {
+          activation_id: string | null
+          batch_id: string | null
+          closed_at: string
+          commission_rate: number
+          contributor_amount: number
+          contributor_id: string | null
+          created_at: string
+          exempt: boolean
+          exempt_reason: string | null
+          fee_amount: number
+          fee_pct: number
+          gross_profit: number
+          id: string
+          listing_kind: Database["public"]["Enums"]["listing_kind"]
+          model_id: string
+          order_id: string | null
+          platform_amount: number
+          simulated: boolean
+          status: string
+          symbol: string
+          user_id: string
+        }
+        Insert: {
+          activation_id?: string | null
+          batch_id?: string | null
+          closed_at?: string
+          commission_rate?: number
+          contributor_amount?: number
+          contributor_id?: string | null
+          created_at?: string
+          exempt?: boolean
+          exempt_reason?: string | null
+          fee_amount?: number
+          fee_pct?: number
+          gross_profit?: number
+          id?: string
+          listing_kind?: Database["public"]["Enums"]["listing_kind"]
+          model_id: string
+          order_id?: string | null
+          platform_amount?: number
+          simulated?: boolean
+          status?: string
+          symbol?: string
+          user_id: string
+        }
+        Update: {
+          activation_id?: string | null
+          batch_id?: string | null
+          closed_at?: string
+          commission_rate?: number
+          contributor_amount?: number
+          contributor_id?: string | null
+          created_at?: string
+          exempt?: boolean
+          exempt_reason?: string | null
+          fee_amount?: number
+          fee_pct?: number
+          gross_profit?: number
+          id?: string
+          listing_kind?: Database["public"]["Enums"]["listing_kind"]
+          model_id?: string
+          order_id?: string | null
+          platform_amount?: number
+          simulated?: boolean
+          status?: string
+          symbol?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performance_fees_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "fee_batches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       platform_revenue_events: {
         Row: {
           amount: number
@@ -2742,6 +2897,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      strategy_watermarks: {
+        Row: {
+          activation_id: string
+          created_at: string
+          cumulative_pnl: number
+          fees_accrued: number
+          high_water_mark: number
+          id: string
+          model_id: string
+          simulated: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activation_id: string
+          created_at?: string
+          cumulative_pnl?: number
+          fees_accrued?: number
+          high_water_mark?: number
+          id?: string
+          model_id: string
+          simulated?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activation_id?: string
+          created_at?: string
+          cumulative_pnl?: number
+          fees_accrued?: number
+          high_water_mark?: number
+          id?: string
+          model_id?: string
+          simulated?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       subscriptions: {
         Row: {

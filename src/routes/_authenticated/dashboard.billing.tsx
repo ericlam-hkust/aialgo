@@ -82,7 +82,7 @@ function BillingPage() {
               <ExternalLink className="ml-2 h-3 w-3" aria-hidden />
             </Button>
             <Button onClick={() => setUpgradeOpen(true)}>
-              <Sparkles className="mr-2 h-4 w-4" aria-hidden /> {tier === "desk" ? "Change plan" : "Upgrade"}
+              <Sparkles className="mr-2 h-4 w-4" aria-hidden /> {tier === "basic" ? "Change plan" : "Upgrade"}
             </Button>
           </div>
         </header>

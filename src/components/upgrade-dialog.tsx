@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { StripeEmbeddedCheckout } from "@/components/stripe-embedded-checkout";
 import { PaymentTestModeBanner } from "@/components/payment-test-mode-banner";
 import { PLAN_FEATURES, PLAN_PRICE_USD, PLAN_PRICE_IDS, type PlanTier } from "@/lib/entitlements";
-
+import { FEE_DISCLOSURE } from "@/lib/monetization";
 
 export function UpgradeDialog({
   open,
@@ -27,14 +27,20 @@ export function UpgradeDialog({
     onOpenChange(next);
   };
 
+  const price = yearly ? PLAN_PRICE_USD.basic.yearly : PLAN_PRICE_USD.basic.monthly;
+  const priceId = yearly ? PLAN_PRICE_IDS.basic.yearly : PLAN_PRICE_IDS.basic.monthly;
+  const isCurrent = currentTier === "basic";
+
   return (
     <Dialog open={open} onOpenChange={close}>
-      <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
+      <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-primary" aria-hidden /> Upgrade your plan
+            <Sparkles className="h-4 w-4 text-primary" aria-hidden /> Go live with Basic
           </DialogTitle>
-          <DialogDescription>{reason ?? "Unlock more capacity and live trading tools."}</DialogDescription>
+          <DialogDescription>
+            {reason ?? "Paper trading is always free. Live execution needs the Basic plan."}
+          </DialogDescription>
         </DialogHeader>
 
         {checkoutPriceId ? (
@@ -42,7 +48,7 @@ export function UpgradeDialog({
             <PaymentTestModeBanner />
             <StripeEmbeddedCheckout priceId={checkoutPriceId} />
             <Button variant="ghost" size="sm" onClick={() => setCheckoutPriceId(null)}>
-              Back to plans
+              Back
             </Button>
           </div>
         ) : (
@@ -65,42 +71,27 @@ export function UpgradeDialog({
               </button>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
-              {(["pro", "desk"] as const).map((plan) => {
-                const price = yearly ? PLAN_PRICE_USD[plan].yearly : PLAN_PRICE_USD[plan].monthly;
-                const priceId = yearly ? PLAN_PRICE_IDS[plan].yearly : PLAN_PRICE_IDS[plan].monthly;
-                const isCurrent = currentTier === plan;
-                return (
-                  <div key={plan} className="rounded-lg border border-border/70 p-5">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-semibold capitalize">{plan}</h3>
-                      {plan === "pro" ? <Badge>Most popular</Badge> : null}
-                    </div>
-                    <p className="mono mt-3 text-2xl font-semibold">
-                      ${price.toLocaleString()}
-                      <span className="ml-1 text-sm font-normal text-muted-foreground">
-                        / {yearly ? "year" : "month"}
-                      </span>
-                    </p>
-                    <ul className="mt-4 space-y-2 text-sm">
-                      {PLAN_FEATURES[plan].map((f) => (
-                        <li key={f} className="flex items-start gap-2">
-                          <Check className="mt-0.5 h-4 w-4 shrink-0 text-profit" aria-hidden />
-                          {f}
-                        </li>
-                      ))}
-                    </ul>
-                    <Button
-                      className="mt-5 w-full"
-                      variant={plan === "pro" ? "default" : "outline"}
-                      disabled={isCurrent}
-                      onClick={() => setCheckoutPriceId(priceId)}
-                    >
-                      {isCurrent ? "Current plan" : `Choose ${plan}`}
-                    </Button>
-                  </div>
-                );
-              })}
+            <div className="rounded-lg border border-primary/50 p-5">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold">Basic</h3>
+                <Badge>The only plan</Badge>
+              </div>
+              <p className="mono mt-3 text-3xl font-semibold">
+                ${price.toLocaleString()}
+                <span className="ml-1 text-sm font-normal text-muted-foreground">/ {yearly ? "year" : "month"}</span>
+              </p>
+              <ul className="mt-4 space-y-2 text-sm">
+                {PLAN_FEATURES.basic.map((f) => (
+                  <li key={f} className="flex items-start gap-2">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-profit" aria-hidden />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <Button className="mt-5 w-full" disabled={isCurrent} onClick={() => setCheckoutPriceId(priceId)}>
+                {isCurrent ? "Current plan" : "Upgrade to Basic"}
+              </Button>
+              <p className="mt-3 text-xs text-muted-foreground">{FEE_DISCLOSURE}</p>
             </div>
           </div>
         )}
