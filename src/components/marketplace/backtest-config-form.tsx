@@ -1,8 +1,11 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { CheckCircle2, Database, XCircle } from "lucide-react";
 import { checkDataAvailability } from "@/lib/backtest-validation.functions";
 import { listDataCatalog } from "@/lib/data-library.functions";
+import { listDataSources } from "@/lib/data-sources.functions";
+import { PROVIDERS } from "@/lib/data-providers";
 import { DATA_INPUTS, SIGNAL_FREQUENCIES, TIMEFRAMES, type BacktestConfig } from "@/lib/backtest-protocol";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 
 export const emptyBacktestConfig = (assetClass = "stocks"): BacktestConfig => ({
   assetClass,
