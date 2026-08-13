@@ -158,7 +158,7 @@ function ConfigureStep({ modelId, onDone }: { modelId: string; onDone: () => voi
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="none">Paper account</SelectItem>
-              {(brokers.data ?? []).map((b: { id: string; broker_name: string; status: string }) => (
+              {(Array.isArray(brokers.data) ? [] : (brokers.data?.connections ?? [])).map((b) => (
                 <SelectItem key={b.id} value={b.id}>
                   {b.broker_name} · {b.status}
                 </SelectItem>
