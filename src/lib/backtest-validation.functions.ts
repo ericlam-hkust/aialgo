@@ -397,7 +397,7 @@ export const runScheduledRevalidations = createServerFn({ method: "POST" })
       const seed = `${model.id}-${new Date().toISOString().slice(0, 7)}`;
       const report = simulateBacktest({
         seed,
-        config: { assetClass: "stocks", universe: ["SPY"], timeframe: "1d", signalFrequency: "daily", minimumCapital: 1000, dataInputs: ["ohlcv"], ...config },
+        config: { assetClass: "stocks", universe: ["SPY"], timeframe: "1d" as const, signalFrequency: "daily", minimumCapital: 1000, dataInputs: ["ohlcv"], ...(config as Partial<BacktestConfig>) } as BacktestConfig,
         protocol,
         bias: biasFor(seed),
       });
