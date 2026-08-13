@@ -231,7 +231,6 @@ export const activateModel = createServerFn({ method: "POST" })
   .inputValidator(
     (data: {
       modelId: string;
-      purchaseId?: string;
       brokerConnectionId?: string | null;
       mode: "paper" | "live";
       capitalAllocation: number;
@@ -245,23 +244,11 @@ export const activateModel = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { data: purchase } = await supabase
-      .from("model_purchases")
-      .select("id")
-      .eq("user_id", userId)
-      .eq("model_id", data.modelId)
-      .eq("status", "active")
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    if (!purchase) throw new Error("Purchase this model before activating it.");
-
     const { data: row, error } = await supabase
       .from("model_activations")
       .insert({
         model_id: data.modelId,
         user_id: userId,
-        purchase_id: purchase.id,
         broker_connection_id: data.brokerConnectionId ?? null,
         mode: data.mode,
         capital_allocation: data.capitalAllocation,

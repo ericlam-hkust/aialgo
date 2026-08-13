@@ -391,34 +391,6 @@ export const getVerifiedReport = createServerFn({ method: "GET" })
     return job ?? null;
   });
 
-export const appealValidation = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((data: { modelId: string; jobId?: string; message: string }) => {
-    if (data.message.trim().length < 20) throw new Error("Please describe the issue in at least 20 characters.");
-    return data;
-  })
-  .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.from("model_appeals").insert({
-      model_id: data.modelId,
-      job_id: data.jobId ?? null,
-      user_id: context.userId,
-      message: data.message,
-    });
-    if (error) throw new Error(error.message);
-    return { ok: true };
-  });
-
-export const listMyAppeals = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { data } = await context.supabase
-      .from("model_appeals")
-      .select("*, model:ai_models(name,slug)")
-      .eq("user_id", context.userId)
-      .order("created_at", { ascending: false });
-    return data ?? [];
-  });
-
 /**
  * Quarterly re-validation plus continuous divergence monitoring. Models whose
  * live 30d return deviates badly from the verified backtest are flagged, and

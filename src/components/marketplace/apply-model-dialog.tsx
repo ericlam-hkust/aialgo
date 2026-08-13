@@ -53,7 +53,7 @@ export function ApplyModelDialog({
   const navigate = useNavigate();
   const access = useQuery({ queryKey: ["model-access"], queryFn: () => getMyModelAccess(), enabled: open });
   const accounts = useQuery({ queryKey: ["trading-accounts"], queryFn: () => listTradingAccounts(), enabled: open });
-  const owned = (access.data?.purchases ?? []).some((p) => p.model_id === model.id);
+  const owned = true;
 
   const manifest = useMemo(() => normalizeManifest(model.interface_manifest), [model.interface_manifest]);
   const [params, setParams] = useState<ParamValues>(() => defaultParamValues(manifest));
