@@ -130,4 +130,5 @@ A search input sits at the top of the sidebar (and a `⌘K` / `Ctrl+K` command p
 - `src/lib/contributor.functions.ts` gains a `publishStrategyListing` server function that creates the listing row from a strategy, derives the interface manifest from the strategy graph, and reuses `submitForValidation` unchanged.
 - `src/lib/backtest-sim.server.ts` and the execution engine branch on `listing_kind`: algo signals come from the existing bar-by-bar engine in `src/lib/backtest-engine.ts`; model signals stay as today.
 - Wizard (`dashboard.models.new.tsx`) and playground get a `kind` parameter; catalog, cards and detail pages get a kind badge and filter.
-- `src/components/app-shell.tsx`: replace flat `NAV` with `NAV_GROUPS`; add group-header keys to all three locales in `src/lib/i18n.tsx`.
+- `src/components/app-shell.tsx`: replace flat `NAV` with a nested `NAV_GROUPS` tree (group → item → optional children), add the sidebar search input plus a `cmdk` command palette bound to ⌘K/Ctrl+K, and persist group open state in local storage. New group/child labels and search synonyms added to all three locales in `src/lib/i18n.tsx`.
+- Merge `dashboard.accounts.tsx` and `dashboard.brokers.tsx` into one tabbed `dashboard.accounts.tsx`; keep `/dashboard/brokers` as a redirect. `/dashboard/data-sources` keeps its route, only the label and placement change.
