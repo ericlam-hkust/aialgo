@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/admin/revenue")(
   head: () => ({
     meta: [
       { title: "Platform revenue — AlgoForge admin" },
-      { name: "description", content: "Revenue, cost and margin by stream across commissions, compute, gateway and data." },
+      { name: "description", content: "Revenue by stream across commissions, data feeds and referrals." },
       { property: "og:title", content: "Platform revenue — AlgoForge admin" },
       { property: "og:description", content: "Admin view of aiAlgo platform economics and MRR trend." },
       { property: "og:type", content: "website" },
@@ -73,7 +73,7 @@ function AdminRevenuePage() {
       <Card className="border-border/70">
         <CardHeader>
           <CardTitle className="text-base">By stream</CardTitle>
-          <CardDescription>Commission, hosted compute, signal gateway, data feeds and referrals.</CardDescription>
+          <CardDescription>Commission, data feeds and referrals.</CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           <Table>

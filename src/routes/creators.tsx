@@ -29,10 +29,10 @@ export const Route = createFileRoute("/creators")({
       {
         name: "description",
         content:
-          "AI model and algo creators pay nothing on aiAlgo: free hosting, free Signal Gateway, free backtest pipeline. You set a 5-25% per-trade fee and keep 80%.",
+          "AI model and algo creators pay nothing on aiAlgo: free hosting, free execution, free backtest pipeline. You set a 5-25% per-trade fee and keep 80%.",
       },
       { property: "og:title", content: "Free for Creators, Forever — aiAlgo" },
-      { property: "og:description", content: "No listing fees, no compute fees, no gateway fees. Keep 80% of every fee collected." },
+      { property: "og:description", content: "No listing fees, no hosting fees. Keep 80% of every fee collected." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -128,7 +128,7 @@ function CreatorsPage() {
             </CardTitle>
             <CardDescription>
               Rule-based logic built in our visual builder or uploaded as parameters. Hosted execution, free forever —
-              including remote and HFT strategies via the Signal Gateway.
+              including high-frequency strategies.
             </CardDescription>
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground">
