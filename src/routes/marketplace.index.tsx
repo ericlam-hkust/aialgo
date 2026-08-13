@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowUpDown, GitCompare, LayoutGrid, List, Search, Trophy } from "lucide-react";
+import { ArrowUpDown, Boxes, GitCompare, LayoutGrid, List, Search, Sparkles, Trophy } from "lucide-react";
 import { listPublicModels, type PublicModel } from "@/lib/models.functions";
 import { ModelCard, type ModelCardModel } from "@/components/marketplace/model-card";
 import { Input } from "@/components/ui/input";
