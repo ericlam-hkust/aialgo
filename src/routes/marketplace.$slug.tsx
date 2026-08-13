@@ -198,9 +198,23 @@ function ModelDetail() {
           <div className="grid gap-3 sm:grid-cols-4">
             <MetricCard label="Sharpe" value={fmtNum(Number(data.sharpe), 2)} tone="neutral" />
             <MetricCard label="Max drawdown" value={`-${fmtNum(Number(data.max_drawdown), 1)}%`} tone="loss" />
-            <MetricCard label="Win rate" value={`${fmtNum(Number(data.win_rate), 1)}%`} />
+            <MetricCard label="Win rate" value={`${fmtNum(Number(data.win_rate), 1)}%`} tone="profit" />
+            <MetricCard label="Loss rate" value={`${fmtNum(Number(data.loss_rate ?? 0), 1)}%`} tone="loss" />
+            <MetricCard label="Profit factor" value={fmtNum(Number(data.profit_factor ?? 0), 2)} />
+            <MetricCard label="Total trades" value={String(data.total_trades ?? 0)} />
+            <MetricCard label="Total return" value={`${fmtNum(Number(data.total_return ?? 0), 1)}%`} tone="profit" />
             <MetricCard label="CAGR" value={`${fmtNum(Number(data.cagr), 1)}%`} tone="profit" />
           </div>
+
+          {data.backtest_ran_at ? (
+            <div className="rounded-lg border border-border bg-card/60 p-3 text-xs text-muted-foreground">
+              <span className="font-medium text-foreground">Backtest data source: </span>
+              {data.data_source_label ?? "AlgoForge platform market data"}
+              {data.data_source_kind === "contributor" ? " (contributor-supplied feed)" : " (platform feed)"} · run on{" "}
+              {new Date(data.backtest_ran_at).toISOString().slice(0, 10)}
+            </div>
+          ) : null}
+
 
           <Tabs defaultValue="overview">
             <TabsList>
