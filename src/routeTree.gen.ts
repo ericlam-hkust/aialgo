@@ -48,6 +48,7 @@ import { Route as AuthenticatedDashboardStrategiesBacktestRouteImport } from './
 import { Route as AuthenticatedDashboardStrategiesBuilderRouteImport } from './routes/_authenticated/dashboard.strategies.builder'
 import { Route as AuthenticatedDashboardStrategiesTemplatesRouteImport } from './routes/_authenticated/dashboard.strategies.templates'
 import { Route as AuthenticatedDashboardTeamsIndexRouteImport } from './routes/_authenticated/dashboard.teams.index'
+import { Route as AuthenticatedDashboardTeamsSlugRouteImport } from './routes/_authenticated/dashboard.teams.$slug'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicV1ModelsRouteImport } from './routes/api/public/v1/models'
 
@@ -269,6 +270,12 @@ const AuthenticatedDashboardTeamsIndexRoute =
     path: '/teams/',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardTeamsSlugRoute =
+  AuthenticatedDashboardTeamsSlugRouteImport.update({
+    id: '/teams/$slug',
+    path: '/teams/$slug',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -317,6 +324,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/strategies/backtest': typeof AuthenticatedDashboardStrategiesBacktestRoute
   '/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
+  '/dashboard/teams/$slug': typeof AuthenticatedDashboardTeamsSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/v1/models': typeof ApiPublicV1ModelsRoute
   '/dashboard/models/': typeof AuthenticatedDashboardModelsIndexRoute
@@ -356,6 +364,7 @@ export interface FileRoutesByTo {
   '/dashboard/strategies/backtest': typeof AuthenticatedDashboardStrategiesBacktestRoute
   '/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
+  '/dashboard/teams/$slug': typeof AuthenticatedDashboardTeamsSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/v1/models': typeof ApiPublicV1ModelsRoute
   '/dashboard/models': typeof AuthenticatedDashboardModelsIndexRoute
@@ -400,6 +409,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/strategies/backtest': typeof AuthenticatedDashboardStrategiesBacktestRoute
   '/_authenticated/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/_authenticated/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
+  '/_authenticated/dashboard/teams/$slug': typeof AuthenticatedDashboardTeamsSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/v1/models': typeof ApiPublicV1ModelsRoute
   '/_authenticated/dashboard/models/': typeof AuthenticatedDashboardModelsIndexRoute
@@ -444,6 +454,7 @@ export interface FileRouteTypes {
     | '/dashboard/strategies/backtest'
     | '/dashboard/strategies/builder'
     | '/dashboard/strategies/templates'
+    | '/dashboard/teams/$slug'
     | '/api/public/payments/webhook'
     | '/api/public/v1/models'
     | '/dashboard/models/'
@@ -483,6 +494,7 @@ export interface FileRouteTypes {
     | '/dashboard/strategies/backtest'
     | '/dashboard/strategies/builder'
     | '/dashboard/strategies/templates'
+    | '/dashboard/teams/$slug'
     | '/api/public/payments/webhook'
     | '/api/public/v1/models'
     | '/dashboard/models'
@@ -526,6 +538,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/strategies/backtest'
     | '/_authenticated/dashboard/strategies/builder'
     | '/_authenticated/dashboard/strategies/templates'
+    | '/_authenticated/dashboard/teams/$slug'
     | '/api/public/payments/webhook'
     | '/api/public/v1/models'
     | '/_authenticated/dashboard/models/'
@@ -818,6 +831,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardTeamsIndexRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/teams/$slug': {
+      id: '/_authenticated/dashboard/teams/$slug'
+      path: '/teams/$slug'
+      fullPath: '/dashboard/teams/$slug'
+      preLoaderRoute: typeof AuthenticatedDashboardTeamsSlugRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -871,6 +891,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardStrategiesBacktestRoute: typeof AuthenticatedDashboardStrategiesBacktestRoute
   AuthenticatedDashboardStrategiesBuilderRoute: typeof AuthenticatedDashboardStrategiesBuilderRoute
   AuthenticatedDashboardStrategiesTemplatesRoute: typeof AuthenticatedDashboardStrategiesTemplatesRoute
+  AuthenticatedDashboardTeamsSlugRoute: typeof AuthenticatedDashboardTeamsSlugRoute
   AuthenticatedDashboardModelsIndexRoute: typeof AuthenticatedDashboardModelsIndexRoute
   AuthenticatedDashboardStrategiesIndexRoute: typeof AuthenticatedDashboardStrategiesIndexRoute
   AuthenticatedDashboardTeamsIndexRoute: typeof AuthenticatedDashboardTeamsIndexRoute
@@ -908,6 +929,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardStrategiesBuilderRoute,
     AuthenticatedDashboardStrategiesTemplatesRoute:
       AuthenticatedDashboardStrategiesTemplatesRoute,
+    AuthenticatedDashboardTeamsSlugRoute: AuthenticatedDashboardTeamsSlugRoute,
     AuthenticatedDashboardModelsIndexRoute:
       AuthenticatedDashboardModelsIndexRoute,
     AuthenticatedDashboardStrategiesIndexRoute:
