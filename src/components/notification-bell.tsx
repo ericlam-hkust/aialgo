@@ -18,7 +18,11 @@ export function NotificationBell() {
     queryKey: ["notifications"],
     queryFn: () => listNotifications(),
     refetchInterval: 60_000,
+    retry: 2,
+    retryDelay: 1500,
+    throwOnError: false,
   });
+
 
   const readOne = useMutation({
     mutationFn: (id: string) => markNotificationRead({ data: { id } }),
