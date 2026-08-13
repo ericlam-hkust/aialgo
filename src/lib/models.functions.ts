@@ -224,6 +224,9 @@ export const activateModel = createServerFn({ method: "POST" })
       maxPositionSizePct: number;
       dailyLossLimitPct: number;
       stopLossPct: number;
+      maxOpenPositions?: number;
+      killSwitchDrawdownPct?: number;
+      parameters?: Record<string, string | number | boolean>;
     }) => data,
   )
   .handler(async ({ data, context }) => {
@@ -251,6 +254,10 @@ export const activateModel = createServerFn({ method: "POST" })
         max_position_size_pct: data.maxPositionSizePct,
         daily_loss_limit_pct: data.dailyLossLimitPct,
         stop_loss_pct: data.stopLossPct,
+        max_open_positions: data.maxOpenPositions ?? 5,
+        kill_switch_drawdown_pct: data.killSwitchDrawdownPct ?? 20,
+        peak_equity: data.capitalAllocation,
+        parameters: (data.parameters ?? {}) as never,
         status: "active",
       })
       .select("id")

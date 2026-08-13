@@ -24,6 +24,7 @@ import { Route as ModelsCompareRouteImport } from './routes/models.compare'
 import { Route as ModelsDataLibraryRouteImport } from './routes/models.data-library'
 import { Route as ModelsDocsRouteImport } from './routes/models.docs'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
+import { Route as AuthenticatedDashboardAccountsRouteImport } from './routes/_authenticated/dashboard.accounts'
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated/dashboard.admin'
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
 import { Route as AuthenticatedDashboardBrokersRouteImport } from './routes/_authenticated/dashboard.brokers'
@@ -120,6 +121,12 @@ const AuthenticatedDashboardIndexRoute =
   AuthenticatedDashboardIndexRouteImport.update({
     id: '/',
     path: '/',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardAccountsRoute =
+  AuthenticatedDashboardAccountsRouteImport.update({
+    id: '/accounts',
+    path: '/accounts',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardAdminRoute =
@@ -268,6 +275,7 @@ export interface FileRoutesByFullPath {
   '/models/docs': typeof ModelsDocsRoute
   '/auth/': typeof AuthIndexRoute
   '/models/': typeof ModelsIndexRoute
+  '/dashboard/accounts': typeof AuthenticatedDashboardAccountsRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
@@ -303,6 +311,7 @@ export interface FileRoutesByTo {
   '/models/docs': typeof ModelsDocsRoute
   '/auth': typeof AuthIndexRoute
   '/models': typeof ModelsIndexRoute
+  '/dashboard/accounts': typeof AuthenticatedDashboardAccountsRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
@@ -343,6 +352,7 @@ export interface FileRoutesById {
   '/models/docs': typeof ModelsDocsRoute
   '/auth/': typeof AuthIndexRoute
   '/models/': typeof ModelsIndexRoute
+  '/_authenticated/dashboard/accounts': typeof AuthenticatedDashboardAccountsRoute
   '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/_authenticated/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
@@ -383,6 +393,7 @@ export interface FileRouteTypes {
     | '/models/docs'
     | '/auth/'
     | '/models/'
+    | '/dashboard/accounts'
     | '/dashboard/admin'
     | '/dashboard/billing'
     | '/dashboard/brokers'
@@ -418,6 +429,7 @@ export interface FileRouteTypes {
     | '/models/docs'
     | '/auth'
     | '/models'
+    | '/dashboard/accounts'
     | '/dashboard/admin'
     | '/dashboard/billing'
     | '/dashboard/brokers'
@@ -457,6 +469,7 @@ export interface FileRouteTypes {
     | '/models/docs'
     | '/auth/'
     | '/models/'
+    | '/_authenticated/dashboard/accounts'
     | '/_authenticated/dashboard/admin'
     | '/_authenticated/dashboard/billing'
     | '/_authenticated/dashboard/brokers'
@@ -596,6 +609,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/dashboard/'
       preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/accounts': {
+      id: '/_authenticated/dashboard/accounts'
+      path: '/accounts'
+      fullPath: '/dashboard/accounts'
+      preLoaderRoute: typeof AuthenticatedDashboardAccountsRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
     '/_authenticated/dashboard/admin': {
@@ -771,6 +791,7 @@ const AuthenticatedDashboardAdminRouteWithChildren =
   )
 
 interface AuthenticatedDashboardRouteChildren {
+  AuthenticatedDashboardAccountsRoute: typeof AuthenticatedDashboardAccountsRoute
   AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRouteWithChildren
   AuthenticatedDashboardBillingRoute: typeof AuthenticatedDashboardBillingRoute
   AuthenticatedDashboardBrokersRoute: typeof AuthenticatedDashboardBrokersRoute
@@ -795,6 +816,7 @@ interface AuthenticatedDashboardRouteChildren {
 
 const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
   {
+    AuthenticatedDashboardAccountsRoute: AuthenticatedDashboardAccountsRoute,
     AuthenticatedDashboardAdminRoute:
       AuthenticatedDashboardAdminRouteWithChildren,
     AuthenticatedDashboardBillingRoute: AuthenticatedDashboardBillingRoute,
