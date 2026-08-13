@@ -6,6 +6,8 @@ import { ArrowLeft, ArrowRight, CheckCircle2, Circle, Loader2 } from "lucide-rea
 import { submitModel, type ModelDraft } from "@/lib/contributor.functions";
 import { submitForValidation } from "@/lib/backtest-validation.functions";
 import { BacktestConfigForm, emptyBacktestConfig } from "@/components/marketplace/backtest-config-form";
+import { InterfaceDefinitionStep } from "@/components/marketplace/interface-step";
+import { emptyManifest, type InterfaceManifest } from "@/lib/model-interface";
 import type { BacktestConfig } from "@/lib/backtest-protocol";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,6 +44,7 @@ function UploadWizard() {
   const [step, setStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [config, setConfig] = useState<BacktestConfig>(emptyBacktestConfig());
+  const [manifest, setManifest] = useState<InterfaceManifest>(() => emptyManifest());
   const [draft, setDraft] = useState<ModelDraft>({
     name: "",
     slug: "",
@@ -65,7 +68,7 @@ function UploadWizard() {
 
   const submit = useMutation({
     mutationFn: async () => {
-      const model = await submitModel({ data: draft });
+      const model = await submitModel({ data: { ...draft, manifest } });
       await submitForValidation({ data: { modelId: model.id, config } });
       return model;
     },
@@ -126,7 +129,7 @@ function UploadWizard() {
               [
                 "Tell buyers what the model does and who it is for.",
                 "Register a live API endpoint or upload a model package.",
-                "Define the tunable parameters buyers can configure.",
+                "Declare your data inputs, tunable parameters and signal output contract.",
                 "Choose how you charge. Platform commission is 20%.",
                 "Declare what your model trades and confirm the platform holds the data it needs.",
                 "Review everything before submitting for validation.",
@@ -221,44 +224,7 @@ function UploadWizard() {
             </>
           ) : null}
 
-          {step === 2 ? (
-            <div className="space-y-3">
-              {draft.parameters.map((p, i) => (
-                <div key={i} className="grid gap-2 rounded-md border border-border/70 p-3 sm:grid-cols-5">
-                  {(["name", "type", "default", "min", "max"] as const).map((k) => (
-                    <div key={k} className="space-y-1.5">
-                      <Label className="text-xs capitalize">{k}</Label>
-                      <Input
-                        className="mono"
-                        value={p[k] ?? ""}
-                        onChange={(e) =>
-                          set(
-                            "parameters",
-                            draft.parameters.map((row, j) => (j === i ? { ...row, [k]: e.target.value } : row)),
-                          )
-                        }
-                      />
-                    </div>
-                  ))}
-                </div>
-              ))}
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() =>
-                    set("parameters", [...draft.parameters, { name: "", type: "number", default: "" }])
-                  }
-                >
-                  Add parameter
-                </Button>
-                {draft.parameters.length > 1 ? (
-                  <Button variant="ghost" onClick={() => set("parameters", draft.parameters.slice(0, -1))}>
-                    Remove last
-                  </Button>
-                ) : null}
-              </div>
-            </div>
-          ) : null}
+          {step === 2 ? <InterfaceDefinitionStep value={manifest} onChange={setManifest} /> : null}
 
           {step === 3 ? (
             <>
@@ -303,7 +269,9 @@ function UploadWizard() {
               <Summary label="Asset / strategy" value={`${draft.assetClass} · ${draft.strategyType}`} />
               <Summary label="Timeframe / risk" value={`${draft.timeframe} · ${draft.riskLevel}`} />
               <Summary label="Delivery" value={draft.packageKind === "api" ? draft.apiEndpoint || "API" : draft.packagePath || "Package"} />
-              <Summary label="Parameters" value={draft.parameters.map((p) => p.name).filter(Boolean).join(", ") || "—"} />
+              <Summary label="Instruments" value={manifest.instruments.join(", ") || "—"} />
+              <Summary label="Parameters" value={manifest.parameters.map((p) => p.label || p.key).filter(Boolean).join(", ") || "—"} />
+              <Summary label="Output contract" value={manifest.outputConfirmed ? "Confirmed" : "Not confirmed"} />
               <Summary label="Pricing" value={`${draft.pricingModel} · ${fmtMoney(draft.price)}`} />
               <Summary label="Universe" value={config.universe.join(", ") || "—"} />
               <Summary label="Backtest inputs" value={`${config.timeframe} · ${config.signalFrequency} · ${config.dataInputs.join(", ")}`} />
