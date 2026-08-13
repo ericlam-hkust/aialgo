@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Bell, CheckCheck } from "lucide-react";
 import {
@@ -70,13 +69,13 @@ export function NotificationBell() {
                         {fmtDate(n.created_at)}
                       </p>
                       {n.link ? (
-                        <Link
-                          to={n.link}
+                        <a
+                          href={n.link}
                           className="mt-1 inline-block text-xs text-primary hover:underline"
                           onClick={() => !n.read_at && readOne.mutate(n.id)}
                         >
                           View
-                        </Link>
+                        </a>
                       ) : null}
                     </div>
                     {!n.read_at ? (
