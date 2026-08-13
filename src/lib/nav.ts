@@ -92,8 +92,8 @@ export const NAV_GROUPS: NavGroup[] = [
             exact: true,
             terms: ["provider", "api key", "polygon", "market feed"],
           },
-          { to: "/models/data-library", key: "nav.dataLibrary", icon: Library, exact: true, terms: ["historical", "catalog"] },
-          { to: "/models/docs", key: "nav.docs", icon: BookOpen, exact: true, terms: ["interface", "contract", "api docs"] },
+          { to: "/marketplace/data-library", key: "nav.dataLibrary", icon: Library, exact: true, terms: ["historical", "catalog"] },
+          { to: "/marketplace/docs", key: "nav.docs", icon: BookOpen, exact: true, terms: ["interface", "contract", "api docs"] },
         ],
       },
     ],
@@ -101,9 +101,9 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     key: "group.discover",
     items: [
-      { to: "/models", key: "nav.models", icon: Sparkles, exact: false, terms: ["marketplace", "catalog", "buy"] },
-      { to: "/dashboard/marketplace", key: "nav.marketplace", icon: Store, exact: false, terms: ["strategies marketplace"] },
-      { to: "/models/compare", key: "nav.compare", icon: GitCompare, exact: true, terms: ["side by side"] },
+      { to: "/marketplace", key: "nav.marketplace", icon: Store, exact: false, terms: ["marketplace", "catalog", "buy", "ai models", "algo strategies"] },
+
+      { to: "/marketplace/compare", key: "nav.compare", icon: GitCompare, exact: true, terms: ["side by side"] },
       { to: "/dashboard/my-models", key: "nav.mySubscriptions", icon: Layers, exact: true, terms: ["applied", "activations"] },
     ],
   },
@@ -129,7 +129,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { to: "/dashboard/earnings", key: "nav.earnings", icon: Banknote, exact: true, terms: ["earnings", "commission", "fees", "revenue"] },
       { to: "/dashboard/models/payouts", key: "nav.payouts", icon: Banknote, exact: true, terms: ["stripe", "bank", "revenue"] },
       { to: "/dashboard/teams", key: "nav.teams", icon: Building2, exact: false, terms: ["organization", "namespace", "tokens"] },
-      { to: "/models/api-status", key: "nav.apiStatus", icon: Activity, exact: true, terms: ["uptime", "incidents", "changelog"] },
+      { to: "/marketplace/api-status", key: "nav.apiStatus", icon: Activity, exact: true, terms: ["uptime", "incidents", "changelog"] },
     ],
   },
   {

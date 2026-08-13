@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-export const Route = createFileRoute("/models/docs")({
+export const Route = createFileRoute("/marketplace/docs")({
   head: () => ({
     meta: [
       { title: "Model Developer Documentation — AlgoForge" },
@@ -91,7 +91,7 @@ function Docs() {
         </p>
         <div className="flex flex-wrap gap-2 pt-2">
           <Button asChild size="sm" variant="outline">
-            <Link to="/models/data-library">Data library</Link>
+            <Link to="/marketplace/data-library">Data library</Link>
           </Button>
           <Button asChild size="sm">
             <Link to="/dashboard/models/new">Submit a model</Link>
@@ -144,7 +144,7 @@ function Docs() {
       <Section id="schemas" title="3. Data schemas">
         <p className="text-sm text-muted-foreground">
           All feeds are normalised OHLCV with UTC timestamps. Full coverage windows and per-instrument details live in
-          the <Link className="text-primary underline" to="/models/data-library">data library</Link>.
+          the <Link className="text-primary underline" to="/marketplace/data-library">data library</Link>.
         </p>
         <Code>{`Bar = { timestamp: str, open: float, high: float, low: float, close: float, volume: float }
 Timeframes = "1m" | "5m" | "1h" | "1d"

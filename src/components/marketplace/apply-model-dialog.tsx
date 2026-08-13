@@ -275,7 +275,7 @@ function PayStep({ model }: { model: { id: string; slug: string } }) {
     const res = await createModelCheckoutSession({
       data: {
         modelId: model.id,
-        returnUrl: `${window.location.origin}/models/${model.slug}?purchase=done`,
+        returnUrl: `${window.location.origin}/marketplace/${model.slug}?purchase=done`,
         environment: getStripeEnvironment(),
       },
     });

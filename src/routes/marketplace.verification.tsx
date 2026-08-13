@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { TrustBadge } from "@/components/marketplace/trust-badges";
 import { FREQUENCY_CLASSES, LIVE_VERIFIED_DAYS, PLATFORM_DISCLAIMER, RISK_DISCLOSURE, TRUST_TIERS, type FrequencyClass } from "@/lib/monetization";
 
-export const Route = createFileRoute("/models/verification")({
+export const Route = createFileRoute("/marketplace/verification")({
   head: () => ({
     meta: [
       { title: "How model verification works — aiAlgo" },

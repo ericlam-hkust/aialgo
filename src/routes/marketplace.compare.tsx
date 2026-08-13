@@ -41,7 +41,7 @@ function parseSlugs(raw: unknown): string[] {
   return raw.split(",").filter(Boolean).slice(0, 3);
 }
 
-export const Route = createFileRoute("/models/compare")({
+export const Route = createFileRoute("/marketplace/compare")({
   validateSearch: (search: Record<string, unknown>) => ({ models: typeof search["models"] === "string" ? (search["models"] as string) : "" }),
   head: () => ({
     meta: [
@@ -100,7 +100,7 @@ function ComparePage() {
   return (
     <main className="mx-auto max-w-7xl px-4 py-8">
       <Button asChild variant="ghost" size="sm" className="mb-4">
-        <Link to="/models">
+        <Link to="/marketplace">
           <ArrowLeft className="mr-1.5 h-4 w-4" aria-hidden /> All models
         </Link>
       </Button>
@@ -173,7 +173,7 @@ function ComparePage() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2">
                     <span className="h-2.5 w-2.5 rounded-full" style={{ background: LINE_COLORS[i] }} aria-hidden />
-                    <Link to="/models/$slug" params={{ slug: row.slug }} className="font-semibold hover:text-primary">
+                    <Link to="/marketplace/$slug" params={{ slug: row.slug }} className="font-semibold hover:text-primary">
                       {row.name}
                     </Link>
                   </div>

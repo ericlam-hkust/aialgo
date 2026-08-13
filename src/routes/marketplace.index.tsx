@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowUpDown, GitCompare, LayoutGrid, List, Search, Trophy } from "lucide-react";
+import { ArrowUpDown, Boxes, GitCompare, LayoutGrid, List, Search, Sparkles, Trophy } from "lucide-react";
 import { listPublicModels, type PublicModel } from "@/lib/models.functions";
 import { ModelCard, type ModelCardModel } from "@/components/marketplace/model-card";
 import { Input } from "@/components/ui/input";
@@ -21,7 +21,7 @@ const modelsQuery = queryOptions({
   queryFn: () => listPublicModels(),
 });
 
-export const Route = createFileRoute("/models/")({
+export const Route = createFileRoute("/marketplace/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(modelsQuery),
   head: () => ({
     meta: [
@@ -45,6 +45,13 @@ export const Route = createFileRoute("/models/")({
 
 const ALL = "all";
 type SortKey = "popular" | "live" | "sharpe" | "cagr" | "rating" | "price";
+
+const LISTING_TABS = [
+  { value: ALL, label: "All listings", icon: LayoutGrid },
+  { value: "algo", label: "Algo strategies", icon: Boxes },
+  { value: "ai_model", label: "AI models", icon: Sparkles },
+] as const;
+
 
 function Catalog() {
   const { data } = useSuspenseQuery(modelsQuery);
@@ -95,29 +102,59 @@ function Catalog() {
     return [...rows].sort(by[sort]);
   }, [data, q, asset, strategy, timeframe, risk, pricing, trust, frequency, listing, sort]);
 
+  const countFor = (kind: string) =>
+    kind === ALL
+      ? (data as PublicModel[]).length
+      : (data as PublicModel[]).filter((m) => (m.listing_kind ?? "ai_model") === kind).length;
+
   const leaderboard = useMemo(
-    () => [...(data as PublicModel[])].sort((a, b) => Number(b.live_return_30d) - Number(a.live_return_30d)).slice(0, 20),
-    [data],
+    () =>
+      (data as PublicModel[])
+        .filter((m) => listing === ALL || (m.listing_kind ?? "ai_model") === listing)
+        .sort((a, b) => Number(b.live_return_30d) - Number(a.live_return_30d))
+        .slice(0, 20),
+    [data, listing],
   );
+
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-10">
       <div className="max-w-2xl">
-        <Badge variant="secondary">Model marketplace</Badge>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">AI trading models, verified</h1>
+        <Badge variant="secondary">Marketplace</Badge>
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
+          Algo strategies and AI models, verified
+        </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Every listing is re-run out of sample, paper traded, and tracked live since listing. Deploy to paper or a
-          connected broker in a few clicks.
+          Every listing — rule-based algo or AI model — is re-run out of sample, paper traded, and tracked live since
+          listing. Deploy to paper or a connected broker in a few clicks.
         </p>
       </div>
 
-      <Tabs defaultValue="catalog" className="mt-8">
+      <div className="mt-6 inline-flex flex-wrap items-center gap-1 rounded-lg border border-border/70 bg-card/60 p-1">
+        {LISTING_TABS.map((tab) => (
+          <Button
+            key={tab.value}
+            size="sm"
+            variant={listing === tab.value ? "secondary" : "ghost"}
+            onClick={() => setListing(tab.value)}
+            aria-pressed={listing === tab.value}
+            className="gap-1.5"
+          >
+            <tab.icon className="h-4 w-4" aria-hidden />
+            {tab.label}
+            <span className="text-xs text-muted-foreground">{countFor(tab.value)}</span>
+          </Button>
+        ))}
+      </div>
+
+      <Tabs defaultValue="catalog" className="mt-6">
         <TabsList>
           <TabsTrigger value="catalog">Catalog</TabsTrigger>
           <TabsTrigger value="leaderboard">
             <Trophy className="mr-1.5 h-4 w-4" aria-hidden /> Leaderboard
           </TabsTrigger>
         </TabsList>
+
 
         <TabsContent value="catalog" className="mt-6 space-y-6">
           <Card className="border-border/70 bg-card/60">
@@ -161,15 +198,6 @@ function Catalog() {
                   value: f,
                   label: FREQUENCY_CLASSES[f].label,
                 }))}
-              />
-              <FilterSelect
-                label="Type"
-                value={listing}
-                onChange={setListing}
-                options={[
-                  { value: "ai_model", label: "AI model" },
-                  { value: "algo", label: "Algo strategy" },
-                ]}
               />
               <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
                 <SelectTrigger className="w-[170px]" aria-label="Sort by">
@@ -251,7 +279,7 @@ function Catalog() {
                   Clear
                 </Button>
                 <Button asChild size="sm" disabled={compare.length < 2}>
-                  <Link to="/models/compare" search={{ models: compare.join(",") }}>
+                  <Link to="/marketplace/compare" search={{ models: compare.join(",") }}>
                     Compare {compare.length}
                   </Link>
                 </Button>
@@ -281,7 +309,7 @@ function Catalog() {
                     <TableRow key={m.slug}>
                       <TableCell className="mono text-muted-foreground">{i + 1}</TableCell>
                       <TableCell>
-                        <Link to="/models/$slug" params={{ slug: m.slug }} className="hover:text-primary">
+                        <Link to="/marketplace/$slug" params={{ slug: m.slug }} className="hover:text-primary">
                           <span className="font-medium">{m.name}</span>
                           <span className="block text-xs text-muted-foreground">{m.contributor?.display_name}</span>
                         </Link>

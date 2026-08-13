@@ -65,7 +65,7 @@ export function ModelCard({
   ];
 
   return (
-    <Link to="/models/$slug" params={{ slug: model.slug }} className="group relative block">
+    <Link to="/marketplace/$slug" params={{ slug: model.slug }} className="group relative block">
       {onToggleSelect ? (
         <label
           className="absolute top-3 right-3 z-10 flex cursor-pointer items-center gap-1.5 rounded-md border border-border/70 bg-background/90 px-2 py-1 text-[11px] text-muted-foreground"

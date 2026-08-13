@@ -40,7 +40,7 @@ const modelQuery = (slug: string) =>
     queryFn: () => getPublicModel({ data: { slug } }),
   });
 
-export const Route = createFileRoute("/models/$slug")({
+export const Route = createFileRoute("/marketplace/$slug")({
   loader: async ({ context, params }) => {
     const model = await context.queryClient.ensureQueryData(modelQuery(params.slug));
     if (!model) throw notFound();
@@ -74,7 +74,7 @@ function ModelNotFound() {
       <h1 className="text-2xl font-semibold">Model unavailable</h1>
       <p className="mt-2 text-sm text-muted-foreground">This listing may have been delisted by its contributor.</p>
       <Button asChild className="mt-6">
-        <Link to="/models">Back to marketplace</Link>
+        <Link to="/marketplace">Back to marketplace</Link>
       </Button>
     </main>
   );
@@ -112,7 +112,7 @@ function ModelDetail() {
   return (
     <main className="mx-auto max-w-7xl px-4 py-8">
       <Button asChild variant="ghost" size="sm" className="mb-4">
-        <Link to="/models">
+        <Link to="/marketplace">
           <ArrowLeft className="mr-1.5 h-4 w-4" aria-hidden /> All models
         </Link>
       </Button>
