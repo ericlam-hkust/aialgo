@@ -54,10 +54,12 @@ export type Database = {
           strategy_type: Database["public"]["Enums"]["model_strategy_type"]
           tagline: string | null
           tags: string[]
+          team_id: string | null
           timeframe: string
           updated_at: string
           user_id: string | null
           validation_job_id: string | null
+          visibility: Database["public"]["Enums"]["model_visibility"]
           win_rate: number
         }
         Insert: {
@@ -99,10 +101,12 @@ export type Database = {
           strategy_type?: Database["public"]["Enums"]["model_strategy_type"]
           tagline?: string | null
           tags?: string[]
+          team_id?: string | null
           timeframe?: string
           updated_at?: string
           user_id?: string | null
           validation_job_id?: string | null
+          visibility?: Database["public"]["Enums"]["model_visibility"]
           win_rate?: number
         }
         Update: {
@@ -144,10 +148,12 @@ export type Database = {
           strategy_type?: Database["public"]["Enums"]["model_strategy_type"]
           tagline?: string | null
           tags?: string[]
+          team_id?: string | null
           timeframe?: string
           updated_at?: string
           user_id?: string | null
           validation_job_id?: string | null
+          visibility?: Database["public"]["Enums"]["model_visibility"]
           win_rate?: number
         }
         Relationships: [
@@ -158,7 +164,92 @@ export type Database = {
             referencedRelation: "contributor_profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "ai_models_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      api_changelog: {
+        Row: {
+          body: string
+          breaking: boolean
+          created_at: string
+          deprecation_notice: string | null
+          id: string
+          kind: string
+          released_at: string
+          sunset_on: string | null
+          title: string
+          version: string
+        }
+        Insert: {
+          body: string
+          breaking?: boolean
+          created_at?: string
+          deprecation_notice?: string | null
+          id?: string
+          kind?: string
+          released_at?: string
+          sunset_on?: string | null
+          title: string
+          version: string
+        }
+        Update: {
+          body?: string
+          breaking?: boolean
+          created_at?: string
+          deprecation_notice?: string | null
+          id?: string
+          kind?: string
+          released_at?: string
+          sunset_on?: string | null
+          title?: string
+          version?: string
+        }
+        Relationships: []
+      }
+      api_incidents: {
+        Row: {
+          component: string
+          created_at: string
+          id: string
+          impact: string
+          resolved_at: string | null
+          started_at: string
+          status: string
+          summary: string
+          title: string
+          uptime_pct: number
+        }
+        Insert: {
+          component?: string
+          created_at?: string
+          id?: string
+          impact?: string
+          resolved_at?: string | null
+          started_at?: string
+          status?: string
+          summary: string
+          title: string
+          uptime_pct?: number
+        }
+        Update: {
+          component?: string
+          created_at?: string
+          id?: string
+          impact?: string
+          resolved_at?: string | null
+          started_at?: string
+          status?: string
+          summary?: string
+          title?: string
+          uptime_pct?: number
+        }
+        Relationships: []
       }
       audit_logs: {
         Row: {
@@ -1118,6 +1209,47 @@ export type Database = {
           },
         ]
       }
+      model_access_grants: {
+        Row: {
+          created_at: string
+          email: string | null
+          granted_by: string
+          id: string
+          model_id: string
+          note: string | null
+          role: Database["public"]["Enums"]["model_access_role"]
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          granted_by: string
+          id?: string
+          model_id: string
+          note?: string | null
+          role?: Database["public"]["Enums"]["model_access_role"]
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          granted_by?: string
+          id?: string
+          model_id?: string
+          note?: string | null
+          role?: Database["public"]["Enums"]["model_access_role"]
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "model_access_grants_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "ai_models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       model_activations: {
         Row: {
           activated_at: string
@@ -2065,6 +2197,124 @@ export type Database = {
         }
         Relationships: []
       }
+      team_api_tokens: {
+        Row: {
+          created_at: string
+          created_by: string
+          expires_at: string | null
+          id: string
+          last_used_at: string | null
+          name: string
+          revoked_at: string | null
+          scopes: string[]
+          team_id: string
+          token_hash: string
+          token_prefix: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          expires_at?: string | null
+          id?: string
+          last_used_at?: string | null
+          name: string
+          revoked_at?: string | null
+          scopes?: string[]
+          team_id: string
+          token_hash: string
+          token_prefix: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          expires_at?: string | null
+          id?: string
+          last_used_at?: string | null
+          name?: string
+          revoked_at?: string | null
+          scopes?: string[]
+          team_id?: string
+          token_hash?: string
+          token_prefix?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_api_tokens_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_members: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["team_role"]
+          team_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["team_role"]
+          team_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["team_role"]
+          team_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_members_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          name: string
+          slug: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          name: string
+          slug: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          name?: string
+          slug?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       usage_counters: {
         Row: {
           ai_calls: number
@@ -2136,6 +2386,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_manage_model: {
+        Args: { _model_id: string; _user_id: string }
+        Returns: boolean
+      }
+      can_manage_team: {
+        Args: { _team_id: string; _user_id: string }
+        Returns: boolean
+      }
+      can_view_model: {
+        Args: { _model_id: string; _user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -2143,14 +2405,23 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_team_member: {
+        Args: { _team_id: string; _user_id: string }
+        Returns: boolean
+      }
       my_plan_tier: {
         Args: { _env?: string }
         Returns: Database["public"]["Enums"]["plan_tier"]
+      }
+      team_role_of: {
+        Args: { _team_id: string; _user_id: string }
+        Returns: Database["public"]["Enums"]["team_role"]
       }
     }
     Enums: {
       app_role: "free" | "pro" | "admin"
       asset_class: "stocks" | "crypto" | "forex" | "futures"
+      model_access_role: "viewer" | "beta_tester"
       model_listing_status:
         | "draft"
         | "pending_review"
@@ -2167,9 +2438,11 @@ export type Database = {
         | "mean_reversion"
         | "ml_signal"
         | "arbitrage"
+      model_visibility: "public" | "unlisted" | "private"
       payout_status: "pending" | "processing" | "paid" | "failed"
       plan_tier: "free" | "pro" | "elite"
       risk_tolerance: "conservative" | "moderate" | "aggressive"
+      team_role: "owner" | "maintainer" | "viewer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2299,6 +2572,7 @@ export const Constants = {
     Enums: {
       app_role: ["free", "pro", "admin"],
       asset_class: ["stocks", "crypto", "forex", "futures"],
+      model_access_role: ["viewer", "beta_tester"],
       model_listing_status: [
         "draft",
         "pending_review",
@@ -2317,9 +2591,11 @@ export const Constants = {
         "ml_signal",
         "arbitrage",
       ],
+      model_visibility: ["public", "unlisted", "private"],
       payout_status: ["pending", "processing", "paid", "failed"],
       plan_tier: ["free", "pro", "elite"],
       risk_tolerance: ["conservative", "moderate", "aggressive"],
+      team_role: ["owner", "maintainer", "viewer"],
     },
   },
 } as const

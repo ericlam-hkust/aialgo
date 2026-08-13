@@ -20,6 +20,7 @@ import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthRegisterRouteImport } from './routes/auth.register'
 import { Route as ModelsIndexRouteImport } from './routes/models.index'
 import { Route as ModelsSlugRouteImport } from './routes/models.$slug'
+import { Route as ModelsApiStatusRouteImport } from './routes/models.api-status'
 import { Route as ModelsCompareRouteImport } from './routes/models.compare'
 import { Route as ModelsDataLibraryRouteImport } from './routes/models.data-library'
 import { Route as ModelsDocsRouteImport } from './routes/models.docs'
@@ -47,7 +48,10 @@ import { Route as AuthenticatedDashboardStrategiesIndexRouteImport } from './rou
 import { Route as AuthenticatedDashboardStrategiesBacktestRouteImport } from './routes/_authenticated/dashboard.strategies.backtest'
 import { Route as AuthenticatedDashboardStrategiesBuilderRouteImport } from './routes/_authenticated/dashboard.strategies.builder'
 import { Route as AuthenticatedDashboardStrategiesTemplatesRouteImport } from './routes/_authenticated/dashboard.strategies.templates'
+import { Route as AuthenticatedDashboardTeamsIndexRouteImport } from './routes/_authenticated/dashboard.teams.index'
+import { Route as AuthenticatedDashboardTeamsSlugRouteImport } from './routes/_authenticated/dashboard.teams.$slug'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
+import { Route as ApiPublicV1ModelsRouteImport } from './routes/api/public/v1/models'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -101,6 +105,11 @@ const ModelsIndexRoute = ModelsIndexRouteImport.update({
 const ModelsSlugRoute = ModelsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
+  getParentRoute: () => ModelsRoute,
+} as any)
+const ModelsApiStatusRoute = ModelsApiStatusRouteImport.update({
+  id: '/api-status',
+  path: '/api-status',
   getParentRoute: () => ModelsRoute,
 } as any)
 const ModelsCompareRoute = ModelsCompareRouteImport.update({
@@ -261,12 +270,29 @@ const AuthenticatedDashboardStrategiesTemplatesRoute =
     path: '/strategies/templates',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardTeamsIndexRoute =
+  AuthenticatedDashboardTeamsIndexRouteImport.update({
+    id: '/teams/',
+    path: '/teams/',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardTeamsSlugRoute =
+  AuthenticatedDashboardTeamsSlugRouteImport.update({
+    id: '/teams/$slug',
+    path: '/teams/$slug',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
     path: '/api/public/payments/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicV1ModelsRoute = ApiPublicV1ModelsRouteImport.update({
+  id: '/api/public/v1/models',
+  path: '/api/public/v1/models',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -277,6 +303,7 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/models/$slug': typeof ModelsSlugRoute
+  '/models/api-status': typeof ModelsApiStatusRoute
   '/models/compare': typeof ModelsCompareRoute
   '/models/data-library': typeof ModelsDataLibraryRoute
   '/models/docs': typeof ModelsDocsRoute
@@ -304,9 +331,12 @@ export interface FileRoutesByFullPath {
   '/dashboard/strategies/backtest': typeof AuthenticatedDashboardStrategiesBacktestRoute
   '/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
+  '/dashboard/teams/$slug': typeof AuthenticatedDashboardTeamsSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/v1/models': typeof ApiPublicV1ModelsRoute
   '/dashboard/models/': typeof AuthenticatedDashboardModelsIndexRoute
   '/dashboard/strategies/': typeof AuthenticatedDashboardStrategiesIndexRoute
+  '/dashboard/teams/': typeof AuthenticatedDashboardTeamsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -314,6 +344,7 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/models/$slug': typeof ModelsSlugRoute
+  '/models/api-status': typeof ModelsApiStatusRoute
   '/models/compare': typeof ModelsCompareRoute
   '/models/data-library': typeof ModelsDataLibraryRoute
   '/models/docs': typeof ModelsDocsRoute
@@ -341,9 +372,12 @@ export interface FileRoutesByTo {
   '/dashboard/strategies/backtest': typeof AuthenticatedDashboardStrategiesBacktestRoute
   '/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
+  '/dashboard/teams/$slug': typeof AuthenticatedDashboardTeamsSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/v1/models': typeof ApiPublicV1ModelsRoute
   '/dashboard/models': typeof AuthenticatedDashboardModelsIndexRoute
   '/dashboard/strategies': typeof AuthenticatedDashboardStrategiesIndexRoute
+  '/dashboard/teams': typeof AuthenticatedDashboardTeamsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -356,6 +390,7 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/models/$slug': typeof ModelsSlugRoute
+  '/models/api-status': typeof ModelsApiStatusRoute
   '/models/compare': typeof ModelsCompareRoute
   '/models/data-library': typeof ModelsDataLibraryRoute
   '/models/docs': typeof ModelsDocsRoute
@@ -383,9 +418,12 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/strategies/backtest': typeof AuthenticatedDashboardStrategiesBacktestRoute
   '/_authenticated/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/_authenticated/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
+  '/_authenticated/dashboard/teams/$slug': typeof AuthenticatedDashboardTeamsSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/v1/models': typeof ApiPublicV1ModelsRoute
   '/_authenticated/dashboard/models/': typeof AuthenticatedDashboardModelsIndexRoute
   '/_authenticated/dashboard/strategies/': typeof AuthenticatedDashboardStrategiesIndexRoute
+  '/_authenticated/dashboard/teams/': typeof AuthenticatedDashboardTeamsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -398,6 +436,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/models/$slug'
+    | '/models/api-status'
     | '/models/compare'
     | '/models/data-library'
     | '/models/docs'
@@ -425,9 +464,12 @@ export interface FileRouteTypes {
     | '/dashboard/strategies/backtest'
     | '/dashboard/strategies/builder'
     | '/dashboard/strategies/templates'
+    | '/dashboard/teams/$slug'
     | '/api/public/payments/webhook'
+    | '/api/public/v1/models'
     | '/dashboard/models/'
     | '/dashboard/strategies/'
+    | '/dashboard/teams/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -435,6 +477,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/models/$slug'
+    | '/models/api-status'
     | '/models/compare'
     | '/models/data-library'
     | '/models/docs'
@@ -462,9 +505,12 @@ export interface FileRouteTypes {
     | '/dashboard/strategies/backtest'
     | '/dashboard/strategies/builder'
     | '/dashboard/strategies/templates'
+    | '/dashboard/teams/$slug'
     | '/api/public/payments/webhook'
+    | '/api/public/v1/models'
     | '/dashboard/models'
     | '/dashboard/strategies'
+    | '/dashboard/teams'
   id:
     | '__root__'
     | '/'
@@ -476,6 +522,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/models/$slug'
+    | '/models/api-status'
     | '/models/compare'
     | '/models/data-library'
     | '/models/docs'
@@ -503,9 +550,12 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/strategies/backtest'
     | '/_authenticated/dashboard/strategies/builder'
     | '/_authenticated/dashboard/strategies/templates'
+    | '/_authenticated/dashboard/teams/$slug'
     | '/api/public/payments/webhook'
+    | '/api/public/v1/models'
     | '/_authenticated/dashboard/models/'
     | '/_authenticated/dashboard/strategies/'
+    | '/_authenticated/dashboard/teams/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -515,6 +565,7 @@ export interface RootRouteChildren {
   ModelsRoute: typeof ModelsRouteWithChildren
   ApiPublicSyncRoute: typeof ApiPublicSyncRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
+  ApiPublicV1ModelsRoute: typeof ApiPublicV1ModelsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -594,6 +645,13 @@ declare module '@tanstack/react-router' {
       path: '/$slug'
       fullPath: '/models/$slug'
       preLoaderRoute: typeof ModelsSlugRouteImport
+      parentRoute: typeof ModelsRoute
+    }
+    '/models/api-status': {
+      id: '/models/api-status'
+      path: '/api-status'
+      fullPath: '/models/api-status'
+      preLoaderRoute: typeof ModelsApiStatusRouteImport
       parentRoute: typeof ModelsRoute
     }
     '/models/compare': {
@@ -785,11 +843,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardStrategiesTemplatesRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/teams/': {
+      id: '/_authenticated/dashboard/teams/'
+      path: '/teams'
+      fullPath: '/dashboard/teams/'
+      preLoaderRoute: typeof AuthenticatedDashboardTeamsIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/teams/$slug': {
+      id: '/_authenticated/dashboard/teams/$slug'
+      path: '/teams/$slug'
+      fullPath: '/dashboard/teams/$slug'
+      preLoaderRoute: typeof AuthenticatedDashboardTeamsSlugRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
       fullPath: '/api/public/payments/webhook'
       preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/models': {
+      id: '/api/public/v1/models'
+      path: '/api/public/v1/models'
+      fullPath: '/api/public/v1/models'
+      preLoaderRoute: typeof ApiPublicV1ModelsRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -831,8 +910,10 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardStrategiesBacktestRoute: typeof AuthenticatedDashboardStrategiesBacktestRoute
   AuthenticatedDashboardStrategiesBuilderRoute: typeof AuthenticatedDashboardStrategiesBuilderRoute
   AuthenticatedDashboardStrategiesTemplatesRoute: typeof AuthenticatedDashboardStrategiesTemplatesRoute
+  AuthenticatedDashboardTeamsSlugRoute: typeof AuthenticatedDashboardTeamsSlugRoute
   AuthenticatedDashboardModelsIndexRoute: typeof AuthenticatedDashboardModelsIndexRoute
   AuthenticatedDashboardStrategiesIndexRoute: typeof AuthenticatedDashboardStrategiesIndexRoute
+  AuthenticatedDashboardTeamsIndexRoute: typeof AuthenticatedDashboardTeamsIndexRoute
 }
 
 const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
@@ -867,10 +948,13 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardStrategiesBuilderRoute,
     AuthenticatedDashboardStrategiesTemplatesRoute:
       AuthenticatedDashboardStrategiesTemplatesRoute,
+    AuthenticatedDashboardTeamsSlugRoute: AuthenticatedDashboardTeamsSlugRoute,
     AuthenticatedDashboardModelsIndexRoute:
       AuthenticatedDashboardModelsIndexRoute,
     AuthenticatedDashboardStrategiesIndexRoute:
       AuthenticatedDashboardStrategiesIndexRoute,
+    AuthenticatedDashboardTeamsIndexRoute:
+      AuthenticatedDashboardTeamsIndexRoute,
   }
 
 const AuthenticatedDashboardRouteWithChildren =
@@ -907,6 +991,7 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface ModelsRouteChildren {
   ModelsSlugRoute: typeof ModelsSlugRoute
+  ModelsApiStatusRoute: typeof ModelsApiStatusRoute
   ModelsCompareRoute: typeof ModelsCompareRoute
   ModelsDataLibraryRoute: typeof ModelsDataLibraryRoute
   ModelsDocsRoute: typeof ModelsDocsRoute
@@ -915,6 +1000,7 @@ interface ModelsRouteChildren {
 
 const ModelsRouteChildren: ModelsRouteChildren = {
   ModelsSlugRoute: ModelsSlugRoute,
+  ModelsApiStatusRoute: ModelsApiStatusRoute,
   ModelsCompareRoute: ModelsCompareRoute,
   ModelsDataLibraryRoute: ModelsDataLibraryRoute,
   ModelsDocsRoute: ModelsDocsRoute,
@@ -931,6 +1017,7 @@ const rootRouteChildren: RootRouteChildren = {
   ModelsRoute: ModelsRouteWithChildren,
   ApiPublicSyncRoute: ApiPublicSyncRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
+  ApiPublicV1ModelsRoute: ApiPublicV1ModelsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

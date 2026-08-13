@@ -131,6 +131,11 @@ function ModelDetail() {
               </Badge>
             </div>
             <h1 className="mt-3 text-3xl font-semibold tracking-tight">{data.name}</h1>
+            <p className="mono mt-1 text-xs text-muted-foreground">
+              {data.namespace}
+              {data.visibility !== "public" ? ` · ${data.visibility}` : ""}
+            </p>
+
             <div className="mt-3 flex flex-wrap gap-2">
               {data.verifiedBacktest ? (
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/15 px-2.5 py-1 text-xs font-medium text-primary">
