@@ -126,8 +126,7 @@ export const NAV_GROUPS: NavGroup[] = [
     key: "group.earn",
     items: [
       { to: "/dashboard/models", key: "nav.myListings", icon: Package, exact: true, terms: ["contributor", "publish", "earnings"] },
-      { to: "/dashboard/gateway", key: "nav.gateway", icon: Zap, exact: true, terms: ["signal", "remote", "hft", "api"] },
-      { to: "/dashboard/compute", key: "nav.compute", icon: PlugZap, exact: true, terms: ["hosting", "gpu", "earnings", "commission"] },
+      { to: "/dashboard/earnings", key: "nav.earnings", icon: Banknote, exact: true, terms: ["earnings", "commission", "fees", "revenue"] },
       { to: "/dashboard/models/payouts", key: "nav.payouts", icon: Banknote, exact: true, terms: ["stripe", "bank", "revenue"] },
       { to: "/dashboard/teams", key: "nav.teams", icon: Building2, exact: false, terms: ["organization", "namespace", "tokens"] },
       { to: "/models/api-status", key: "nav.apiStatus", icon: Activity, exact: true, terms: ["uptime", "incidents", "changelog"] },
