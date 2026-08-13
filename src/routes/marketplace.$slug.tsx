@@ -16,7 +16,7 @@ import {
 } from "recharts";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ArrowLeft, BadgeCheck, GitCompare, ShieldCheck, Star, TriangleAlert, Users } from "lucide-react";
-import { getPublicModel, submitReview } from "@/lib/marketplace.functions";
+import { getPublicModel, submitReview } from "@/lib/models.functions";
 import { getReviewEligibility } from "@/lib/activations.functions";
 import { daysSince, modelBadges } from "@/lib/model-badges";
 import { BacktestReportView } from "@/components/marketplace/backtest-report";

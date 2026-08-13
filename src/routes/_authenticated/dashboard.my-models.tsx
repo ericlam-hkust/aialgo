@@ -11,7 +11,7 @@ import {
   updateActivationRisk,
   type ActivationRow,
 } from "@/lib/activations.functions";
-import { setActivationStatus } from "@/lib/marketplace.functions";
+import { setActivationStatus } from "@/lib/models.functions";
 import { EmptyState } from "@/components/empty-state";
 import { MetricCard } from "@/components/metric-card";
 import { Button } from "@/components/ui/button";

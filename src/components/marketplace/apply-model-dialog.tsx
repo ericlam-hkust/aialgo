@@ -6,7 +6,7 @@ import { ArrowLeft, ArrowRight, CheckCircle2, CreditCard, Loader2, ShieldAlert, 
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { createModelCheckoutSession } from "@/lib/marketplace-payments.functions";
-import { activateModel, getMyModelAccess } from "@/lib/marketplace.functions";
+import { activateModel, getMyModelAccess } from "@/lib/models.functions";
 import { listTradingAccounts } from "@/lib/trading-accounts.functions";
 import { providerLabel } from "@/lib/trading-accounts";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";

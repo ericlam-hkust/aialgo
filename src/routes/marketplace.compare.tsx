@@ -12,7 +12,7 @@ import {
   YAxis,
 } from "recharts";
 import { ArrowLeft, GitCompare, TriangleAlert, X } from "lucide-react";
-import { compareModelsData, listPublicModels, type PublicModel } from "@/lib/marketplace.functions";
+import { compareModelsData, listPublicModels, type PublicModel } from "@/lib/models.functions";
 import type { BacktestReport } from "@/lib/backtest-protocol";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
