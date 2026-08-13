@@ -30,6 +30,7 @@ import { Route as AuthenticatedDashboardRiskRouteImport } from './routes/_authen
 import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
 import { Route as ApiPublicSyncRouteImport } from './routes/api/public/sync'
 import { Route as AuthenticatedDashboardModelsIndexRouteImport } from './routes/_authenticated/dashboard.models.index'
+import { Route as AuthenticatedDashboardModelsNewRouteImport } from './routes/_authenticated/dashboard.models.new'
 import { Route as AuthenticatedDashboardStrategiesIndexRouteImport } from './routes/_authenticated/dashboard.strategies.index'
 import { Route as AuthenticatedDashboardStrategiesBacktestRouteImport } from './routes/_authenticated/dashboard.strategies.backtest'
 import { Route as AuthenticatedDashboardStrategiesBuilderRouteImport } from './routes/_authenticated/dashboard.strategies.builder'
@@ -149,6 +150,12 @@ const AuthenticatedDashboardModelsIndexRoute =
     path: '/models/',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardModelsNewRoute =
+  AuthenticatedDashboardModelsNewRouteImport.update({
+    id: '/models/new',
+    path: '/models/new',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardStrategiesIndexRoute =
   AuthenticatedDashboardStrategiesIndexRouteImport.update({
     id: '/strategies/',
@@ -200,6 +207,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/models/new': typeof AuthenticatedDashboardModelsNewRoute
   '/dashboard/strategies/backtest': typeof AuthenticatedDashboardStrategiesBacktestRoute
   '/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
@@ -224,6 +232,7 @@ export interface FileRoutesByTo {
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/models/new': typeof AuthenticatedDashboardModelsNewRoute
   '/dashboard/strategies/backtest': typeof AuthenticatedDashboardStrategiesBacktestRoute
   '/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
@@ -253,6 +262,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/_authenticated/dashboard/models/new': typeof AuthenticatedDashboardModelsNewRoute
   '/_authenticated/dashboard/strategies/backtest': typeof AuthenticatedDashboardStrategiesBacktestRoute
   '/_authenticated/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/_authenticated/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
@@ -282,6 +292,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/api/public/sync'
     | '/dashboard/'
+    | '/dashboard/models/new'
     | '/dashboard/strategies/backtest'
     | '/dashboard/strategies/builder'
     | '/dashboard/strategies/templates'
@@ -306,6 +317,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/api/public/sync'
     | '/dashboard'
+    | '/dashboard/models/new'
     | '/dashboard/strategies/backtest'
     | '/dashboard/strategies/builder'
     | '/dashboard/strategies/templates'
@@ -334,6 +346,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/settings'
     | '/api/public/sync'
     | '/_authenticated/dashboard/'
+    | '/_authenticated/dashboard/models/new'
     | '/_authenticated/dashboard/strategies/backtest'
     | '/_authenticated/dashboard/strategies/builder'
     | '/_authenticated/dashboard/strategies/templates'
@@ -500,6 +513,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardModelsIndexRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/models/new': {
+      id: '/_authenticated/dashboard/models/new'
+      path: '/models/new'
+      fullPath: '/dashboard/models/new'
+      preLoaderRoute: typeof AuthenticatedDashboardModelsNewRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/strategies/': {
       id: '/_authenticated/dashboard/strategies/'
       path: '/strategies'
@@ -547,6 +567,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardRiskRoute: typeof AuthenticatedDashboardRiskRoute
   AuthenticatedDashboardSettingsRoute: typeof AuthenticatedDashboardSettingsRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
+  AuthenticatedDashboardModelsNewRoute: typeof AuthenticatedDashboardModelsNewRoute
   AuthenticatedDashboardStrategiesBacktestRoute: typeof AuthenticatedDashboardStrategiesBacktestRoute
   AuthenticatedDashboardStrategiesBuilderRoute: typeof AuthenticatedDashboardStrategiesBuilderRoute
   AuthenticatedDashboardStrategiesTemplatesRoute: typeof AuthenticatedDashboardStrategiesTemplatesRoute
@@ -567,6 +588,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardRiskRoute: AuthenticatedDashboardRiskRoute,
     AuthenticatedDashboardSettingsRoute: AuthenticatedDashboardSettingsRoute,
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
+    AuthenticatedDashboardModelsNewRoute: AuthenticatedDashboardModelsNewRoute,
     AuthenticatedDashboardStrategiesBacktestRoute:
       AuthenticatedDashboardStrategiesBacktestRoute,
     AuthenticatedDashboardStrategiesBuilderRoute:
