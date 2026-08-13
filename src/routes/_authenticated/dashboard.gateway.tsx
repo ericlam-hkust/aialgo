@@ -2,7 +2,7 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Activity, Copy, Gift, KeyRound, Loader2, Pause, Play, Radio } from "lucide-react";
+import { Activity, Copy, Gift, KeyRound, Loader2, Pause, Play, Radio, Zap } from "lucide-react";
 import { getGatewayConsole, rotateGatewaySecret, setGatewayPaused } from "@/lib/gateway.functions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
