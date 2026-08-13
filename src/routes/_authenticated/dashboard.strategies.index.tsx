@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { listMyModels } from "@/lib/contributor.functions";
+import { publishStrategyListing } from "@/lib/algo-listing.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/strategies/")({
   component: StrategyLibrary,
@@ -67,17 +68,15 @@ function StrategyLibrary() {
   });
 
   const publish = useMutation({
-    mutationFn: async (row: Row) => {
-      const { error } = await supabase
-        .from("strategies")
-        .update({ is_public: !row.is_public })
-        .eq("id", row.id);
-      if (error) throw new Error(error.message);
-      return !row.is_public;
-    },
-    onSuccess: (isPublic) => {
-      toast.success(isPublic ? "Published to the marketplace" : "Removed from the marketplace");
+    mutationFn: (row: Row) => publishStrategyListing({ data: { strategyId: row.id } }),
+    onSuccess: (res) => {
+      toast.success(
+        res.created
+          ? "Listing created — finish pricing and run validation in My listings."
+          : "This strategy already has a listing.",
+      );
       qc.invalidateQueries({ queryKey: ["my-strategies"] });
+      navigate({ to: "/dashboard/models" });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -178,7 +177,8 @@ function StrategyLibrary() {
           <Button
             size="icon"
             variant="ghost"
-            aria-label={r.is_public ? `Unpublish ${r.name}` : `Publish ${r.name}`}
+            aria-label={`Publish ${r.name} to the marketplace`}
+            title="Publish as a marketplace listing"
             onClick={() => publish.mutate(r)}
           >
             <Upload className="h-4 w-4" aria-hidden />
