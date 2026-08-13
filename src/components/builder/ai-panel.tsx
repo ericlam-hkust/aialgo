@@ -47,7 +47,8 @@ export function AiPanel({ turns, busy, pending, onSend, onApply, onDiscard }: Pr
         </Badge>
       </div>
 
-      <ScrollArea className="flex-1" viewportRef={scrollRef}>
+      <ScrollArea className="flex-1">
+        <div ref={scrollRef}>
         <div className="space-y-3 p-3">
           {!turns.length ? (
             <div className="space-y-2">
@@ -111,6 +112,7 @@ export function AiPanel({ turns, busy, pending, onSend, onApply, onDiscard }: Pr
               </div>
             </div>
           ) : null}
+        </div>
         </div>
       </ScrollArea>
 
