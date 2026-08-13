@@ -21,14 +21,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { fmtMoney } from "@/lib/format";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BrokersPanel } from "@/components/brokers-panel";
 
 export const Route = createFileRoute("/_authenticated/dashboard/accounts")({
   component: AccountsPage,
   head: () => ({
     meta: [
-      { title: "Connected Accounts — AlgoForge" },
+      { title: "Trading Accounts — AlgoForge" },
       { name: "description", content: "Link your broker and exchange accounts, or trade models risk-free on the built-in paper account." },
-      { property: "og:title", content: "Connected Accounts — AlgoForge" },
+      { property: "og:title", content: "Trading Accounts — AlgoForge" },
       { property: "og:description", content: "Link brokers and exchanges with trade-only API keys, or use the paper account." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -112,11 +114,22 @@ function AccountsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Connected accounts</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Trading accounts</h1>
         <p className="text-sm text-muted-foreground">
-          Link the venues your models trade on. Start on the paper account — it is free and risk-free.
+          Where your orders and balances live. Use <strong>Accounts</strong> for the paper account and exchange API keys,
+          and <strong>Broker sync</strong> for IBKR, Futu and Tiger. Market data provider keys live under Build &rarr; Data.
         </p>
       </div>
+
+      <Tabs defaultValue="accounts" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="accounts">Accounts</TabsTrigger>
+          <TabsTrigger value="sync">Broker sync</TabsTrigger>
+        </TabsList>
+        <TabsContent value="sync">
+          <BrokersPanel />
+        </TabsContent>
+        <TabsContent value="accounts" className="space-y-6">
 
       <Card className="border-border/70">
         <CardHeader className="flex-row items-center justify-between gap-4 space-y-0">
@@ -261,6 +274,8 @@ function AccountsPage() {
           </CardContent>
         </Card>
       </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
