@@ -1,6 +1,6 @@
-import { CONSUMER_PLANS, planSpec, type ConsumerPlan } from "./monetization";
+import { BASE_COMMISSION, CONSUMER_PLANS, planSpec, type ConsumerPlan } from "./monetization";
 
-export type PlanTier = ConsumerPlan; // "free" | "pro" | "desk"
+export type PlanTier = ConsumerPlan; // "free" | "basic"
 
 export type PlanLimits = {
   maxStrategies: number;
@@ -18,18 +18,20 @@ export type PlanLimits = {
   brokerConnections: boolean;
   intradaySync: boolean;
   marketplacePublish: boolean;
-  /** Platform commission taken on marketplace sales by this creator. */
+  /** Platform commission taken on performance fees collected for this creator. */
   marketplaceFeeRate: number;
 };
 
+const UNLIMITED = Number.POSITIVE_INFINITY;
+
 export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
   free: {
-    maxStrategies: Number.POSITIVE_INFINITY,
-    maxBacktestsPerMonth: 3,
-    maxAiCallsPerMonth: 20,
+    maxStrategies: UNLIMITED,
+    maxBacktestsPerMonth: UNLIMITED,
+    maxAiCallsPerMonth: UNLIMITED,
     liveExecution: false,
     maxConcurrentLive: 0,
-    hftAccess: false,
+    hftAccess: true, // paper trading with HFT listings is free
     realtimeData: false,
     premiumFeeds: false,
     multiAccount: false,
@@ -38,31 +40,14 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
     brokerConnections: false,
     intradaySync: false,
     marketplacePublish: true,
-    marketplaceFeeRate: 0.2,
+    marketplaceFeeRate: BASE_COMMISSION,
   },
-  pro: {
-    maxStrategies: Number.POSITIVE_INFINITY,
-    maxBacktestsPerMonth: Number.POSITIVE_INFINITY,
-    maxAiCallsPerMonth: 1000,
+  basic: {
+    maxStrategies: UNLIMITED,
+    maxBacktestsPerMonth: UNLIMITED,
+    maxAiCallsPerMonth: UNLIMITED,
     liveExecution: true,
-    maxConcurrentLive: 3,
-    hftAccess: true,
-    realtimeData: true,
-    premiumFeeds: false,
-    multiAccount: false,
-    liveDataSources: true,
-    paperDeployments: true,
-    brokerConnections: true,
-    intradaySync: true,
-    marketplacePublish: true,
-    marketplaceFeeRate: 0.2,
-  },
-  desk: {
-    maxStrategies: Number.POSITIVE_INFINITY,
-    maxBacktestsPerMonth: Number.POSITIVE_INFINITY,
-    maxAiCallsPerMonth: Number.POSITIVE_INFINITY,
-    liveExecution: true,
-    maxConcurrentLive: Number.POSITIVE_INFINITY,
+    maxConcurrentLive: UNLIMITED,
     hftAccess: true,
     realtimeData: true,
     premiumFeeds: true,
@@ -72,33 +57,30 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
     brokerConnections: true,
     intradaySync: true,
     marketplacePublish: true,
-    marketplaceFeeRate: 0.2,
+    marketplaceFeeRate: BASE_COMMISSION,
   },
 };
 
-export const PLAN_LABEL: Record<PlanTier, string> = { free: "Free", pro: "Pro", desk: "Desk" };
+export const PLAN_LABEL: Record<PlanTier, string> = { free: "Free", basic: "Basic" };
 
 export const PLAN_PRICE_IDS = {
-  pro: { monthly: "pro_monthly", yearly: "pro_yearly" },
-  desk: { monthly: "desk_monthly", yearly: "desk_yearly" },
+  basic: { monthly: "basic_monthly", yearly: "basic_yearly" },
 } as const;
 
 export const PLAN_PRICE_USD = {
-  pro: { monthly: planSpec("pro").monthly, yearly: planSpec("pro").annual },
-  desk: { monthly: planSpec("desk").monthly, yearly: planSpec("desk").annual },
+  basic: { monthly: planSpec("basic").monthly, yearly: planSpec("basic").annual },
 } as const;
 
 export const PLAN_FEATURES: Record<Exclude<PlanTier, "free">, string[]> = {
-  pro: planSpec("pro").features,
-  desk: planSpec("desk").features,
+  basic: planSpec("basic").features,
 };
 
 export { CONSUMER_PLANS };
 
+/** Legacy price ids (pro_*, desk_*, elite_*) all resolve to Basic so old rows keep working. */
 export function tierFromPriceId(priceId: string | null | undefined): PlanTier {
   if (!priceId) return "free";
-  if (priceId.startsWith("desk") || priceId.startsWith("elite")) return "desk";
-  if (priceId.startsWith("pro")) return "pro";
+  if (/^(basic|pro|desk|elite)/.test(priceId)) return "basic";
   return "free";
 }
 
@@ -108,8 +90,8 @@ export function currentPeriodKey(date = new Date()): string {
 
 export const UPGRADE_PREFIX = "UPGRADE_REQUIRED:";
 
-export function upgradeMessage(feature: string, plan: Exclude<PlanTier, "free">): string {
-  return `${UPGRADE_PREFIX} ${feature} requires the ${PLAN_LABEL[plan]} plan.`;
+export function upgradeMessage(feature: string, plan: Exclude<PlanTier, "free"> = "basic"): string {
+  return `${UPGRADE_PREFIX} ${feature} requires the ${PLAN_LABEL[plan]} plan ($${planSpec("basic").monthly}/mo).`;
 }
 
 export function isUpgradeError(message: string | undefined | null): boolean {
