@@ -1,12 +1,24 @@
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AppShell } from "@/components/app-shell";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/models")({
   component: ModelsLayout,
 });
 
 function ModelsLayout() {
+  const { session, loading } = useAuth();
+
+  if (!loading && session) {
+    return (
+      <AppShell>
+        <Outlet />
+      </AppShell>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-30 border-b border-border/70 bg-background/85 backdrop-blur">
