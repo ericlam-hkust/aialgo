@@ -244,7 +244,10 @@ export const advanceBacktestJob = createServerFn({ method: "POST" })
                 last_validated_at: new Date().toISOString(),
                 next_revalidation_at: nextRevalidation.toISOString(),
                 divergence_flagged: false,
+                overfitting_risk: Boolean(report.walkForward?.overfittingRisk),
+                consistency_score: report.walkForward?.consistencyScore ?? 0,
               }),
+
         })
         .eq("id", job.model_id);
 
