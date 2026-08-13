@@ -199,16 +199,34 @@ function ModelDetail() {
             </TabsContent>
 
             <TabsContent value="backtest" className="mt-4 space-y-4">
-              {data.verifiedBacktest?.results ? (
-                <BacktestReportView
-                  report={data.verifiedBacktest.results as unknown as BacktestReport}
-                  variant="verified"
-                  title={`Version ${data.verifiedBacktest.model_version ?? "1.0.0"}`}
-                />
+              {versionReports.length ? (
+                <>
+                  {versionReports.length > 1 ? (
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="text-sm text-muted-foreground">Verified report for version</span>
+                      <Select value={reportVersion} onValueChange={setReportVersion}>
+                        <SelectTrigger className="w-48">
+                          <SelectValue placeholder="Version" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {versionReports.map((v) => (
+                            <SelectItem key={v.version} value={v.version}>
+                              v{v.version}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  ) : null}
+                  {activeReport ? (
+                    <BacktestReportView report={activeReport} variant="verified" title={`Version ${reportVersion}`} />
+                  ) : null}
+                </>
               ) : (
                 <EquityCard title="Out-of-sample equity curve" series={backtestSeries} />
               )}
             </TabsContent>
+
 
             <TabsContent value="live" className="mt-4 space-y-4">
               {data.divergence_flagged ? (
