@@ -14,6 +14,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { EmptyState } from "@/components/empty-state";
 import { fmtNum, pnlClass } from "@/lib/format";
 import { ASSET_CLASSES, PRICING_MODELS, RISK_LEVELS, STRATEGY_TYPES, TIMEFRAMES, pricingLabel } from "@/lib/marketplace";
+import { FREQUENCY_CLASSES, TRUST_TIERS, type FrequencyClass, type TrustTier } from "@/lib/monetization";
 
 const modelsQuery = queryOptions({
   queryKey: ["public-models"],
@@ -53,6 +54,9 @@ function Catalog() {
   const [timeframe, setTimeframe] = useState<string>(ALL);
   const [risk, setRisk] = useState<string>(ALL);
   const [pricing, setPricing] = useState<string>(ALL);
+  const [trust, setTrust] = useState<string>(ALL);
+  const [frequency, setFrequency] = useState<string>(ALL);
+  const [listing, setListing] = useState<string>(ALL);
   const [sort, setSort] = useState<SortKey>("popular");
   const [layout, setLayout] = useState<"grid" | "list">("grid");
   const [compare, setCompare] = useState<string[]>([]);
@@ -69,6 +73,9 @@ function Catalog() {
       if (timeframe !== ALL && m.timeframe !== timeframe) return false;
       if (risk !== ALL && m.risk_level !== risk) return false;
       if (pricing !== ALL && m.pricing_model !== pricing) return false;
+      if (trust !== ALL && (m as any).trust_tier !== trust) return false;
+      if (frequency !== ALL && (m as any).declared_frequency !== frequency) return false;
+      if (listing !== ALL && (m as any).listing_kind !== listing) return false;
       if (!term) return true;
       return (
         m.name.toLowerCase().includes(term) ||
@@ -86,7 +93,7 @@ function Catalog() {
       price: (a, b) => Number(a.price) - Number(b.price),
     };
     return [...rows].sort(by[sort]);
-  }, [data, q, asset, strategy, timeframe, risk, pricing, sort]);
+  }, [data, q, asset, strategy, timeframe, risk, pricing, trust, frequency, listing, sort]);
 
   const leaderboard = useMemo(
     () => [...(data as PublicModel[])].sort((a, b) => Number(b.live_return_30d) - Number(a.live_return_30d)).slice(0, 20),
@@ -139,6 +146,30 @@ function Catalog() {
                 value={pricing}
                 onChange={setPricing}
                 options={PRICING_MODELS.map((p) => ({ value: p.value, label: p.label }))}
+              />
+              <FilterSelect
+                label="Trust tier"
+                value={trust}
+                onChange={setTrust}
+                options={(Object.keys(TRUST_TIERS) as TrustTier[]).map((t) => ({ value: t, label: TRUST_TIERS[t].label }))}
+              />
+              <FilterSelect
+                label="Frequency"
+                value={frequency}
+                onChange={setFrequency}
+                options={(Object.keys(FREQUENCY_CLASSES) as FrequencyClass[]).map((f) => ({
+                  value: f,
+                  label: FREQUENCY_CLASSES[f].label,
+                }))}
+              />
+              <FilterSelect
+                label="Type"
+                value={listing}
+                onChange={setListing}
+                options={[
+                  { value: "ai_model", label: "AI model" },
+                  { value: "algo", label: "Algo strategy" },
+                ]}
               />
               <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
                 <SelectTrigger className="w-[170px]" aria-label="Sort by">
