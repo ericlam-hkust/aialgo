@@ -73,6 +73,72 @@ async function markCanceled(subscription: any, env: StripeEnv) {
   }
 }
 
+/** Records a marketplace model purchase plus the 80/20 revenue split. */
+async function fulfillModelPurchase(session: any, env: StripeEnv) {
+  const meta = session.metadata ?? {};
+  if (meta.kind !== "model_purchase" || !meta.modelId || !meta.userId) return;
+
+  const supabase = getSupabase();
+  const { data: model } = await supabase
+    .from("ai_models")
+    .select("id,name,price,currency,pricing_model,contributor_id,active_users")
+    .eq("id", meta.modelId)
+    .maybeSingle();
+  if (!model) return;
+
+  const { data: settings } = await supabase
+    .from("platform_settings")
+    .select("value")
+    .eq("key", "commission")
+    .maybeSingle();
+  const rate = Number((settings?.value as { rate?: number } | null)?.rate ?? 0.2);
+  const gross = Number(session.amount_total ?? 0) / 100 || Number(model.price ?? 0);
+  const commission = Math.round(gross * rate * 100) / 100;
+
+  const { data: purchase } = await supabase
+    .from("model_purchases")
+    .insert({
+      model_id: model.id,
+      user_id: meta.userId,
+      pricing_model: model.pricing_model,
+      amount: gross,
+      currency: model.currency ?? "HKD",
+      status: "active",
+      stripe_session_id: session.id,
+      stripe_subscription_id: session.subscription ?? null,
+      environment: env,
+    })
+    .select("id")
+    .maybeSingle();
+
+  await supabase.from("model_transactions").insert({
+    model_id: model.id,
+    model_name: model.name,
+    contributor_id: model.contributor_id,
+    buyer_id: meta.userId,
+    kind: "purchase",
+    gross_amount: gross,
+    commission_amount: commission,
+    net_amount: Math.round((gross - commission) * 100) / 100,
+    commission_rate: rate,
+    currency: model.currency ?? "HKD",
+    status: "settled",
+  });
+
+  await supabase
+    .from("ai_models")
+    .update({ active_users: Number(model.active_users ?? 0) + 1 })
+    .eq("id", model.id);
+
+  console.log("Model purchase fulfilled", { modelId: model.id, purchaseId: purchase?.id });
+}
+
+async function syncConnectAccount(account: any) {
+  if (!account?.id) return;
+  const status = account.payouts_enabled ? "active" : account.details_submitted ? "in_review" : "pending";
+  await getSupabase().from("contributor_profiles").update({ payout_status: status }).eq("stripe_account_id", account.id);
+}
+
 async function handleWebhook(req: Request, env: StripeEnv) {
   const event = await verifyWebhook(req, env);
 
@@ -84,8 +150,17 @@ async function handleWebhook(req: Request, env: StripeEnv) {
     case "customer.subscription.deleted":
       await markCanceled(event.data.object, env);
       break;
-    case "checkout.session.completed":
+    case "checkout.session.completed": {
+      const session = event.data.object;
+      if (session.payment_status !== "unpaid") await fulfillModelPurchase(session, env);
+      break;
+    }
     case "checkout.session.async_payment_succeeded":
+      await fulfillModelPurchase(event.data.object, env);
+      break;
+    case "account.updated":
+      await syncConnectAccount(event.data.object);
+      break;
     case "invoice.paid":
       break;
     default:
