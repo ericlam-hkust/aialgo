@@ -54,12 +54,10 @@ export const Route = createFileRoute("/api/public/v1/models")({
           : null;
 
         const [listed, owned] = await Promise.all([publicQuery, teamQuery ?? Promise.resolve({ data: [] as never[] })]);
+        const rows = [...(listed.data ?? []), ...(owned.data ?? [])] as { id: string }[];
         const byId = new Map<string, Record<string, unknown>>();
-        for (const m of [...(listed.data ?? []), ...((owned.data ?? []) as typeof listed.data ?? [])] as {
-          id: string;
-        }[]) {
-          byId.set(m.id, m as unknown as Record<string, unknown>);
-        }
+        for (const m of rows) byId.set(m.id, m as unknown as Record<string, unknown>);
+
 
         const teamIds = [...new Set([...byId.values()].map((m) => m["team_id"]).filter(Boolean))] as string[];
         const { data: teams } = teamIds.length
