@@ -20,22 +20,31 @@ export type Database = {
           api_auth_encrypted: string | null
           api_endpoint: string | null
           asset_class: Database["public"]["Enums"]["asset_class"]
+          avg_holding_hours: number
           backtest_config: Json
           cagr: number
           consistency_score: number
           contributor_id: string
           created_at: string
           currency: string
+          declared_frequency: Database["public"]["Enums"]["frequency_class"]
           description: string
           divergence_flagged: boolean
           executions: number
+          gateway_secret_hash: string | null
+          hosting_mode: Database["public"]["Enums"]["hosting_mode"]
           id: string
           interface_manifest: Json
           last_validated_at: string | null
           listed_at: string | null
           listing_kind: Database["public"]["Enums"]["listing_kind"]
           live_return_30d: number
+          live_since: string | null
           max_drawdown: number
+          measured_frequency:
+            | Database["public"]["Enums"]["frequency_class"]
+            | null
+          measured_latency_ms: number
           name: string
           next_revalidation_at: string | null
           overfitting_risk: boolean
@@ -44,6 +53,7 @@ export type Database = {
           parameters: Json
           price: number
           pricing_model: Database["public"]["Enums"]["model_pricing_model"]
+          promoted: boolean
           rating: number
           rating_count: number
           risk_disclosure: string | null
@@ -58,6 +68,7 @@ export type Database = {
           tags: string[]
           team_id: string | null
           timeframe: string
+          trust_tier: Database["public"]["Enums"]["trust_tier"]
           updated_at: string
           user_id: string | null
           validation_job_id: string | null
@@ -69,22 +80,31 @@ export type Database = {
           api_auth_encrypted?: string | null
           api_endpoint?: string | null
           asset_class?: Database["public"]["Enums"]["asset_class"]
+          avg_holding_hours?: number
           backtest_config?: Json
           cagr?: number
           consistency_score?: number
           contributor_id: string
           created_at?: string
           currency?: string
+          declared_frequency?: Database["public"]["Enums"]["frequency_class"]
           description?: string
           divergence_flagged?: boolean
           executions?: number
+          gateway_secret_hash?: string | null
+          hosting_mode?: Database["public"]["Enums"]["hosting_mode"]
           id?: string
           interface_manifest?: Json
           last_validated_at?: string | null
           listed_at?: string | null
           listing_kind?: Database["public"]["Enums"]["listing_kind"]
           live_return_30d?: number
+          live_since?: string | null
           max_drawdown?: number
+          measured_frequency?:
+            | Database["public"]["Enums"]["frequency_class"]
+            | null
+          measured_latency_ms?: number
           name: string
           next_revalidation_at?: string | null
           overfitting_risk?: boolean
@@ -93,6 +113,7 @@ export type Database = {
           parameters?: Json
           price?: number
           pricing_model?: Database["public"]["Enums"]["model_pricing_model"]
+          promoted?: boolean
           rating?: number
           rating_count?: number
           risk_disclosure?: string | null
@@ -107,6 +128,7 @@ export type Database = {
           tags?: string[]
           team_id?: string | null
           timeframe?: string
+          trust_tier?: Database["public"]["Enums"]["trust_tier"]
           updated_at?: string
           user_id?: string | null
           validation_job_id?: string | null
@@ -118,22 +140,31 @@ export type Database = {
           api_auth_encrypted?: string | null
           api_endpoint?: string | null
           asset_class?: Database["public"]["Enums"]["asset_class"]
+          avg_holding_hours?: number
           backtest_config?: Json
           cagr?: number
           consistency_score?: number
           contributor_id?: string
           created_at?: string
           currency?: string
+          declared_frequency?: Database["public"]["Enums"]["frequency_class"]
           description?: string
           divergence_flagged?: boolean
           executions?: number
+          gateway_secret_hash?: string | null
+          hosting_mode?: Database["public"]["Enums"]["hosting_mode"]
           id?: string
           interface_manifest?: Json
           last_validated_at?: string | null
           listed_at?: string | null
           listing_kind?: Database["public"]["Enums"]["listing_kind"]
           live_return_30d?: number
+          live_since?: string | null
           max_drawdown?: number
+          measured_frequency?:
+            | Database["public"]["Enums"]["frequency_class"]
+            | null
+          measured_latency_ms?: number
           name?: string
           next_revalidation_at?: string | null
           overfitting_risk?: boolean
@@ -142,6 +173,7 @@ export type Database = {
           parameters?: Json
           price?: number
           pricing_model?: Database["public"]["Enums"]["model_pricing_model"]
+          promoted?: boolean
           rating?: number
           rating_count?: number
           risk_disclosure?: string | null
@@ -156,6 +188,7 @@ export type Database = {
           tags?: string[]
           team_id?: string | null
           timeframe?: string
+          trust_tier?: Database["public"]["Enums"]["trust_tier"]
           updated_at?: string
           user_id?: string | null
           validation_job_id?: string | null
@@ -635,6 +668,209 @@ export type Database = {
           },
         ]
       }
+      broker_referrals: {
+        Row: {
+          active: boolean
+          blurb: string
+          broker: string
+          created_at: string
+          disclosure: string
+          id: string
+          payout_note: string | null
+          referral_url: string
+          region: string
+          sort_order: number
+        }
+        Insert: {
+          active?: boolean
+          blurb: string
+          broker: string
+          created_at?: string
+          disclosure: string
+          id?: string
+          payout_note?: string | null
+          referral_url: string
+          region?: string
+          sort_order?: number
+        }
+        Update: {
+          active?: boolean
+          blurb?: string
+          broker?: string
+          created_at?: string
+          disclosure?: string
+          id?: string
+          payout_note?: string | null
+          referral_url?: string
+          region?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      compliance_acks: {
+        Row: {
+          acknowledged_at: string
+          id: string
+          reference: string | null
+          scope: string
+          user_id: string
+          version: string
+        }
+        Insert: {
+          acknowledged_at?: string
+          id?: string
+          reference?: string | null
+          scope: string
+          user_id: string
+          version?: string
+        }
+        Update: {
+          acknowledged_at?: string
+          id?: string
+          reference?: string | null
+          scope?: string
+          user_id?: string
+          version?: string
+        }
+        Relationships: []
+      }
+      compliance_flags: {
+        Row: {
+          created_at: string
+          details: string
+          id: string
+          model_id: string | null
+          reason: string
+          reporter_id: string | null
+          resolution: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          details?: string
+          id?: string
+          model_id?: string | null
+          reason: string
+          reporter_id?: string | null
+          resolution?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          details?: string
+          id?: string
+          model_id?: string | null
+          reason?: string
+          reporter_id?: string | null
+          resolution?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_flags_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "ai_models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compute_usage: {
+        Row: {
+          contributor_id: string
+          cpu_hours: number
+          created_at: string
+          gpu_cost: number
+          gpu_hours: number
+          id: string
+          model_id: string | null
+          period: string
+          plan_cost: number
+          platform_cost: number
+        }
+        Insert: {
+          contributor_id: string
+          cpu_hours?: number
+          created_at?: string
+          gpu_cost?: number
+          gpu_hours?: number
+          id?: string
+          model_id?: string | null
+          period: string
+          plan_cost?: number
+          platform_cost?: number
+        }
+        Update: {
+          contributor_id?: string
+          cpu_hours?: number
+          created_at?: string
+          gpu_cost?: number
+          gpu_hours?: number
+          id?: string
+          model_id?: string | null
+          period?: string
+          plan_cost?: number
+          platform_cost?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compute_usage_contributor_id_fkey"
+            columns: ["contributor_id"]
+            isOneToOne: false
+            referencedRelation: "contributor_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compute_usage_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "ai_models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contributor_billing: {
+        Row: {
+          compute_plan: Database["public"]["Enums"]["compute_plan"]
+          contributor_id: string
+          gpu_spend_cap: number
+          pending_signal_plan: Database["public"]["Enums"]["signal_plan"] | null
+          signal_plan: Database["public"]["Enums"]["signal_plan"]
+          updated_at: string
+        }
+        Insert: {
+          compute_plan?: Database["public"]["Enums"]["compute_plan"]
+          contributor_id: string
+          gpu_spend_cap?: number
+          pending_signal_plan?:
+            | Database["public"]["Enums"]["signal_plan"]
+            | null
+          signal_plan?: Database["public"]["Enums"]["signal_plan"]
+          updated_at?: string
+        }
+        Update: {
+          compute_plan?: Database["public"]["Enums"]["compute_plan"]
+          contributor_id?: string
+          gpu_spend_cap?: number
+          pending_signal_plan?:
+            | Database["public"]["Enums"]["signal_plan"]
+            | null
+          signal_plan?: Database["public"]["Enums"]["signal_plan"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contributor_billing_contributor_id_fkey"
+            columns: ["contributor_id"]
+            isOneToOne: true
+            referencedRelation: "contributor_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contributor_profiles: {
         Row: {
           avatar_url: string | null
@@ -744,6 +980,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      data_addons: {
+        Row: {
+          bundled_in: string[]
+          currency: string
+          description: string
+          hft_required: boolean
+          key: string
+          name: string
+          price: number
+          sort_order: number
+        }
+        Insert: {
+          bundled_in?: string[]
+          currency?: string
+          description: string
+          hft_required?: boolean
+          key: string
+          name: string
+          price?: number
+          sort_order?: number
+        }
+        Update: {
+          bundled_in?: string[]
+          currency?: string
+          description?: string
+          hft_required?: boolean
+          key?: string
+          name?: string
+          price?: number
+          sort_order?: number
+        }
+        Relationships: []
       }
       data_catalog: {
         Row: {
@@ -1062,6 +1331,53 @@ export type Database = {
             foreignKeyName: "execution_signals_model_id_fkey"
             columns: ["model_id"]
             isOneToOne: false
+            referencedRelation: "ai_models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gateway_status: {
+        Row: {
+          calls_today: number
+          error_rate: number
+          heartbeat_seconds: number
+          last_signal_at: string | null
+          model_id: string
+          p50_latency_ms: number
+          p95_latency_ms: number
+          paused_reason: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          calls_today?: number
+          error_rate?: number
+          heartbeat_seconds?: number
+          last_signal_at?: string | null
+          model_id: string
+          p50_latency_ms?: number
+          p95_latency_ms?: number
+          paused_reason?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          calls_today?: number
+          error_rate?: number
+          heartbeat_seconds?: number
+          last_signal_at?: string | null
+          model_id?: string
+          p50_latency_ms?: number
+          p95_latency_ms?: number
+          paused_reason?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gateway_status_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: true
             referencedRelation: "ai_models"
             referencedColumns: ["id"]
           },
@@ -1611,13 +1927,16 @@ export type Database = {
           created_at: string
           currency: string
           gross_amount: number
+          hosting_mode: Database["public"]["Enums"]["hosting_mode"]
           id: string
           kind: string
+          listing_kind: Database["public"]["Enums"]["listing_kind"]
           model_id: string | null
           model_name: string | null
           net_amount: number
           payout_batch_id: string | null
           status: string
+          tier_bonus: number
         }
         Insert: {
           buyer_id?: string | null
@@ -1627,13 +1946,16 @@ export type Database = {
           created_at?: string
           currency?: string
           gross_amount?: number
+          hosting_mode?: Database["public"]["Enums"]["hosting_mode"]
           id?: string
           kind?: string
+          listing_kind?: Database["public"]["Enums"]["listing_kind"]
           model_id?: string | null
           model_name?: string | null
           net_amount?: number
           payout_batch_id?: string | null
           status?: string
+          tier_bonus?: number
         }
         Update: {
           buyer_id?: string | null
@@ -1643,13 +1965,16 @@ export type Database = {
           created_at?: string
           currency?: string
           gross_amount?: number
+          hosting_mode?: Database["public"]["Enums"]["hosting_mode"]
           id?: string
           kind?: string
+          listing_kind?: Database["public"]["Enums"]["listing_kind"]
           model_id?: string | null
           model_name?: string | null
           net_amount?: number
           payout_batch_id?: string | null
           status?: string
+          tier_bonus?: number
         }
         Relationships: [
           {
@@ -1919,6 +2244,39 @@ export type Database = {
           },
         ]
       }
+      platform_revenue_events: {
+        Row: {
+          amount: number
+          category: string
+          cost: number
+          created_at: string
+          currency: string
+          id: string
+          occurred_on: string
+          subcategory: string
+        }
+        Insert: {
+          amount?: number
+          category: string
+          cost?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          occurred_on?: string
+          subcategory?: string
+        }
+        Update: {
+          amount?: number
+          category?: string
+          cost?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          occurred_on?: string
+          subcategory?: string
+        }
+        Relationships: []
+      }
       platform_settings: {
         Row: {
           key: string
@@ -1970,6 +2328,125 @@ export type Database = {
           risk_tolerance?: Database["public"]["Enums"]["risk_tolerance"]
           subscription_tier?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      promoted_listings: {
+        Row: {
+          amount: number
+          contributor_id: string | null
+          created_at: string
+          currency: string
+          ends_at: string
+          id: string
+          model_id: string
+          placement: string
+          starts_at: string
+          status: string
+        }
+        Insert: {
+          amount?: number
+          contributor_id?: string | null
+          created_at?: string
+          currency?: string
+          ends_at?: string
+          id?: string
+          model_id: string
+          placement?: string
+          starts_at?: string
+          status?: string
+        }
+        Update: {
+          amount?: number
+          contributor_id?: string | null
+          created_at?: string
+          currency?: string
+          ends_at?: string
+          id?: string
+          model_id?: string
+          placement?: string
+          starts_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promoted_listings_contributor_id_fkey"
+            columns: ["contributor_id"]
+            isOneToOne: false
+            referencedRelation: "contributor_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promoted_listings_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "ai_models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      referral_clicks: {
+        Row: {
+          converted: boolean
+          created_at: string
+          id: string
+          partner_key: string
+          revenue: number
+          user_id: string | null
+        }
+        Insert: {
+          converted?: boolean
+          created_at?: string
+          id?: string
+          partner_key: string
+          revenue?: number
+          user_id?: string | null
+        }
+        Update: {
+          converted?: boolean
+          created_at?: string
+          id?: string
+          partner_key?: string
+          revenue?: number
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_clicks_partner_key_fkey"
+            columns: ["partner_key"]
+            isOneToOne: false
+            referencedRelation: "referral_partners"
+            referencedColumns: ["key"]
+          },
+        ]
+      }
+      referral_partners: {
+        Row: {
+          blurb: string
+          bounty: number
+          hft_compatible: boolean
+          key: string
+          name: string
+          sort_order: number
+          url: string
+        }
+        Insert: {
+          blurb: string
+          bounty?: number
+          hft_compatible?: boolean
+          key: string
+          name: string
+          sort_order?: number
+          url: string
+        }
+        Update: {
+          blurb?: string
+          bounty?: number
+          hft_compatible?: boolean
+          key?: string
+          name?: string
+          sort_order?: number
+          url?: string
         }
         Relationships: []
       }
@@ -2043,6 +2520,110 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      signal_api_usage: {
+        Row: {
+          calls: number
+          contributor_id: string
+          created_at: string
+          flat_amount: number
+          id: string
+          included_calls: number
+          overage_amount: number
+          p95_latency_ms: number
+          period: string
+          plan: Database["public"]["Enums"]["signal_plan"]
+        }
+        Insert: {
+          calls?: number
+          contributor_id: string
+          created_at?: string
+          flat_amount?: number
+          id?: string
+          included_calls?: number
+          overage_amount?: number
+          p95_latency_ms?: number
+          period: string
+          plan?: Database["public"]["Enums"]["signal_plan"]
+        }
+        Update: {
+          calls?: number
+          contributor_id?: string
+          created_at?: string
+          flat_amount?: number
+          id?: string
+          included_calls?: number
+          overage_amount?: number
+          p95_latency_ms?: number
+          period?: string
+          plan?: Database["public"]["Enums"]["signal_plan"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signal_api_usage_contributor_id_fkey"
+            columns: ["contributor_id"]
+            isOneToOne: false
+            referencedRelation: "contributor_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      signal_events: {
+        Row: {
+          action: string
+          contributor_id: string | null
+          id: string
+          latency_ms: number
+          model_id: string
+          received_at: string
+          subscribers_reached: number
+          symbol: string
+          transport: string
+          validation_error: string | null
+          validation_ok: boolean
+        }
+        Insert: {
+          action?: string
+          contributor_id?: string | null
+          id?: string
+          latency_ms?: number
+          model_id: string
+          received_at?: string
+          subscribers_reached?: number
+          symbol?: string
+          transport?: string
+          validation_error?: string | null
+          validation_ok?: boolean
+        }
+        Update: {
+          action?: string
+          contributor_id?: string | null
+          id?: string
+          latency_ms?: number
+          model_id?: string
+          received_at?: string
+          subscribers_reached?: number
+          symbol?: string
+          transport?: string
+          validation_error?: string | null
+          validation_ok?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signal_events_contributor_id_fkey"
+            columns: ["contributor_id"]
+            isOneToOne: false
+            referencedRelation: "contributor_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signal_events_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "ai_models"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       strategies: {
         Row: {
@@ -2352,6 +2933,51 @@ export type Database = {
         }
         Relationships: []
       }
+      user_data_addons: {
+        Row: {
+          addon_key: string
+          id: string
+          model_id: string | null
+          scope: string
+          started_at: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          addon_key: string
+          id?: string
+          model_id?: string | null
+          scope?: string
+          started_at?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          addon_key?: string
+          id?: string
+          model_id?: string | null
+          scope?: string
+          started_at?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_data_addons_addon_key_fkey"
+            columns: ["addon_key"]
+            isOneToOne: false
+            referencedRelation: "data_addons"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "user_data_addons_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "ai_models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -2434,6 +3060,13 @@ export type Database = {
     Enums: {
       app_role: "free" | "pro" | "admin"
       asset_class: "stocks" | "crypto" | "forex" | "futures"
+      compute_plan:
+        | "shared_cpu"
+        | "dedicated_basic"
+        | "dedicated_pro"
+        | "gpu_metered"
+      frequency_class: "hft" | "intraday" | "swing" | "position"
+      hosting_mode: "hosted" | "remote"
       listing_kind: "algo" | "ai_model"
       model_access_role: "viewer" | "beta_tester"
       model_listing_status:
@@ -2456,7 +3089,9 @@ export type Database = {
       payout_status: "pending" | "processing" | "paid" | "failed"
       plan_tier: "free" | "pro" | "elite"
       risk_tolerance: "conservative" | "moderate" | "aggressive"
+      signal_plan: "metered" | "remote_pro" | "remote_hft"
       team_role: "owner" | "maintainer" | "viewer"
+      trust_tier: "platform_verified" | "live_verified" | "unproven"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2586,6 +3221,14 @@ export const Constants = {
     Enums: {
       app_role: ["free", "pro", "admin"],
       asset_class: ["stocks", "crypto", "forex", "futures"],
+      compute_plan: [
+        "shared_cpu",
+        "dedicated_basic",
+        "dedicated_pro",
+        "gpu_metered",
+      ],
+      frequency_class: ["hft", "intraday", "swing", "position"],
+      hosting_mode: ["hosted", "remote"],
       listing_kind: ["algo", "ai_model"],
       model_access_role: ["viewer", "beta_tester"],
       model_listing_status: [
@@ -2610,7 +3253,9 @@ export const Constants = {
       payout_status: ["pending", "processing", "paid", "failed"],
       plan_tier: ["free", "pro", "elite"],
       risk_tolerance: ["conservative", "moderate", "aggressive"],
+      signal_plan: ["metered", "remote_pro", "remote_hft"],
       team_role: ["owner", "maintainer", "viewer"],
+      trust_tier: ["platform_verified", "live_verified", "unproven"],
     },
   },
 } as const

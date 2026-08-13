@@ -39,7 +39,7 @@ export async function getPlanTier(supabase: Client, userId: string): Promise<Pla
       (row.status === "canceled" && row.current_period_end && new Date(row.current_period_end) > new Date());
     if (!active) continue;
     const rowTier = tierFromPriceId(row.price_id);
-    if (rowTier === "elite") return "elite";
+    if (rowTier === "desk") return "desk";
     if (rowTier === "pro") tier = "pro";
   }
   return tier;
@@ -79,7 +79,7 @@ export function requireFeature(
   label: string,
 ) {
   if (PLAN_LIMITS[tier][feature]) return;
-  const required: Exclude<PlanTier, "free"> = feature === "brokerConnections" || feature === "intradaySync" ? "elite" : "pro";
+  const required: Exclude<PlanTier, "free"> = feature === "brokerConnections" || feature === "intradaySync" ? "desk" : "pro";
   throw new Error(upgradeMessage(label, required));
 }
 
@@ -114,7 +114,7 @@ export async function assertQuota(
     throw new Error(
       upgradeMessage(
         `You have used all ${ent.limits.maxBacktestsPerMonth} backtests included this month — more backtests`,
-        ent.tier === "free" ? "pro" : "elite",
+        ent.tier === "free" ? "pro" : "desk",
       ),
     );
   }
@@ -122,7 +122,7 @@ export async function assertQuota(
     throw new Error(
       upgradeMessage(
         `You have used all ${ent.limits.maxAiCallsPerMonth} AI requests included this month — more AI assistance`,
-        ent.tier === "free" ? "pro" : "elite",
+        ent.tier === "free" ? "pro" : "desk",
       ),
     );
   }
@@ -130,7 +130,7 @@ export async function assertQuota(
     throw new Error(
       upgradeMessage(
         `Your plan includes ${ent.limits.maxStrategies} strategies — more strategies`,
-        ent.tier === "free" ? "pro" : "elite",
+        ent.tier === "free" ? "pro" : "desk",
       ),
     );
   }

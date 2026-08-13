@@ -126,6 +126,8 @@ export const NAV_GROUPS: NavGroup[] = [
     key: "group.earn",
     items: [
       { to: "/dashboard/models", key: "nav.myListings", icon: Package, exact: true, terms: ["contributor", "publish", "earnings"] },
+      { to: "/dashboard/gateway", key: "nav.gateway", icon: Zap, exact: true, terms: ["signal", "remote", "hft", "api"] },
+      { to: "/dashboard/compute", key: "nav.compute", icon: PlugZap, exact: true, terms: ["hosting", "gpu", "earnings", "commission"] },
       { to: "/dashboard/models/payouts", key: "nav.payouts", icon: Banknote, exact: true, terms: ["stripe", "bank", "revenue"] },
       { to: "/dashboard/teams", key: "nav.teams", icon: Building2, exact: false, terms: ["organization", "namespace", "tokens"] },
       { to: "/models/api-status", key: "nav.apiStatus", icon: Activity, exact: true, terms: ["uptime", "incidents", "changelog"] },
@@ -138,6 +140,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { to: "/dashboard/billing", key: "nav.billing", icon: CreditCard, exact: true, terms: ["plan", "subscription", "invoice"] },
       { to: "/dashboard/settings", key: "nav.settings", icon: Settings, exact: true, terms: ["profile", "preferences"] },
       { to: "/dashboard/admin", key: "nav.admin", icon: Gavel, exact: true, terms: ["moderation", "review"] },
+      { to: "/dashboard/admin/revenue", key: "nav.adminRevenue", icon: Gavel, exact: true, terms: ["platform revenue", "margin", "mrr"] },
     ],
   },
 ];

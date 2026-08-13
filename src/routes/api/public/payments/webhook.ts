@@ -52,7 +52,7 @@ async function upsertSubscription(subscription: any, env: StripeEnv) {
 
   // Keep the profile's marketing tier label in sync so the UI can read it cheaply.
   const priceId = priceIdOf(item) ?? "";
-  const tier = priceId.startsWith("elite") ? "elite" : priceId.startsWith("pro") ? "pro" : "free";
+  const tier = priceId.startsWith("desk") || priceId.startsWith("elite") ? "desk" : priceId.startsWith("pro") ? "pro" : "free";
   const active = ["active", "trialing", "past_due"].includes(subscription.status);
   await getSupabase()
     .from("profiles")
