@@ -1,24 +1,18 @@
-import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { Cpu, Loader2, TrendingUp } from "lucide-react";
-import { getContributorBilling, setComputePlan, setGpuSpendCap } from "@/lib/compute.functions";
+import { useQuery } from "@tanstack/react-query";
+import { Cpu, Gift, Loader2, TrendingUp } from "lucide-react";
+import { getContributorBilling } from "@/lib/compute.functions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
-  COMPUTE_PLANS,
-  GPU_HOURLY_RATE,
+  CONTRIBUTOR_FREE_ITEMS,
   PRO_CREATOR_THRESHOLD,
   proCreatorProgress,
   splitFor,
   usd,
-  type ComputePlanKey,
 } from "@/lib/monetization";
 
 export const Route = createFileRoute("/_authenticated/dashboard/compute")({
@@ -39,30 +33,10 @@ export const Route = createFileRoute("/_authenticated/dashboard/compute")({
 });
 
 function ComputeBillingPage() {
-  const qc = useQueryClient();
   const q = useQuery({ queryKey: ["contributor-billing"], queryFn: () => getContributorBilling() });
-  const [cap, setCap] = useState<string>("");
 
-  const planMut = useMutation({
-    mutationFn: (plan: ComputePlanKey) => setComputePlan({ data: { plan } }),
-    onSuccess: () => {
-      toast.success("Compute plan updated");
-      void qc.invalidateQueries({ queryKey: ["contributor-billing"] });
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-
-  const capMut = useMutation({
-    mutationFn: (value: number) => setGpuSpendCap({ data: { cap: value } }),
-    onSuccess: () => {
-      toast.success("GPU spend cap saved");
-      void qc.invalidateQueries({ queryKey: ["contributor-billing"] });
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
 
   const data = q.data;
-  const currentPlan = (data?.billing?.compute_plan ?? "shared_cpu") as ComputePlanKey;
   const txns = (data?.transactions ?? []) as any[];
   const monthKey = new Date().toISOString().slice(0, 7);
   const monthGross = txns
@@ -71,9 +45,6 @@ function ComputeBillingPage() {
   const split = splitFor(monthGross, monthGross);
   const progress = proCreatorProgress(monthGross);
   const computeRows = (data?.compute ?? []) as any[];
-  const monthCost = computeRows
-    .filter((r) => r.period === monthKey)
-    .reduce((s, r) => s + Number(r.plan_cost ?? 0) + Number(r.gpu_cost ?? 0), 0);
 
   return (
     <div className="space-y-6">
@@ -82,7 +53,8 @@ function ComputeBillingPage() {
           <Cpu className="h-5 w-5 text-primary" aria-hidden /> Compute &amp; earnings
         </h1>
         <p className="text-sm text-muted-foreground">
-          What you pay to run hosted models, and what you keep from marketplace sales.
+          Hosted compute is free for every contributor. This console shows your usage and what you keep from
+          performance fees.
         </p>
       </header>
 
@@ -95,8 +67,8 @@ function ComputeBillingPage() {
       <div className="grid gap-4 md:grid-cols-4">
         <Stat label="Gross sales this month" value={usd(monthGross)} />
         <Stat label="Platform commission" value={usd(split.commission)} hint={`${Math.round(split.rate * 100)}% rate`} />
-        <Stat label="Compute cost" value={usd(monthCost)} hint={`GPU ${usd(GPU_HOURLY_RATE)}/hr`} />
-        <Stat label="Net to you" value={usd(split.net - monthCost)} tone="profit" />
+        <Stat label="Compute cost" value="$0.00" hint="Free for all contributors" />
+        <Stat label="Net to you" value={usd(split.net)} tone="profit" />
       </div>
 
       <Card className="border-border/70">
@@ -105,7 +77,8 @@ function ComputeBillingPage() {
             <TrendingUp className="h-4 w-4 text-primary" aria-hidden /> Pro Creator status
           </CardTitle>
           <CardDescription>
-            Cross {usd(PRO_CREATOR_THRESHOLD, 0)} in monthly gross sales and your commission drops from 20% to 15%.
+            Cross {usd(PRO_CREATOR_THRESHOLD, 0)} in collected performance fees in a month and your commission drops
+            from 20% to 15%.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-2">
@@ -113,67 +86,33 @@ function ComputeBillingPage() {
           <p className="text-xs text-muted-foreground">
             {split.proCreator
               ? `Pro Creator active — you saved ${usd(split.tierBonus)} this month.`
-              : `${usd(progress.remaining)} of monthly sales to go.`}
+              : `${usd(progress.remaining)} of collected fees to go.`}
           </p>
         </CardContent>
       </Card>
 
-      <Card className="border-border/70">
+      <Card className="border-profit/40">
         <CardHeader>
-          <CardTitle className="text-base">Hosted compute plan</CardTitle>
-          <CardDescription>Applies to Tier 1 listings we run inside the aiAlgo sandbox.</CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          {COMPUTE_PLANS.map((p) => (
-            <div
-              key={p.key}
-              className={`rounded-lg border p-4 ${p.key === currentPlan ? "border-primary/60 bg-primary/5" : "border-border/70"}`}
-            >
-              <div className="flex items-center justify-between">
-                <p className="font-medium">{p.name}</p>
-                <Badge variant="outline">
-                  {p.forKind === "both" ? "Any" : p.forKind === "algo" ? "Algo" : "AI"}
-                </Badge>
-              </div>
-              <p className="mono mt-1 text-xl font-semibold">
-                {p.price === 0 ? "Free" : usd(p.price, 2)}
-                <span className="text-xs font-normal text-muted-foreground"> /{p.unit}</span>
-              </p>
-              <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
-                {p.features.map((f) => (
-                  <li key={f}>· {f}</li>
-                ))}
-              </ul>
-              <Button
-                className="mt-3 w-full"
-                size="sm"
-                variant={p.key === currentPlan ? "secondary" : "outline"}
-                disabled={p.key === currentPlan || planMut.isPending}
-                onClick={() => planMut.mutate(p.key)}
-              >
-                {p.key === currentPlan ? "Current plan" : "Switch"}
-              </Button>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-
-      <Card className="border-border/70">
-        <CardHeader>
-          <CardTitle className="text-base">GPU spend cap</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Gift className="h-4 w-4 text-profit" aria-hidden /> Free for creators, forever
+          </CardTitle>
           <CardDescription>
-            Metered GPU jobs pause automatically once this monthly cap is reached. Current cap:{" "}
-            <span className="mono">{usd(Number(data?.billing?.gpu_spend_cap ?? 0), 0)}</span>
+            No listing fees, no compute fees, no gateway fees — for AI models and algo strategies alike. The platform
+            earns only when you earn.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-wrap items-end gap-3">
-          <div className="space-y-1.5">
-            <Label htmlFor="cap">New cap (USD / month)</Label>
-            <Input id="cap" type="number" min={0} value={cap} onChange={(e) => setCap(e.target.value)} className="w-40" />
-          </div>
-          <Button onClick={() => capMut.mutate(Number(cap))} disabled={cap === "" || capMut.isPending}>
-            Save cap
-          </Button>
+        <CardContent className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {CONTRIBUTOR_FREE_ITEMS.map((item) => (
+            <div key={item.key} className="rounded-lg border border-border/60 bg-muted/20 p-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">{item.label}</span>
+                <Badge variant="outline" className="mono border-profit/50 text-profit">
+                  $0
+                </Badge>
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">{item.hint}</p>
+            </div>
+          ))}
         </CardContent>
       </Card>
 
