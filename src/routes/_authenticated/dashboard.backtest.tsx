@@ -241,14 +241,15 @@ function BacktestPlayground() {
             <>
               <VerificationCard
                 verification={verification}
-                modelId={job.data?.model_id as string | undefined}
+                modelId={(job.data?.model_id as string | null) ?? null}
                 strategyId={selectedModel?.strategy_id ?? null}
-                onList={(id, strategyId) =>
+                onList={(_id, strategyId) =>
                   strategyId
                     ? navigate({ to: "/dashboard/strategies/list/$id", params: { id: strategyId } })
-                    : navigate({ to: "/dashboard/models/$id/manage", params: { id } })
+                    : navigate({ to: "/dashboard/my-models" })
                 }
               />
+
               <BacktestReportView report={report} />
             </>
           ) : null}
