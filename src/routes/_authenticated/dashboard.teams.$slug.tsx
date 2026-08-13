@@ -13,7 +13,6 @@ import {
 } from "@/lib/teams.functions";
 import { setModelVisibility } from "@/lib/model-access.functions";
 import { TEAM_ROLES, TOKEN_SCOPES, VISIBILITY_OPTIONS, namespacedSlug, type TeamRole } from "@/lib/teams";
-import { ModelAccessDialog } from "@/components/marketplace/model-access-dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -122,7 +121,6 @@ function TeamDetail() {
                           </Select>
                         </TableCell>
                         <TableCell className="text-right">
-                          <ModelAccessDialog modelId={m.id} modelName={m.name} disabled={!canManage} />
                         </TableCell>
                       </TableRow>
                     ))

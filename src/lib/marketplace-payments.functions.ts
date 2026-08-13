@@ -84,31 +84,6 @@ export const createModelCheckoutSession = createServerFn({ method: "POST" })
     }
   });
 
-export const getWallet = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { supabase, userId } = context;
-    const [{ data: wallet }, { data: purchases }, { data: transactions }] = await Promise.all([
-      supabase.from("user_wallets").select("balance,currency").eq("user_id", userId).maybeSingle(),
-      supabase
-        .from("model_purchases")
-        .select("id,amount,currency,pricing_model,status,created_at, model:ai_models(name,slug)")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false }),
-      supabase
-        .from("model_transactions")
-        .select("id,model_name,gross_amount,commission_amount,net_amount,currency,kind,status,created_at,buyer_id")
-        .order("created_at", { ascending: false })
-        .limit(100),
-    ]);
-    return {
-      balance: Number(wallet?.balance ?? 0),
-      currency: wallet?.currency ?? "HKD",
-      purchases: purchases ?? [],
-      transactions: transactions ?? [],
-    };
-  });
-
 /** Creates or refreshes a Stripe Connect Express onboarding link for the contributor. */
 export const createConnectOnboardingLink = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

@@ -205,12 +205,14 @@ export const getMyModelAccess = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const [{ data: purchases }, { data: activations }] = await Promise.all([
-      supabase.from("model_purchases").select("*").eq("user_id", userId).eq("status", "active"),
-      supabase.from("model_activations").select("*").eq("user_id", userId).order("activated_at", { ascending: false }),
-    ]);
-    return { purchases: purchases ?? [], activations: activations ?? [] };
+    const { data: activations } = await supabase
+      .from("model_activations")
+      .select("*")
+      .eq("user_id", userId)
+      .order("activated_at", { ascending: false });
+    return { activations: activations ?? [] };
   });
+
 
 export const listMyActivations = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -229,7 +231,6 @@ export const activateModel = createServerFn({ method: "POST" })
   .inputValidator(
     (data: {
       modelId: string;
-      purchaseId?: string;
       brokerConnectionId?: string | null;
       mode: "paper" | "live";
       capitalAllocation: number;
@@ -243,23 +244,11 @@ export const activateModel = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { data: purchase } = await supabase
-      .from("model_purchases")
-      .select("id")
-      .eq("user_id", userId)
-      .eq("model_id", data.modelId)
-      .eq("status", "active")
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    if (!purchase) throw new Error("Purchase this model before activating it.");
-
     const { data: row, error } = await supabase
       .from("model_activations")
       .insert({
         model_id: data.modelId,
         user_id: userId,
-        purchase_id: purchase.id,
         broker_connection_id: data.brokerConnectionId ?? null,
         mode: data.mode,
         capital_allocation: data.capitalAllocation,

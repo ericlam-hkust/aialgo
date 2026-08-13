@@ -27,7 +27,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { setModelNamespace, setModelVisibility } from "@/lib/model-access.functions";
 import { listMyTeams } from "@/lib/teams.functions";
 import { VISIBILITY_OPTIONS, namespacedSlug, type ModelVisibility } from "@/lib/teams";
-import { ModelAccessDialog } from "@/components/marketplace/model-access-dialog";
 import { fmtDate, fmtMoney } from "@/lib/format";
 import { PLATFORM_COMMISSION, pricingLabel } from "@/lib/marketplace";
 
@@ -288,7 +287,6 @@ function ModelRow({
                 ))}
               </SelectContent>
             </Select>
-            <ModelAccessDialog modelId={model.id} modelName={model.name} />
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">

@@ -811,45 +811,6 @@ export type Database = {
           },
         ]
       }
-      broker_referrals: {
-        Row: {
-          active: boolean
-          blurb: string
-          broker: string
-          created_at: string
-          disclosure: string
-          id: string
-          payout_note: string | null
-          referral_url: string
-          region: string
-          sort_order: number
-        }
-        Insert: {
-          active?: boolean
-          blurb: string
-          broker: string
-          created_at?: string
-          disclosure: string
-          id?: string
-          payout_note?: string | null
-          referral_url: string
-          region?: string
-          sort_order?: number
-        }
-        Update: {
-          active?: boolean
-          blurb?: string
-          broker?: string
-          created_at?: string
-          disclosure?: string
-          id?: string
-          payout_note?: string | null
-          referral_url?: string
-          region?: string
-          sort_order?: number
-        }
-        Relationships: []
-      }
       compliance_acks: {
         Row: {
           acknowledged_at: string
@@ -876,164 +837,6 @@ export type Database = {
           version?: string
         }
         Relationships: []
-      }
-      compliance_flags: {
-        Row: {
-          created_at: string
-          details: string
-          id: string
-          model_id: string | null
-          reason: string
-          reporter_id: string | null
-          resolution: string | null
-          status: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          details?: string
-          id?: string
-          model_id?: string | null
-          reason: string
-          reporter_id?: string | null
-          resolution?: string | null
-          status?: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          details?: string
-          id?: string
-          model_id?: string | null
-          reason?: string
-          reporter_id?: string | null
-          resolution?: string | null
-          status?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "compliance_flags_model_id_fkey"
-            columns: ["model_id"]
-            isOneToOne: false
-            referencedRelation: "ai_models"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      compute_usage: {
-        Row: {
-          contributor_id: string
-          cpu_hours: number
-          created_at: string
-          gpu_cost: number
-          gpu_hours: number
-          id: string
-          model_id: string | null
-          period: string
-          plan_cost: number
-          platform_cost: number
-        }
-        Insert: {
-          contributor_id: string
-          cpu_hours?: number
-          created_at?: string
-          gpu_cost?: number
-          gpu_hours?: number
-          id?: string
-          model_id?: string | null
-          period: string
-          plan_cost?: number
-          platform_cost?: number
-        }
-        Update: {
-          contributor_id?: string
-          cpu_hours?: number
-          created_at?: string
-          gpu_cost?: number
-          gpu_hours?: number
-          id?: string
-          model_id?: string | null
-          period?: string
-          plan_cost?: number
-          platform_cost?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "compute_usage_contributor_id_fkey"
-            columns: ["contributor_id"]
-            isOneToOne: false
-            referencedRelation: "contributor_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "compute_usage_model_id_fkey"
-            columns: ["model_id"]
-            isOneToOne: false
-            referencedRelation: "ai_models"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      consumer_fee_settings: {
-        Row: {
-          auto_pause_on_cap: boolean
-          monthly_cap: number | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          auto_pause_on_cap?: boolean
-          monthly_cap?: number | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          auto_pause_on_cap?: boolean
-          monthly_cap?: number | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      contributor_billing: {
-        Row: {
-          compute_plan: Database["public"]["Enums"]["compute_plan"]
-          contributor_id: string
-          gpu_spend_cap: number
-          pending_signal_plan: Database["public"]["Enums"]["signal_plan"] | null
-          signal_plan: Database["public"]["Enums"]["signal_plan"]
-          updated_at: string
-        }
-        Insert: {
-          compute_plan?: Database["public"]["Enums"]["compute_plan"]
-          contributor_id: string
-          gpu_spend_cap?: number
-          pending_signal_plan?:
-            | Database["public"]["Enums"]["signal_plan"]
-            | null
-          signal_plan?: Database["public"]["Enums"]["signal_plan"]
-          updated_at?: string
-        }
-        Update: {
-          compute_plan?: Database["public"]["Enums"]["compute_plan"]
-          contributor_id?: string
-          gpu_spend_cap?: number
-          pending_signal_plan?:
-            | Database["public"]["Enums"]["signal_plan"]
-            | null
-          signal_plan?: Database["public"]["Enums"]["signal_plan"]
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "contributor_billing_contributor_id_fkey"
-            columns: ["contributor_id"]
-            isOneToOne: true
-            referencedRelation: "contributor_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       contributor_profiles: {
         Row: {
@@ -1089,92 +892,6 @@ export type Database = {
           updated_at?: string
           user_id?: string | null
           verified?: boolean
-        }
-        Relationships: []
-      }
-      creator_payouts: {
-        Row: {
-          created_at: string
-          creator_id: string
-          currency: string
-          fee_amount: number
-          fee_rate: number
-          gross_amount: number
-          id: string
-          net_amount: number
-          status: string
-          strategy_id: string | null
-          strategy_name: string | null
-          subscriber_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          creator_id: string
-          currency?: string
-          fee_amount?: number
-          fee_rate?: number
-          gross_amount?: number
-          id?: string
-          net_amount?: number
-          status?: string
-          strategy_id?: string | null
-          strategy_name?: string | null
-          subscriber_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          creator_id?: string
-          currency?: string
-          fee_amount?: number
-          fee_rate?: number
-          gross_amount?: number
-          id?: string
-          net_amount?: number
-          status?: string
-          strategy_id?: string | null
-          strategy_name?: string | null
-          subscriber_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "creator_payouts_strategy_id_fkey"
-            columns: ["strategy_id"]
-            isOneToOne: false
-            referencedRelation: "strategies"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      data_addons: {
-        Row: {
-          bundled_in: string[]
-          currency: string
-          description: string
-          hft_required: boolean
-          key: string
-          name: string
-          price: number
-          sort_order: number
-        }
-        Insert: {
-          bundled_in?: string[]
-          currency?: string
-          description: string
-          hft_required?: boolean
-          key: string
-          name: string
-          price?: number
-          sort_order?: number
-        }
-        Update: {
-          bundled_in?: string[]
-          currency?: string
-          description?: string
-          hft_required?: boolean
-          key?: string
-          name?: string
-          price?: number
-          sort_order?: number
         }
         Relationships: []
       }
@@ -1616,53 +1333,6 @@ export type Database = {
           },
         ]
       }
-      gateway_status: {
-        Row: {
-          calls_today: number
-          error_rate: number
-          heartbeat_seconds: number
-          last_signal_at: string | null
-          model_id: string
-          p50_latency_ms: number
-          p95_latency_ms: number
-          paused_reason: string | null
-          status: string
-          updated_at: string
-        }
-        Insert: {
-          calls_today?: number
-          error_rate?: number
-          heartbeat_seconds?: number
-          last_signal_at?: string | null
-          model_id: string
-          p50_latency_ms?: number
-          p95_latency_ms?: number
-          paused_reason?: string | null
-          status?: string
-          updated_at?: string
-        }
-        Update: {
-          calls_today?: number
-          error_rate?: number
-          heartbeat_seconds?: number
-          last_signal_at?: string | null
-          model_id?: string
-          p50_latency_ms?: number
-          p95_latency_ms?: number
-          paused_reason?: string | null
-          status?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "gateway_status_model_id_fkey"
-            columns: ["model_id"]
-            isOneToOne: true
-            referencedRelation: "ai_models"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       market_data_daily: {
         Row: {
           close: number
@@ -1702,8 +1372,9 @@ export type Database = {
       market_data_intraday: {
         Row: {
           close: number
+          created_at: string
           high: number
-          id: number
+          id: string
           interval: string
           low: number
           open: number
@@ -1714,8 +1385,9 @@ export type Database = {
         }
         Insert: {
           close: number
+          created_at?: string
           high: number
-          id?: number
+          id?: string
           interval: string
           low: number
           open: number
@@ -1726,8 +1398,9 @@ export type Database = {
         }
         Update: {
           close?: number
+          created_at?: string
           high?: number
-          id?: number
+          id?: string
           interval?: string
           low?: number
           open?: number
@@ -1782,82 +1455,6 @@ export type Database = {
           volume?: number | null
         }
         Relationships: []
-      }
-      marketplace_subscriptions: {
-        Row: {
-          creator_id: string | null
-          id: string
-          price_paid: number
-          strategy_id: string
-          subscribed_at: string
-          subscriber_id: string
-        }
-        Insert: {
-          creator_id?: string | null
-          id?: string
-          price_paid?: number
-          strategy_id: string
-          subscribed_at?: string
-          subscriber_id: string
-        }
-        Update: {
-          creator_id?: string | null
-          id?: string
-          price_paid?: number
-          strategy_id?: string
-          subscribed_at?: string
-          subscriber_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "marketplace_subscriptions_strategy_id_fkey"
-            columns: ["strategy_id"]
-            isOneToOne: false
-            referencedRelation: "strategies"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      model_access_grants: {
-        Row: {
-          created_at: string
-          email: string | null
-          granted_by: string
-          id: string
-          model_id: string
-          note: string | null
-          role: Database["public"]["Enums"]["model_access_role"]
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          email?: string | null
-          granted_by: string
-          id?: string
-          model_id: string
-          note?: string | null
-          role?: Database["public"]["Enums"]["model_access_role"]
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          email?: string | null
-          granted_by?: string
-          id?: string
-          model_id?: string
-          note?: string | null
-          role?: Database["public"]["Enums"]["model_access_role"]
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "model_access_grants_model_id_fkey"
-            columns: ["model_id"]
-            isOneToOne: false
-            referencedRelation: "ai_models"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       model_activations: {
         Row: {
@@ -1959,64 +1556,6 @@ export type Database = {
             referencedRelation: "ai_models"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "model_activations_purchase_id_fkey"
-            columns: ["purchase_id"]
-            isOneToOne: false
-            referencedRelation: "model_purchases"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      model_appeals: {
-        Row: {
-          admin_notes: string | null
-          created_at: string
-          id: string
-          job_id: string | null
-          message: string
-          model_id: string
-          status: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          admin_notes?: string | null
-          created_at?: string
-          id?: string
-          job_id?: string | null
-          message: string
-          model_id: string
-          status?: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          admin_notes?: string | null
-          created_at?: string
-          id?: string
-          job_id?: string | null
-          message?: string
-          model_id?: string
-          status?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "model_appeals_job_id_fkey"
-            columns: ["job_id"]
-            isOneToOne: false
-            referencedRelation: "backtest_jobs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "model_appeals_model_id_fkey"
-            columns: ["model_id"]
-            isOneToOne: false
-            referencedRelation: "ai_models"
-            referencedColumns: ["id"]
-          },
         ]
       }
       model_metrics: {
@@ -2050,59 +1589,6 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "model_metrics_model_id_fkey"
-            columns: ["model_id"]
-            isOneToOne: false
-            referencedRelation: "ai_models"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      model_purchases: {
-        Row: {
-          amount: number
-          created_at: string
-          currency: string
-          environment: string
-          id: string
-          model_id: string
-          pricing_model: Database["public"]["Enums"]["model_pricing_model"]
-          status: string
-          stripe_session_id: string | null
-          stripe_subscription_id: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          amount?: number
-          created_at?: string
-          currency?: string
-          environment?: string
-          id?: string
-          model_id: string
-          pricing_model: Database["public"]["Enums"]["model_pricing_model"]
-          status?: string
-          stripe_session_id?: string | null
-          stripe_subscription_id?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          amount?: number
-          created_at?: string
-          currency?: string
-          environment?: string
-          id?: string
-          model_id?: string
-          pricing_model?: Database["public"]["Enums"]["model_pricing_model"]
-          status?: string
-          stripe_session_id?: string | null
-          stripe_subscription_id?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "model_purchases_model_id_fkey"
             columns: ["model_id"]
             isOneToOne: false
             referencedRelation: "ai_models"
@@ -2691,125 +2177,6 @@ export type Database = {
         }
         Relationships: []
       }
-      promoted_listings: {
-        Row: {
-          amount: number
-          contributor_id: string | null
-          created_at: string
-          currency: string
-          ends_at: string
-          id: string
-          model_id: string
-          placement: string
-          starts_at: string
-          status: string
-        }
-        Insert: {
-          amount?: number
-          contributor_id?: string | null
-          created_at?: string
-          currency?: string
-          ends_at?: string
-          id?: string
-          model_id: string
-          placement?: string
-          starts_at?: string
-          status?: string
-        }
-        Update: {
-          amount?: number
-          contributor_id?: string | null
-          created_at?: string
-          currency?: string
-          ends_at?: string
-          id?: string
-          model_id?: string
-          placement?: string
-          starts_at?: string
-          status?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "promoted_listings_contributor_id_fkey"
-            columns: ["contributor_id"]
-            isOneToOne: false
-            referencedRelation: "contributor_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "promoted_listings_model_id_fkey"
-            columns: ["model_id"]
-            isOneToOne: false
-            referencedRelation: "ai_models"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      referral_clicks: {
-        Row: {
-          converted: boolean
-          created_at: string
-          id: string
-          partner_key: string
-          revenue: number
-          user_id: string | null
-        }
-        Insert: {
-          converted?: boolean
-          created_at?: string
-          id?: string
-          partner_key: string
-          revenue?: number
-          user_id?: string | null
-        }
-        Update: {
-          converted?: boolean
-          created_at?: string
-          id?: string
-          partner_key?: string
-          revenue?: number
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "referral_clicks_partner_key_fkey"
-            columns: ["partner_key"]
-            isOneToOne: false
-            referencedRelation: "referral_partners"
-            referencedColumns: ["key"]
-          },
-        ]
-      }
-      referral_partners: {
-        Row: {
-          blurb: string
-          bounty: number
-          hft_compatible: boolean
-          key: string
-          name: string
-          sort_order: number
-          url: string
-        }
-        Insert: {
-          blurb: string
-          bounty?: number
-          hft_compatible?: boolean
-          key: string
-          name: string
-          sort_order?: number
-          url: string
-        }
-        Update: {
-          blurb?: string
-          bounty?: number
-          hft_compatible?: boolean
-          key?: string
-          name?: string
-          sort_order?: number
-          url?: string
-        }
-        Relationships: []
-      }
       risk_events: {
         Row: {
           event_type: string
@@ -2880,110 +2247,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
-      }
-      signal_api_usage: {
-        Row: {
-          calls: number
-          contributor_id: string
-          created_at: string
-          flat_amount: number
-          id: string
-          included_calls: number
-          overage_amount: number
-          p95_latency_ms: number
-          period: string
-          plan: Database["public"]["Enums"]["signal_plan"]
-        }
-        Insert: {
-          calls?: number
-          contributor_id: string
-          created_at?: string
-          flat_amount?: number
-          id?: string
-          included_calls?: number
-          overage_amount?: number
-          p95_latency_ms?: number
-          period: string
-          plan?: Database["public"]["Enums"]["signal_plan"]
-        }
-        Update: {
-          calls?: number
-          contributor_id?: string
-          created_at?: string
-          flat_amount?: number
-          id?: string
-          included_calls?: number
-          overage_amount?: number
-          p95_latency_ms?: number
-          period?: string
-          plan?: Database["public"]["Enums"]["signal_plan"]
-        }
-        Relationships: [
-          {
-            foreignKeyName: "signal_api_usage_contributor_id_fkey"
-            columns: ["contributor_id"]
-            isOneToOne: false
-            referencedRelation: "contributor_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      signal_events: {
-        Row: {
-          action: string
-          contributor_id: string | null
-          id: string
-          latency_ms: number
-          model_id: string
-          received_at: string
-          subscribers_reached: number
-          symbol: string
-          transport: string
-          validation_error: string | null
-          validation_ok: boolean
-        }
-        Insert: {
-          action?: string
-          contributor_id?: string | null
-          id?: string
-          latency_ms?: number
-          model_id: string
-          received_at?: string
-          subscribers_reached?: number
-          symbol?: string
-          transport?: string
-          validation_error?: string | null
-          validation_ok?: boolean
-        }
-        Update: {
-          action?: string
-          contributor_id?: string | null
-          id?: string
-          latency_ms?: number
-          model_id?: string
-          received_at?: string
-          subscribers_reached?: number
-          symbol?: string
-          transport?: string
-          validation_error?: string | null
-          validation_ok?: boolean
-        }
-        Relationships: [
-          {
-            foreignKeyName: "signal_events_contributor_id_fkey"
-            columns: ["contributor_id"]
-            isOneToOne: false
-            referencedRelation: "contributor_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "signal_events_model_id_fkey"
-            columns: ["model_id"]
-            isOneToOne: false
-            referencedRelation: "ai_models"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       strategies: {
         Row: {
@@ -3338,51 +2601,6 @@ export type Database = {
         }
         Relationships: []
       }
-      user_data_addons: {
-        Row: {
-          addon_key: string
-          id: string
-          model_id: string | null
-          scope: string
-          started_at: string
-          status: string
-          user_id: string
-        }
-        Insert: {
-          addon_key: string
-          id?: string
-          model_id?: string | null
-          scope?: string
-          started_at?: string
-          status?: string
-          user_id: string
-        }
-        Update: {
-          addon_key?: string
-          id?: string
-          model_id?: string | null
-          scope?: string
-          started_at?: string
-          status?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_data_addons_addon_key_fkey"
-            columns: ["addon_key"]
-            isOneToOne: false
-            referencedRelation: "data_addons"
-            referencedColumns: ["key"]
-          },
-          {
-            foreignKeyName: "user_data_addons_model_id_fkey"
-            columns: ["model_id"]
-            isOneToOne: false
-            referencedRelation: "ai_models"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       user_roles: {
         Row: {
           created_at: string
@@ -3400,27 +2618,6 @@ export type Database = {
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
-        }
-        Relationships: []
-      }
-      user_wallets: {
-        Row: {
-          balance: number
-          currency: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          balance?: number
-          currency?: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          balance?: number
-          currency?: string
-          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -3465,15 +2662,9 @@ export type Database = {
     Enums: {
       app_role: "free" | "pro" | "admin"
       asset_class: "stocks" | "crypto" | "forex" | "futures"
-      compute_plan:
-        | "shared_cpu"
-        | "dedicated_basic"
-        | "dedicated_pro"
-        | "gpu_metered"
       frequency_class: "hft" | "intraday" | "swing" | "position"
       hosting_mode: "hosted" | "remote"
       listing_kind: "algo" | "ai_model"
-      model_access_role: "viewer" | "beta_tester"
       model_listing_status:
         | "draft"
         | "pending_review"
@@ -3494,7 +2685,6 @@ export type Database = {
       payout_status: "pending" | "processing" | "paid" | "failed"
       plan_tier: "free" | "pro" | "elite"
       risk_tolerance: "conservative" | "moderate" | "aggressive"
-      signal_plan: "metered" | "remote_pro" | "remote_hft"
       team_role: "owner" | "maintainer" | "viewer"
       trust_tier: "platform_verified" | "live_verified" | "unproven"
     }
@@ -3626,16 +2816,9 @@ export const Constants = {
     Enums: {
       app_role: ["free", "pro", "admin"],
       asset_class: ["stocks", "crypto", "forex", "futures"],
-      compute_plan: [
-        "shared_cpu",
-        "dedicated_basic",
-        "dedicated_pro",
-        "gpu_metered",
-      ],
       frequency_class: ["hft", "intraday", "swing", "position"],
       hosting_mode: ["hosted", "remote"],
       listing_kind: ["algo", "ai_model"],
-      model_access_role: ["viewer", "beta_tester"],
       model_listing_status: [
         "draft",
         "pending_review",
@@ -3658,7 +2841,6 @@ export const Constants = {
       payout_status: ["pending", "processing", "paid", "failed"],
       plan_tier: ["free", "pro", "elite"],
       risk_tolerance: ["conservative", "moderate", "aggressive"],
-      signal_plan: ["metered", "remote_pro", "remote_hft"],
       team_role: ["owner", "maintainer", "viewer"],
       trust_tier: ["platform_verified", "live_verified", "unproven"],
     },

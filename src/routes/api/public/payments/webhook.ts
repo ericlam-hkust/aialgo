@@ -95,22 +95,6 @@ async function fulfillModelPurchase(session: any, env: StripeEnv) {
   const gross = Number(session.amount_total ?? 0) / 100 || Number(model.price ?? 0);
   const commission = Math.round(gross * rate * 100) / 100;
 
-  const { data: purchase } = await supabase
-    .from("model_purchases")
-    .insert({
-      model_id: model.id,
-      user_id: meta.userId,
-      pricing_model: model.pricing_model,
-      amount: gross,
-      currency: model.currency ?? "HKD",
-      status: "active",
-      stripe_session_id: session.id,
-      stripe_subscription_id: session.subscription ?? null,
-      environment: env,
-    })
-    .select("id")
-    .maybeSingle();
-
   await supabase.from("model_transactions").insert({
     model_id: model.id,
     model_name: model.name,
@@ -156,7 +140,7 @@ async function fulfillModelPurchase(session: any, env: StripeEnv) {
   }
   await notify(notifications);
 
-  console.log("Model purchase fulfilled", { modelId: model.id, purchaseId: purchase?.id });
+  console.log("Model purchase fulfilled", { modelId: model.id, sessionId: session.id });
 }
 
 async function syncConnectAccount(account: any) {
