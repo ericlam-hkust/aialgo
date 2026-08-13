@@ -63,7 +63,7 @@ export const getPublicModel = createServerFn({ method: "GET" })
       supabase.from("model_metrics").select("kind,series,monthly_returns,stats").eq("model_id", model.id),
       supabase
         .from("model_reviews")
-        .select("id,author_name,rating,comment,created_at")
+        .select("id,author_name,rating,comment,created_at,verified,days_active")
         .eq("model_id", model.id)
         .order("created_at", { ascending: false })
         .limit(50),
