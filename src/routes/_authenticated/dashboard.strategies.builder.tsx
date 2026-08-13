@@ -535,7 +535,7 @@ function Builder() {
         </header>
 
         <div className="grid gap-3 xl:grid-cols-[224px_minmax(0,1fr)_320px]">
-          <aside className="order-2 hidden h-[640px] overflow-hidden rounded-xl border border-border bg-card xl:order-1 xl:block">
+          <aside className="order-2 h-[300px] overflow-hidden rounded-xl border border-border bg-card xl:order-1 xl:h-[640px]">
             <NodePalette onAdd={(spec) => placeNode(spec)} />
           </aside>
 
@@ -575,8 +575,8 @@ function Builder() {
                         key={lane}
                         style={{
                           position: "absolute",
-                          transform: `translate(-80px, ${LANE_BOUNDS[lane].y - 24}px)`,
-                          width: 1120,
+                          transform: `translate(-24px, ${LANE_BOUNDS[lane].y - 26}px)`,
+                          width: 1080,
                           height: LANE_BOUNDS[lane].height,
                         }}
                         className="pointer-events-none rounded-xl border border-dashed border-border/70 bg-muted/10"
