@@ -305,7 +305,7 @@ function VerificationCard({
   onList,
 }: {
   verification: ReturnType<typeof verificationChecklist>;
-  modelId?: string;
+  modelId: string | null;
   strategyId: string | null;
   onList: (modelId: string, strategyId: string | null) => void;
 }) {
