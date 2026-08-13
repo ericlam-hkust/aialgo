@@ -92,8 +92,14 @@ export const getPublicModel = createServerFn({ method: "GET" })
     }
     const versionReports = [...byVersion.entries()].map(([version, job]) => ({ version, job }));
 
+    const { data: team } = model.team_id
+      ? await supabase.from("teams").select("id,slug,name").eq("id", model.team_id).maybeSingle()
+      : { data: null };
+
     return {
       ...model,
+      team: team ?? null,
+      namespace: team ? `${team.slug}/${model.slug}` : model.slug,
       verifiedBacktest: jobs?.[0] ?? null,
       versionReports,
       contributor: contributor ?? null,
