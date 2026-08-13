@@ -45,35 +45,38 @@ Algo backtests, validation runs and live execution all read through the existing
 
 ## 5. Navigation reorganization
 
+Two levels of nesting, plus a search box pinned at the top of the sidebar.
+
 ```text
+[ Search menu…  ⌘K ]
+
 Overview
 
-BUILD                        (your own work — both kinds)
-  My work            (algo strategies + AI models you own)
-  Algo builder       (visual canvas + AI assist)
-  Upload AI model    (submission wizard)
+BUILD
+  My work                        (list of everything you own)
+    › Algo builder               (visual canvas + AI assist)
+    › AI model upload            (submission wizard)
   Templates
   Backtest
   Playground
   Validation queue
+  Data
+    › Market data sources        (your provider API keys)
+    › Data library               (catalog of historical feeds)
+    › Developer docs             (model interface contract)
 
-
-DISCOVER                     (things others published)
-  Marketplace          (algo strategies + AI models, filterable by kind)
+DISCOVER
+  Marketplace                    (algo + AI, filterable by kind)
   Compare
-  My subscriptions     (applied models and subscribed strategies)
-  Data library
-  Developer docs
+  My subscriptions
 
 TRADE
   Paper trading
   Execution monitor
   Risk center
-  Connected accounts
-  Brokers
-  Data sources
+  Trading accounts               (merged: paper + broker connections)
 
-EARN                         (contributor)
+EARN
   My listings
   Payouts
   Teams
@@ -83,28 +86,42 @@ ACCOUNT
   Wallet
   Billing
   Settings
-  Admin          (admins only)
+  Admin                          (admins only)
 ```
 
-Groups are collapsible with uppercase headers; the group containing the current route stays open, state persists across reloads, and the icon-only collapsed sidebar keeps icons plus tooltips.
+**On nesting the two builders under My work:** yes, that reads better. "My work" is the destination you go back to; "Algo builder" and "AI model upload" are the two ways to create something new. Nesting them makes the parent/child relationship obvious instead of showing three sibling links that look unrelated. They stay clickable links (not just a dropdown) so they remain deep-linkable, and the child group auto-expands when you are on either page.
 
-## 6. What is on the BUILD pages
+**Data sources / library / docs under BUILD:** agreed — all three are inputs to building and validating, not trading. They go into a "Data" subgroup so BUILD does not get long.
 
-**My work** (`/dashboard/strategies` today, retitled) is the single home for everything you create. A "New" button offers two choices:
+## 6. Untangling Connected accounts vs Brokers vs Data sources
 
-- Build an algo strategy → opens the visual builder
-- Upload an AI model → opens the model submission wizard
+They are three different things today and the names do not say so:
 
-Below it, one table with a kind column and tabs `All / Algo / AI models`. Each row shows name, kind, status (Draft, Validating, Verified, Listed, Rejected, Paused), visibility (Private / Unlisted / Public), price if listed, and lifetime earnings if listed. Row actions by kind:
+- **Connected accounts** — where your money and orders live: the built-in $100k paper account plus linked execution accounts (Alpaca, Binance, etc.). Used when you apply a model or deploy a strategy.
+- **Brokers** — the IBKR / Futu / Tiger sync integrations that pull balances, positions and orders. Functionally the same idea as above, just a different set of providers.
+- **Data sources** — market data provider API keys (prices/candles). Nothing to do with placing orders.
+
+Refinement:
+
+1. Merge **Connected accounts** and **Brokers** into one page, **Trading accounts**, under TRADE, with two tabs: *Accounts* (paper + execution accounts, default account marker) and *Sync* (balance/position/order sync status, last sync, errors). No data is lost — both existing tables keep working, they are just presented in one place.
+2. Rename **Data sources** → **Market data sources** and move it under BUILD → Data, since it configures the feeds used by builder, backtests, validation and the playground.
+3. Old routes redirect to the new ones so bookmarks keep working.
+
+## 7. Menu search
+
+A search input sits at the top of the sidebar (and a `⌘K` / `Ctrl+K` command palette opens the same list from anywhere). Typing filters across all nav items by label, group name and a few synonyms (e.g. "API key" finds Market data sources, "broker" finds Trading accounts, "publish" finds My listings). Results show the group path, arrow keys navigate, Enter opens. When the sidebar is collapsed to icons, the search icon opens the palette instead.
+
+## 8. What is on the BUILD pages
+
+**My work** (`/dashboard/strategies`, retitled) is the single home for everything you create. A "New" button offers two choices: build an algo strategy, or upload an AI model. Below it, one table with tabs `All / Algo / AI models`, and columns: name, kind, status (Draft, Validating, Verified, Listed, Rejected, Paused), visibility (Private / Unlisted / Public), price if listed, lifetime earnings if listed. Row actions:
 
 - Algo: Edit in builder, Backtest, Duplicate, Playground run, Publish/Manage listing, Share access, Delete
 - AI model: Edit listing, New version, Playground run, Validation status, Manage listing, Share access, Delete
 
-**Algo builder** (`/dashboard/strategies/builder`) stays the drag-and-drop canvas with AI assist and stays algo-only — no model upload here. Two additions: a Backtest button that reuses the shared protocol form, and a Publish button that opens the shared wizard pre-filled from the strategy (only enabled once the strategy has passed validation, otherwise it starts validation first).
+**Algo builder** (`/dashboard/strategies/builder`) stays the drag-and-drop canvas with AI assist, algo-only. Adds a Backtest button using the shared protocol form and a Publish button that opens the shared wizard pre-filled from the strategy (validation runs first if it has not passed).
 
-**Upload AI model** (`/dashboard/models/new`) stays the six-step wizard, unchanged except that it is now reachable from the same New menu and shares the Interface/Pricing/Backtest steps with algo publishing.
+**AI model upload** (`/dashboard/models/new`) stays the six-step wizard, sharing the Interface / Pricing / Backtest steps with algo publishing.
 
-So: yes, both paths live under BUILD, they are separate entry points because the authoring surfaces genuinely differ, but they converge into one list, one validation queue, one playground, and one listing/earnings flow.
 
 
 ## Technical notes
@@ -113,4 +130,5 @@ So: yes, both paths live under BUILD, they are separate entry points because the
 - `src/lib/contributor.functions.ts` gains a `publishStrategyListing` server function that creates the listing row from a strategy, derives the interface manifest from the strategy graph, and reuses `submitForValidation` unchanged.
 - `src/lib/backtest-sim.server.ts` and the execution engine branch on `listing_kind`: algo signals come from the existing bar-by-bar engine in `src/lib/backtest-engine.ts`; model signals stay as today.
 - Wizard (`dashboard.models.new.tsx`) and playground get a `kind` parameter; catalog, cards and detail pages get a kind badge and filter.
-- `src/components/app-shell.tsx`: replace flat `NAV` with `NAV_GROUPS`; add group-header keys to all three locales in `src/lib/i18n.tsx`.
+- `src/components/app-shell.tsx`: replace flat `NAV` with a nested `NAV_GROUPS` tree (group → item → optional children), add the sidebar search input plus a `cmdk` command palette bound to ⌘K/Ctrl+K, and persist group open state in local storage. New group/child labels and search synonyms added to all three locales in `src/lib/i18n.tsx`.
+- Merge `dashboard.accounts.tsx` and `dashboard.brokers.tsx` into one tabbed `dashboard.accounts.tsx`; keep `/dashboard/brokers` as a redirect. `/dashboard/data-sources` keeps its route, only the label and placement change.
