@@ -27,7 +27,7 @@ import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { fmtNum, pnlClass } from "@/lib/format";
+import { fmtNum } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/dashboard/strategies/list/$id")({
   head: () => ({
@@ -219,7 +219,7 @@ function DetailsStep({ listing, strategyId, onSaved }: { listing: Listing; strat
         </div>
         <div className="grid gap-4 md:grid-cols-4">
           <Field label="Asset class">
-            <Select value={form.assetClass} onValueChange={(v) => setForm({ ...form, assetClass: v })}>
+            <Select value={form.assetClass} onValueChange={(v) => setForm({ ...form, assetClass: v as typeof form.assetClass })}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 {ASSET_CLASSES.map((a) => <SelectItem key={a.value} value={a.value}>{a.label}</SelectItem>)}
@@ -227,7 +227,7 @@ function DetailsStep({ listing, strategyId, onSaved }: { listing: Listing; strat
             </Select>
           </Field>
           <Field label="Strategy type">
-            <Select value={form.strategyType} onValueChange={(v) => setForm({ ...form, strategyType: v })}>
+            <Select value={form.strategyType} onValueChange={(v) => setForm({ ...form, strategyType: v as typeof form.strategyType })}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 {STRATEGY_TYPES.map((a) => <SelectItem key={a.value} value={a.value}>{a.label}</SelectItem>)}
@@ -235,7 +235,7 @@ function DetailsStep({ listing, strategyId, onSaved }: { listing: Listing; strat
             </Select>
           </Field>
           <Field label="Timeframe">
-            <Select value={form.timeframe} onValueChange={(v) => setForm({ ...form, timeframe: v })}>
+            <Select value={form.timeframe} onValueChange={(v) => setForm({ ...form, timeframe: v as typeof form.timeframe })}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 {TIMEFRAMES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
@@ -243,7 +243,7 @@ function DetailsStep({ listing, strategyId, onSaved }: { listing: Listing; strat
             </Select>
           </Field>
           <Field label="Risk level">
-            <Select value={form.riskLevel} onValueChange={(v) => setForm({ ...form, riskLevel: v })}>
+            <Select value={form.riskLevel} onValueChange={(v) => setForm({ ...form, riskLevel: v as typeof form.riskLevel })}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 {RISK_LEVELS.map((r) => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}
@@ -489,7 +489,7 @@ function BacktestStep({
             <MetricCard
               label="Total return"
               value={`${fmtNum(report.metrics.totalReturn, 1)}%`}
-              className={pnlClass(report.metrics.totalReturn)}
+              tone={report.metrics.totalReturn >= 0 ? "profit" : "loss"}
             />
           </div>
           <BacktestReportView report={report} variant="verified" title="Platform verified report" />
@@ -608,7 +608,7 @@ function PricingStep({ listing, strategyId, onSaved }: { listing: Listing; strat
         </CardHeader>
         <CardContent className="space-y-4">
           <Field label="Pricing model">
-            <Select value={pricingModel} onValueChange={setPricingModel}>
+            <Select value={pricingModel} onValueChange={(v) => setPricingModel(v as typeof pricingModel)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 {PRICING_MODELS.map((p) => <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>)}
