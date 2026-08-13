@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { DEFAULT_PROTOCOL, FAILURE_REASONS as FAILURE_REASONS_MAP, type BacktestConfig, type BacktestProtocol } from "@/lib/backtest-protocol";
+import { suggestPricing } from "@/lib/pricing-suggestion";
 
 /** Reads the admin-configured global protocol, falling back to defaults. */
 export const getBacktestProtocol = createServerFn({ method: "GET" }).handler(async () => {
