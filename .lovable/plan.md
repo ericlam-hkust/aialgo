@@ -48,7 +48,7 @@ Extend the upload system so one listing can package several cooperating models.
 - **Wizard path**: an "Advanced: Multi-Model Pipeline" option in the upload wizard with a pipeline builder preview (add artifacts, assign roles, choose pipeline type, live diagram preview) and the note: "Multi-stage pipelines carry higher overfitting risk — your model will receive extra walk-forward scrutiny during validation." Pipeline bundles get more walk-forward windows and a tighter consistency threshold in validation.
 - **Demo**: an oversized bundle run that is rejected at the resource gate with the clear error and remediation steps, alongside a passing bundle.
 
-## 7. Demo flow (mock data)
+## 8. Demo flow (mock data)
 
 End-to-end simulated path: open Base Model Library → `meanrev-gbm-base` → Cloud Fine-Tune on ETH/USDT + SOL/USDT 1h → animated training with loss curve → auto backtest report → publish with a 15% per-trade fee → new model appears in the catalog with lineage badge, verified backtest badge, and fee; the base model's derivatives tree includes it.
 
