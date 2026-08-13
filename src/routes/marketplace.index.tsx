@@ -103,21 +103,41 @@ function Catalog() {
   return (
     <main className="mx-auto max-w-7xl px-4 py-10">
       <div className="max-w-2xl">
-        <Badge variant="secondary">Model marketplace</Badge>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">AI trading models, verified</h1>
+        <Badge variant="secondary">Marketplace</Badge>
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
+          Algo strategies and AI models, verified
+        </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Every listing is re-run out of sample, paper traded, and tracked live since listing. Deploy to paper or a
-          connected broker in a few clicks.
+          Every listing — rule-based algo or AI model — is re-run out of sample, paper traded, and tracked live since
+          listing. Deploy to paper or a connected broker in a few clicks.
         </p>
       </div>
 
-      <Tabs defaultValue="catalog" className="mt-8">
+      <div className="mt-6 inline-flex flex-wrap items-center gap-1 rounded-lg border border-border/70 bg-card/60 p-1">
+        {LISTING_TABS.map((tab) => (
+          <Button
+            key={tab.value}
+            size="sm"
+            variant={listing === tab.value ? "secondary" : "ghost"}
+            onClick={() => setListing(tab.value)}
+            aria-pressed={listing === tab.value}
+            className="gap-1.5"
+          >
+            <tab.icon className="h-4 w-4" aria-hidden />
+            {tab.label}
+            <span className="text-xs text-muted-foreground">{countFor(tab.value)}</span>
+          </Button>
+        ))}
+      </div>
+
+      <Tabs defaultValue="catalog" className="mt-6">
         <TabsList>
           <TabsTrigger value="catalog">Catalog</TabsTrigger>
           <TabsTrigger value="leaderboard">
             <Trophy className="mr-1.5 h-4 w-4" aria-hidden /> Leaderboard
           </TabsTrigger>
         </TabsList>
+
 
         <TabsContent value="catalog" className="mt-6 space-y-6">
           <Card className="border-border/70 bg-card/60">
