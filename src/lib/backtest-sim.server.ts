@@ -1,4 +1,12 @@
-import type { BacktestConfig, BacktestProtocol, BacktestReport } from "@/lib/backtest-protocol";
+import type {
+  BacktestConfig,
+  BacktestProtocol,
+  BacktestReport,
+  WalkForwardAnalysis,
+  WalkForwardWindow,
+} from "@/lib/backtest-protocol";
+import { OVERFITTING_CONSISTENCY_THRESHOLD } from "@/lib/backtest-protocol";
+
 
 /** Deterministic PRNG so a job always regenerates the same report. */
 function rng(seed: string) {
