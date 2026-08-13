@@ -150,7 +150,6 @@ export const fetchLiveQuotes = createServerFn({ method: "POST" })
     z.object({ symbols: z.array(z.string().trim().max(20)).max(30) }).parse(input),
   )
   .handler(async ({ data, context }) => {
-    const rows = await loadConnections(context.supabase);
     const persist: Parameters<typeof persistQuotes>[0] = [];
     const quotes: Record<
       string,
@@ -158,29 +157,48 @@ export const fetchLiveQuotes = createServerFn({ method: "POST" })
     > = {};
     const errors: Record<string, string> = {};
 
+    let rows: Awaited<ReturnType<typeof loadConnections>> = [];
+    try {
+      rows = await loadConnections(context.supabase);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Failed to load data sources";
+      for (const s of data.symbols) errors[s] = msg;
+      return { quotes, errors, fetchedAt: new Date().toISOString() };
+    }
+
     await Promise.all(
       data.symbols.map(async (symbol) => {
-        const chain = await buildChain(rows, symbol);
-        const result = await quoteWithFallback(chain, symbol);
-        if (result.quote && result.provider) {
-          const q = result.quote;
-          quotes[symbol] = {
-            price: q.price,
-            prevClose: q.prevClose,
-            changePct: q.prevClose && q.prevClose > 0 ? ((q.price - q.prevClose) / q.prevClose) * 100 : 0,
-            provider: result.provider,
-            quotedAt: q.quotedAt,
-          };
-          persist.push({ symbol, quote: q, provider: result.provider });
-        } else if (result.error) {
-          errors[symbol] = result.error;
+        try {
+          const chain = await buildChain(rows, symbol);
+          const result = await quoteWithFallback(chain, symbol);
+          if (result.quote && result.provider) {
+            const q = result.quote;
+            quotes[symbol] = {
+              price: q.price,
+              prevClose: q.prevClose,
+              changePct: q.prevClose && q.prevClose > 0 ? ((q.price - q.prevClose) / q.prevClose) * 100 : 0,
+              provider: result.provider,
+              quotedAt: q.quotedAt,
+            };
+            persist.push({ symbol, quote: q, provider: result.provider });
+          } else if (result.error) {
+            errors[symbol] = result.error;
+          }
+        } catch (e) {
+          errors[symbol] = e instanceof Error ? e.message : "Quote fetch failed";
         }
       }),
     );
 
-    await persistQuotes(persist);
+    try {
+      await persistQuotes(persist);
+    } catch (e) {
+      console.error("persistQuotes failed", e);
+    }
+
     return { quotes, errors, fetchedAt: new Date().toISOString() };
   });
+
 
 export const syncHistory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
