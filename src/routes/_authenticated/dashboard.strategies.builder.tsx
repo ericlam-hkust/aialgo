@@ -143,6 +143,15 @@ function Builder() {
   const [saving, setSaving] = useState(false);
   const [strategyId, setStrategyId] = useState<string | null>(id ?? null);
 
+  const [isWide, setIsWide] = useState(true);
+  useEffect(() => {
+    const mql = window.matchMedia("(min-width: 1280px)");
+    const apply = () => setIsWide(mql.matches);
+    apply();
+    mql.addEventListener("change", apply);
+    return () => mql.removeEventListener("change", apply);
+  }, []);
+
   const [view, setView] = useState<"canvas" | "code">("canvas");
   const [sidePanel, setSidePanel] = useState<"ai" | "properties">("ai");
 
@@ -622,7 +631,7 @@ function Builder() {
 
           <ResizableHandle withHandle className="mx-1.5 my-1.5 bg-transparent" />
 
-          <ResizablePanel defaultSize={isWide ? 26 : 30} minSize={12} className="flex flex-col overflow-hidden rounded-xl border border-border bg-card">
+          <ResizablePanel defaultSize={isWide ? "26%" : "30%"} minSize="12%" className="flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card">
 
             <Tabs value={sidePanel} onValueChange={(v) => setSidePanel(v as "ai" | "properties")} className="flex h-full flex-col">
               <TabsList className="m-2 grid grid-cols-2">
