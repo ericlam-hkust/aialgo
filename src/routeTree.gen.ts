@@ -20,6 +20,7 @@ import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthRegisterRouteImport } from './routes/auth.register'
 import { Route as ModelsIndexRouteImport } from './routes/models.index'
 import { Route as ModelsSlugRouteImport } from './routes/models.$slug'
+import { Route as ModelsDataLibraryRouteImport } from './routes/models.data-library'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated/dashboard.admin'
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
@@ -95,6 +96,11 @@ const ModelsIndexRoute = ModelsIndexRouteImport.update({
 const ModelsSlugRoute = ModelsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
+  getParentRoute: () => ModelsRoute,
+} as any)
+const ModelsDataLibraryRoute = ModelsDataLibraryRouteImport.update({
+  id: '/data-library',
+  path: '/data-library',
   getParentRoute: () => ModelsRoute,
 } as any)
 const AuthenticatedDashboardIndexRoute =
@@ -238,6 +244,7 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/models/$slug': typeof ModelsSlugRoute
+  '/models/data-library': typeof ModelsDataLibraryRoute
   '/auth/': typeof AuthIndexRoute
   '/models/': typeof ModelsIndexRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
@@ -269,6 +276,7 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/models/$slug': typeof ModelsSlugRoute
+  '/models/data-library': typeof ModelsDataLibraryRoute
   '/auth': typeof AuthIndexRoute
   '/models': typeof ModelsIndexRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
@@ -305,6 +313,7 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/models/$slug': typeof ModelsSlugRoute
+  '/models/data-library': typeof ModelsDataLibraryRoute
   '/auth/': typeof AuthIndexRoute
   '/models/': typeof ModelsIndexRoute
   '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
@@ -341,6 +350,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/models/$slug'
+    | '/models/data-library'
     | '/auth/'
     | '/models/'
     | '/dashboard/admin'
@@ -372,6 +382,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/models/$slug'
+    | '/models/data-library'
     | '/auth'
     | '/models'
     | '/dashboard/admin'
@@ -407,6 +418,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/models/$slug'
+    | '/models/data-library'
     | '/auth/'
     | '/models/'
     | '/_authenticated/dashboard/admin'
@@ -519,6 +531,13 @@ declare module '@tanstack/react-router' {
       path: '/$slug'
       fullPath: '/models/$slug'
       preLoaderRoute: typeof ModelsSlugRouteImport
+      parentRoute: typeof ModelsRoute
+    }
+    '/models/data-library': {
+      id: '/models/data-library'
+      path: '/data-library'
+      fullPath: '/models/data-library'
+      preLoaderRoute: typeof ModelsDataLibraryRouteImport
       parentRoute: typeof ModelsRoute
     }
     '/_authenticated/dashboard/': {
@@ -770,11 +789,13 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface ModelsRouteChildren {
   ModelsSlugRoute: typeof ModelsSlugRoute
+  ModelsDataLibraryRoute: typeof ModelsDataLibraryRoute
   ModelsIndexRoute: typeof ModelsIndexRoute
 }
 
 const ModelsRouteChildren: ModelsRouteChildren = {
   ModelsSlugRoute: ModelsSlugRoute,
+  ModelsDataLibraryRoute: ModelsDataLibraryRoute,
   ModelsIndexRoute: ModelsIndexRoute,
 }
 
