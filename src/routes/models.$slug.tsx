@@ -15,6 +15,8 @@ import { ArrowLeft, BadgeCheck, ShieldCheck, Star, Users } from "lucide-react";
 import { getPublicModel, submitReview } from "@/lib/models.functions";
 import { getReviewEligibility } from "@/lib/activations.functions";
 import { daysSince, modelBadges } from "@/lib/model-badges";
+import { BacktestReportView } from "@/components/marketplace/backtest-report";
+import type { BacktestReport } from "@/lib/backtest-protocol";
 import { useAuth } from "@/hooks/use-auth";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
