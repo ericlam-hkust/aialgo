@@ -101,8 +101,8 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     key: "group.discover",
     items: [
-      { to: "/marketplace", key: "nav.models", icon: Sparkles, exact: false, terms: ["marketplace", "catalog", "buy"] },
-      { to: "/dashboard/marketplace", key: "nav.marketplace", icon: Store, exact: false, terms: ["strategies marketplace"] },
+      { to: "/marketplace", key: "nav.marketplace", icon: Store, exact: false, terms: ["marketplace", "catalog", "buy", "ai models", "algo strategies"] },
+
       { to: "/marketplace/compare", key: "nav.compare", icon: GitCompare, exact: true, terms: ["side by side"] },
       { to: "/dashboard/my-models", key: "nav.mySubscriptions", icon: Layers, exact: true, terms: ["applied", "activations"] },
     ],
