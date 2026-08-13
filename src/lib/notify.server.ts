@@ -6,7 +6,11 @@ export type NotificationKind =
   | "new_version"
   | "payout_sent"
   | "model_paused"
-  | "review_status";
+  | "review_status"
+  | "backtest_passed"
+  | "backtest_failed"
+  | "revalidation"
+  | "model_unlisted";
 
 export type NotificationInput = {
   userId: string;
