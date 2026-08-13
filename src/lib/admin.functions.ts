@@ -69,6 +69,56 @@ export const reviewSubmission = createServerFn({ method: "POST" })
       })
       .eq("id", data.modelId);
 
+    const { data: model } = await supabase
+      .from("ai_models")
+      .select("name,slug,user_id")
+      .eq("id", data.modelId)
+      .maybeSingle();
+    if (model?.user_id) {
+      const { notify } = await import("@/lib/notify.server");
+      await notify({
+        userId: model.user_id,
+        kind: "review_status",
+        title: `${model.name}: review status is now ${String(data.status).replace(/_/g, " ")}`,
+        body: data.notes ?? "Track progress from your contributor dashboard.",
+        link: "/dashboard/models",
+      });
+    }
+
+    return { ok: true };
+  });
+
+/** Marks a payout batch as paid and notifies the contributor. */
+export const markPayoutPaid = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { payoutId: string }) => data)
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertAdmin(supabase, userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: payout, error } = await supabaseAdmin
+      .from("payout_batches")
+      .update({ status: "paid", paid_at: new Date().toISOString() })
+      .eq("id", data.payoutId)
+      .select("amount,currency,period,contributor_id")
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+
+    const { data: contributor } = await supabaseAdmin
+      .from("contributor_profiles")
+      .select("user_id")
+      .eq("id", payout?.contributor_id ?? "")
+      .maybeSingle();
+    if (contributor?.user_id) {
+      const { notify } = await import("@/lib/notify.server");
+      await notify({
+        userId: contributor.user_id,
+        kind: "payout_sent",
+        title: `Payout sent — ${payout?.period}`,
+        body: `${payout?.amount} ${payout?.currency} is on its way to your payout account.`,
+        link: "/dashboard/models/payouts",
+      });
+    }
     return { ok: true };
   });
 
