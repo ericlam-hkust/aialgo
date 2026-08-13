@@ -57,7 +57,6 @@ export const saveDataSource = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    requireFeature(await getPlanTier(context.supabase, context.userId), "liveDataSources", "Connecting live market data providers");
     const provider = data.provider as ProviderId;
     let keyToTest: string | null = null;
 
