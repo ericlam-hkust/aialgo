@@ -66,9 +66,12 @@ export function BacktestConfigForm({
 
   const selectSource = (id: string) => {
     if (id === "platform") {
-      set({ dataSourceKind: "platform", dataSourceId: undefined, dataSourceLabel: "aiAlgo platform market data" });
+      setChecked(null);
+      const { dataSourceId: _omit, ...rest } = value;
+      onChange({ ...rest, dataSourceKind: "platform", dataSourceLabel: "aiAlgo platform market data" });
       return;
     }
+
     const conn = connections.find((c) => c.id === id);
     if (!conn) return;
     const providerName = PROVIDERS.find((p) => p.id === conn.provider)?.name ?? conn.provider;
