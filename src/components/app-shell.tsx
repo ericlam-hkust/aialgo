@@ -110,30 +110,125 @@ export function AppShell({ children }: { children: ReactNode }) {
             <ChevronLeft className={cn("h-4 w-4 transition-transform", collapsed && "rotate-180")} aria-hidden />
           </Button>
         </div>
-        <nav id="main-navigation" className="flex-1 space-y-0.5 overflow-y-auto p-2" aria-label={t("shell.mainNavigation")}>
-          {NAV.map((item) => {
-            const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={cn(
-                  "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors",
-                  active
-                    ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
-                    : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
-                )}
-                title={t(item.key)}
-              >
-                <Icon className="h-4 w-4 shrink-0" aria-hidden />
-                {!collapsed ? <span className="truncate">{t(item.key)}</span> : null}
-              </Link>
-            );
-          })}
+        {!collapsed ? (
+          <div className="px-2 pt-2">
+            <button
+              type="button"
+              onClick={() => setPaletteOpen(true)}
+              className="flex w-full items-center gap-2 rounded-md border border-sidebar-border bg-background/40 px-2.5 py-1.5 text-left text-xs text-muted-foreground transition-colors hover:text-foreground"
+              aria-label={t("shell.searchMenu")}
+            >
+              <Search className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              <span className="flex-1 truncate">{t("shell.searchPlaceholder")}</span>
+              <kbd className="mono rounded border border-border px-1 text-[10px]">⌘K</kbd>
+            </button>
+          </div>
+        ) : (
+          <div className="px-2 pt-2">
+            <Button variant="ghost" size="icon" className="h-8 w-full" onClick={() => setPaletteOpen(true)} aria-label={t("shell.searchMenu")}>
+              <Search className="h-4 w-4" aria-hidden />
+            </Button>
+          </div>
+        )}
+        <nav id="main-navigation" className="flex-1 space-y-3 overflow-y-auto p-2" aria-label={t("shell.mainNavigation")}>
+          {NAV_GROUPS.map((group, gi) => (
+            <div key={group.key ?? `g${gi}`} className="space-y-0.5">
+              {group.key && !collapsed ? (
+                <p className="px-2.5 pb-1 pt-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">
+                  {t(group.key)}
+                </p>
+              ) : null}
+              {group.items.map((item) => {
+                const Icon = item.icon;
+                const active = isActive(item, pathname);
+                const open = expanded[item.to] ?? branchActive(item, pathname);
+                return (
+                  <div key={item.to}>
+                    <div className="flex items-center">
+                      <Link
+                        to={item.to}
+                        className={cn(
+                          "flex flex-1 items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors",
+                          active
+                            ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
+                            : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+                        )}
+                        title={t(item.key)}
+                      >
+                        <Icon className="h-4 w-4 shrink-0" aria-hidden />
+                        {!collapsed ? <span className="truncate">{t(item.key)}</span> : null}
+                      </Link>
+                      {item.children && !collapsed ? (
+                        <button
+                          type="button"
+                          onClick={() => setExpanded((s) => ({ ...s, [item.to]: !open }))}
+                          className="ml-0.5 rounded p-1 text-muted-foreground hover:text-foreground"
+                          aria-label={t(item.key)}
+                          aria-expanded={open}
+                        >
+                          <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", !open && "-rotate-90")} aria-hidden />
+                        </button>
+                      ) : null}
+                    </div>
+                    {item.children && !collapsed && open ? (
+                      <div className="ml-4 mt-0.5 space-y-0.5 border-l border-sidebar-border pl-2">
+                        {item.children.map((child) => {
+                          const ChildIcon = child.icon;
+                          const childActive = isActive(child, pathname);
+                          return (
+                            <Link
+                              key={child.to + child.key}
+                              to={child.to}
+                              className={cn(
+                                "flex items-center gap-2 rounded-md px-2 py-1.5 text-[13px] transition-colors",
+                                childActive
+                                  ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
+                                  : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+                              )}
+                            >
+                              <ChildIcon className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                              <span className="truncate">{t(child.key)}</span>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    ) : null}
+                  </div>
+                );
+              })}
+            </div>
+          ))}
         </nav>
         <div className="border-t border-sidebar-border p-2" />
       </aside>
+
+      <CommandDialog open={paletteOpen} onOpenChange={setPaletteOpen}>
+        <CommandInput placeholder={t("shell.searchPlaceholder")} />
+        <CommandList>
+          <CommandEmpty>{t("shell.searchEmpty")}</CommandEmpty>
+          {paletteGroups.map((g) => (
+            <CommandGroup key={g.label} heading={g.label}>
+              {g.items.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <CommandItem
+                    key={item.to + item.key}
+                    value={`${t(item.key)} ${g.label} ${item.terms.join(" ")} ${item.to}`}
+                    onSelect={() => {
+                      setPaletteOpen(false);
+                      void navigate({ to: item.to });
+                    }}
+                  >
+                    <Icon className="mr-2 h-4 w-4" aria-hidden />
+                    <span>{t(item.key)}</span>
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+          ))}
+        </CommandList>
+      </CommandDialog>
+
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-20 flex h-14 items-center justify-between gap-4 border-b border-border bg-background/85 px-4 backdrop-blur">
