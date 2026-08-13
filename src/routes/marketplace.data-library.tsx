@@ -62,7 +62,7 @@ function DataLibrary() {
     const url = URL.createObjectURL(new Blob([SAMPLE_CSV], { type: "text/csv" }));
     const a = document.createElement("a");
     a.href = url;
-    a.download = "algoforge-sample-ohlcv.csv";
+    a.download = "aialgo-sample-ohlcv.csv";
     a.click();
     URL.revokeObjectURL(url);
   };

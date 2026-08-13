@@ -290,7 +290,7 @@ function Builder() {
   const onDrop = useCallback(
     (event: React.DragEvent) => {
       event.preventDefault();
-      const payload = event.dataTransfer.getData("application/algoforge-node");
+      const payload = event.dataTransfer.getData("application/aialgo-node");
       if (!payload) return;
       const [kind, label] = payload.split("::");
       const found = NODE_CATALOG.find((s) => s.kind === kind && s.label === label);

@@ -8,7 +8,7 @@ export const LOCALES: { id: Locale; label: string; short: string }[] = [
   { id: "zh-Hans", label: "简体中文", short: "简" },
 ];
 
-const STORAGE_KEY = "algoforge.locale";
+const STORAGE_KEY = "aialgo.locale";
 
 type Dict = Record<string, string>;
 

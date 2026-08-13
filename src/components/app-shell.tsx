@@ -30,7 +30,7 @@ import { FLAT_NAV, NAV_GROUPS, type NavItem } from "@/lib/nav";
 import { cn } from "@/lib/utils";
 
 
-const OPEN_KEY = "algoforge.nav.open";
+const OPEN_KEY = "aialgo.nav.open";
 
 function isActive(item: NavItem, pathname: string) {
   return item.exact === false ? pathname.startsWith(item.to) : pathname === item.to;

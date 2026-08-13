@@ -1,7 +1,7 @@
 import { toast } from "sonner";
 import { cleanUpgradeMessage, isUpgradeError } from "./entitlements";
 
-export const UPGRADE_EVENT = "algoforge:upgrade-required";
+export const UPGRADE_EVENT = "aialgo:upgrade-required";
 
 /**
  * Shows an upgrade dialog when the server rejected an action for plan reasons,
