@@ -55,6 +55,47 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [upgradeReason, setUpgradeReason] = useState<string | null>(null);
   const { tier } = useEntitlements();
   const { t } = useI18n();
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>(() => {
+    if (typeof window === "undefined") return {};
+    try {
+      return JSON.parse(window.localStorage.getItem(OPEN_KEY) ?? "{}") as Record<string, boolean>;
+    } catch {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(OPEN_KEY, JSON.stringify(expanded));
+    } catch {
+      /* ignore */
+    }
+  }, [expanded]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setPaletteOpen((o) => !o);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  const paletteGroups = useMemo(() => {
+    const out: { label: string; items: typeof FLAT_NAV }[] = [];
+    for (const item of FLAT_NAV) {
+      const label = item.groupKey ? t(item.groupKey) : t("nav.overview");
+      const found = out.find((g) => g.label === label);
+      if (found) found.items.push(item);
+      else out.push({ label, items: [item] });
+    }
+    return out;
+  }, [t]);
+
+
 
   useLiveMarket();
 
