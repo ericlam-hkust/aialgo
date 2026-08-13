@@ -12,12 +12,16 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ModelsRouteImport } from './routes/models'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthIndexRouteImport } from './routes/auth.index'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthRegisterRouteImport } from './routes/auth.register'
+import { Route as ModelsIndexRouteImport } from './routes/models.index'
+import { Route as ModelsSlugRouteImport } from './routes/models.$slug'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
+import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated/dashboard.admin'
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
 import { Route as AuthenticatedDashboardBrokersRouteImport } from './routes/_authenticated/dashboard.brokers'
 import { Route as AuthenticatedDashboardDataSourcesRouteImport } from './routes/_authenticated/dashboard.data-sources'
@@ -25,7 +29,10 @@ import { Route as AuthenticatedDashboardMarketplaceRouteImport } from './routes/
 import { Route as AuthenticatedDashboardPaperTradingRouteImport } from './routes/_authenticated/dashboard.paper-trading'
 import { Route as AuthenticatedDashboardRiskRouteImport } from './routes/_authenticated/dashboard.risk'
 import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
+import { Route as AuthenticatedDashboardWalletRouteImport } from './routes/_authenticated/dashboard.wallet'
 import { Route as ApiPublicSyncRouteImport } from './routes/api/public/sync'
+import { Route as AuthenticatedDashboardModelsIndexRouteImport } from './routes/_authenticated/dashboard.models.index'
+import { Route as AuthenticatedDashboardModelsNewRouteImport } from './routes/_authenticated/dashboard.models.new'
 import { Route as AuthenticatedDashboardStrategiesIndexRouteImport } from './routes/_authenticated/dashboard.strategies.index'
 import { Route as AuthenticatedDashboardStrategiesBacktestRouteImport } from './routes/_authenticated/dashboard.strategies.backtest'
 import { Route as AuthenticatedDashboardStrategiesBuilderRouteImport } from './routes/_authenticated/dashboard.strategies.builder'
@@ -44,6 +51,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ModelsRoute = ModelsRouteImport.update({
+  id: '/models',
+  path: '/models',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
@@ -71,10 +83,26 @@ const AuthRegisterRoute = AuthRegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => AuthRoute,
 } as any)
+const ModelsIndexRoute = ModelsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ModelsRoute,
+} as any)
+const ModelsSlugRoute = ModelsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => ModelsRoute,
+} as any)
 const AuthenticatedDashboardIndexRoute =
   AuthenticatedDashboardIndexRouteImport.update({
     id: '/',
     path: '/',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardAdminRoute =
+  AuthenticatedDashboardAdminRouteImport.update({
+    id: '/admin',
+    path: '/admin',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardBillingRoute =
@@ -119,11 +147,29 @@ const AuthenticatedDashboardSettingsRoute =
     path: '/settings',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardWalletRoute =
+  AuthenticatedDashboardWalletRouteImport.update({
+    id: '/wallet',
+    path: '/wallet',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const ApiPublicSyncRoute = ApiPublicSyncRouteImport.update({
   id: '/api/public/sync',
   path: '/api/public/sync',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedDashboardModelsIndexRoute =
+  AuthenticatedDashboardModelsIndexRouteImport.update({
+    id: '/models/',
+    path: '/models/',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardModelsNewRoute =
+  AuthenticatedDashboardModelsNewRouteImport.update({
+    id: '/models/new',
+    path: '/models/new',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardStrategiesIndexRoute =
   AuthenticatedDashboardStrategiesIndexRouteImport.update({
     id: '/strategies/',
@@ -158,11 +204,15 @@ const ApiPublicPaymentsWebhookRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
+  '/models': typeof ModelsRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/models/$slug': typeof ModelsSlugRoute
   '/auth/': typeof AuthIndexRoute
+  '/models/': typeof ModelsIndexRoute
+  '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
   '/dashboard/data-sources': typeof AuthenticatedDashboardDataSourcesRoute
@@ -170,12 +220,15 @@ export interface FileRoutesByFullPath {
   '/dashboard/paper-trading': typeof AuthenticatedDashboardPaperTradingRoute
   '/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
+  '/dashboard/wallet': typeof AuthenticatedDashboardWalletRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/models/new': typeof AuthenticatedDashboardModelsNewRoute
   '/dashboard/strategies/backtest': typeof AuthenticatedDashboardStrategiesBacktestRoute
   '/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/dashboard/models/': typeof AuthenticatedDashboardModelsIndexRoute
   '/dashboard/strategies/': typeof AuthenticatedDashboardStrategiesIndexRoute
 }
 export interface FileRoutesByTo {
@@ -183,7 +236,10 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/models/$slug': typeof ModelsSlugRoute
   '/auth': typeof AuthIndexRoute
+  '/models': typeof ModelsIndexRoute
+  '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
   '/dashboard/data-sources': typeof AuthenticatedDashboardDataSourcesRoute
@@ -191,12 +247,15 @@ export interface FileRoutesByTo {
   '/dashboard/paper-trading': typeof AuthenticatedDashboardPaperTradingRoute
   '/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
+  '/dashboard/wallet': typeof AuthenticatedDashboardWalletRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/models/new': typeof AuthenticatedDashboardModelsNewRoute
   '/dashboard/strategies/backtest': typeof AuthenticatedDashboardStrategiesBacktestRoute
   '/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/dashboard/models': typeof AuthenticatedDashboardModelsIndexRoute
   '/dashboard/strategies': typeof AuthenticatedDashboardStrategiesIndexRoute
 }
 export interface FileRoutesById {
@@ -204,11 +263,15 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/models': typeof ModelsRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/models/$slug': typeof ModelsSlugRoute
   '/auth/': typeof AuthIndexRoute
+  '/models/': typeof ModelsIndexRoute
+  '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/_authenticated/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
   '/_authenticated/dashboard/data-sources': typeof AuthenticatedDashboardDataSourcesRoute
@@ -216,12 +279,15 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/paper-trading': typeof AuthenticatedDashboardPaperTradingRoute
   '/_authenticated/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
   '/_authenticated/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
+  '/_authenticated/dashboard/wallet': typeof AuthenticatedDashboardWalletRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/_authenticated/dashboard/models/new': typeof AuthenticatedDashboardModelsNewRoute
   '/_authenticated/dashboard/strategies/backtest': typeof AuthenticatedDashboardStrategiesBacktestRoute
   '/_authenticated/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/_authenticated/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/_authenticated/dashboard/models/': typeof AuthenticatedDashboardModelsIndexRoute
   '/_authenticated/dashboard/strategies/': typeof AuthenticatedDashboardStrategiesIndexRoute
 }
 export interface FileRouteTypes {
@@ -229,11 +295,15 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/models'
     | '/dashboard'
     | '/onboarding'
     | '/auth/login'
     | '/auth/register'
+    | '/models/$slug'
     | '/auth/'
+    | '/models/'
+    | '/dashboard/admin'
     | '/dashboard/billing'
     | '/dashboard/brokers'
     | '/dashboard/data-sources'
@@ -241,12 +311,15 @@ export interface FileRouteTypes {
     | '/dashboard/paper-trading'
     | '/dashboard/risk'
     | '/dashboard/settings'
+    | '/dashboard/wallet'
     | '/api/public/sync'
     | '/dashboard/'
+    | '/dashboard/models/new'
     | '/dashboard/strategies/backtest'
     | '/dashboard/strategies/builder'
     | '/dashboard/strategies/templates'
     | '/api/public/payments/webhook'
+    | '/dashboard/models/'
     | '/dashboard/strategies/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -254,7 +327,10 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/auth/login'
     | '/auth/register'
+    | '/models/$slug'
     | '/auth'
+    | '/models'
+    | '/dashboard/admin'
     | '/dashboard/billing'
     | '/dashboard/brokers'
     | '/dashboard/data-sources'
@@ -262,23 +338,30 @@ export interface FileRouteTypes {
     | '/dashboard/paper-trading'
     | '/dashboard/risk'
     | '/dashboard/settings'
+    | '/dashboard/wallet'
     | '/api/public/sync'
     | '/dashboard'
+    | '/dashboard/models/new'
     | '/dashboard/strategies/backtest'
     | '/dashboard/strategies/builder'
     | '/dashboard/strategies/templates'
     | '/api/public/payments/webhook'
+    | '/dashboard/models'
     | '/dashboard/strategies'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/models'
     | '/_authenticated/dashboard'
     | '/_authenticated/onboarding'
     | '/auth/login'
     | '/auth/register'
+    | '/models/$slug'
     | '/auth/'
+    | '/models/'
+    | '/_authenticated/dashboard/admin'
     | '/_authenticated/dashboard/billing'
     | '/_authenticated/dashboard/brokers'
     | '/_authenticated/dashboard/data-sources'
@@ -286,12 +369,15 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/paper-trading'
     | '/_authenticated/dashboard/risk'
     | '/_authenticated/dashboard/settings'
+    | '/_authenticated/dashboard/wallet'
     | '/api/public/sync'
     | '/_authenticated/dashboard/'
+    | '/_authenticated/dashboard/models/new'
     | '/_authenticated/dashboard/strategies/backtest'
     | '/_authenticated/dashboard/strategies/builder'
     | '/_authenticated/dashboard/strategies/templates'
     | '/api/public/payments/webhook'
+    | '/_authenticated/dashboard/models/'
     | '/_authenticated/dashboard/strategies/'
   fileRoutesById: FileRoutesById
 }
@@ -299,6 +385,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
+  ModelsRoute: typeof ModelsRouteWithChildren
   ApiPublicSyncRoute: typeof ApiPublicSyncRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
@@ -324,6 +411,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/models': {
+      id: '/models'
+      path: '/models'
+      fullPath: '/models'
+      preLoaderRoute: typeof ModelsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard': {
@@ -361,11 +455,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRegisterRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/models/': {
+      id: '/models/'
+      path: '/'
+      fullPath: '/models/'
+      preLoaderRoute: typeof ModelsIndexRouteImport
+      parentRoute: typeof ModelsRoute
+    }
+    '/models/$slug': {
+      id: '/models/$slug'
+      path: '/$slug'
+      fullPath: '/models/$slug'
+      preLoaderRoute: typeof ModelsSlugRouteImport
+      parentRoute: typeof ModelsRoute
+    }
     '/_authenticated/dashboard/': {
       id: '/_authenticated/dashboard/'
       path: '/'
       fullPath: '/dashboard/'
       preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/admin': {
+      id: '/_authenticated/dashboard/admin'
+      path: '/admin'
+      fullPath: '/dashboard/admin'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
     '/_authenticated/dashboard/billing': {
@@ -417,12 +532,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardSettingsRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/wallet': {
+      id: '/_authenticated/dashboard/wallet'
+      path: '/wallet'
+      fullPath: '/dashboard/wallet'
+      preLoaderRoute: typeof AuthenticatedDashboardWalletRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/api/public/sync': {
       id: '/api/public/sync'
       path: '/api/public/sync'
       fullPath: '/api/public/sync'
       preLoaderRoute: typeof ApiPublicSyncRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/dashboard/models/': {
+      id: '/_authenticated/dashboard/models/'
+      path: '/models'
+      fullPath: '/dashboard/models/'
+      preLoaderRoute: typeof AuthenticatedDashboardModelsIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/models/new': {
+      id: '/_authenticated/dashboard/models/new'
+      path: '/models/new'
+      fullPath: '/dashboard/models/new'
+      preLoaderRoute: typeof AuthenticatedDashboardModelsNewRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
     }
     '/_authenticated/dashboard/strategies/': {
       id: '/_authenticated/dashboard/strategies/'
@@ -463,6 +599,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedDashboardRouteChildren {
+  AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRoute
   AuthenticatedDashboardBillingRoute: typeof AuthenticatedDashboardBillingRoute
   AuthenticatedDashboardBrokersRoute: typeof AuthenticatedDashboardBrokersRoute
   AuthenticatedDashboardDataSourcesRoute: typeof AuthenticatedDashboardDataSourcesRoute
@@ -470,15 +607,19 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardPaperTradingRoute: typeof AuthenticatedDashboardPaperTradingRoute
   AuthenticatedDashboardRiskRoute: typeof AuthenticatedDashboardRiskRoute
   AuthenticatedDashboardSettingsRoute: typeof AuthenticatedDashboardSettingsRoute
+  AuthenticatedDashboardWalletRoute: typeof AuthenticatedDashboardWalletRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
+  AuthenticatedDashboardModelsNewRoute: typeof AuthenticatedDashboardModelsNewRoute
   AuthenticatedDashboardStrategiesBacktestRoute: typeof AuthenticatedDashboardStrategiesBacktestRoute
   AuthenticatedDashboardStrategiesBuilderRoute: typeof AuthenticatedDashboardStrategiesBuilderRoute
   AuthenticatedDashboardStrategiesTemplatesRoute: typeof AuthenticatedDashboardStrategiesTemplatesRoute
+  AuthenticatedDashboardModelsIndexRoute: typeof AuthenticatedDashboardModelsIndexRoute
   AuthenticatedDashboardStrategiesIndexRoute: typeof AuthenticatedDashboardStrategiesIndexRoute
 }
 
 const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
   {
+    AuthenticatedDashboardAdminRoute: AuthenticatedDashboardAdminRoute,
     AuthenticatedDashboardBillingRoute: AuthenticatedDashboardBillingRoute,
     AuthenticatedDashboardBrokersRoute: AuthenticatedDashboardBrokersRoute,
     AuthenticatedDashboardDataSourcesRoute:
@@ -489,13 +630,17 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardPaperTradingRoute,
     AuthenticatedDashboardRiskRoute: AuthenticatedDashboardRiskRoute,
     AuthenticatedDashboardSettingsRoute: AuthenticatedDashboardSettingsRoute,
+    AuthenticatedDashboardWalletRoute: AuthenticatedDashboardWalletRoute,
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
+    AuthenticatedDashboardModelsNewRoute: AuthenticatedDashboardModelsNewRoute,
     AuthenticatedDashboardStrategiesBacktestRoute:
       AuthenticatedDashboardStrategiesBacktestRoute,
     AuthenticatedDashboardStrategiesBuilderRoute:
       AuthenticatedDashboardStrategiesBuilderRoute,
     AuthenticatedDashboardStrategiesTemplatesRoute:
       AuthenticatedDashboardStrategiesTemplatesRoute,
+    AuthenticatedDashboardModelsIndexRoute:
+      AuthenticatedDashboardModelsIndexRoute,
     AuthenticatedDashboardStrategiesIndexRoute:
       AuthenticatedDashboardStrategiesIndexRoute,
   }
@@ -532,10 +677,24 @@ const AuthRouteChildren: AuthRouteChildren = {
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
+interface ModelsRouteChildren {
+  ModelsSlugRoute: typeof ModelsSlugRoute
+  ModelsIndexRoute: typeof ModelsIndexRoute
+}
+
+const ModelsRouteChildren: ModelsRouteChildren = {
+  ModelsSlugRoute: ModelsSlugRoute,
+  ModelsIndexRoute: ModelsIndexRoute,
+}
+
+const ModelsRouteWithChildren =
+  ModelsRoute._addFileChildren(ModelsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
+  ModelsRoute: ModelsRouteWithChildren,
   ApiPublicSyncRoute: ApiPublicSyncRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
