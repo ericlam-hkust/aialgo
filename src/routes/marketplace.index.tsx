@@ -102,10 +102,20 @@ function Catalog() {
     return [...rows].sort(by[sort]);
   }, [data, q, asset, strategy, timeframe, risk, pricing, trust, frequency, listing, sort]);
 
+  const countFor = (kind: string) =>
+    kind === ALL
+      ? (data as PublicModel[]).length
+      : (data as PublicModel[]).filter((m) => (m.listing_kind ?? "ai_model") === kind).length;
+
   const leaderboard = useMemo(
-    () => [...(data as PublicModel[])].sort((a, b) => Number(b.live_return_30d) - Number(a.live_return_30d)).slice(0, 20),
-    [data],
+    () =>
+      (data as PublicModel[])
+        .filter((m) => listing === ALL || (m.listing_kind ?? "ai_model") === listing)
+        .sort((a, b) => Number(b.live_return_30d) - Number(a.live_return_30d))
+        .slice(0, 20),
+    [data, listing],
   );
+
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-10">
