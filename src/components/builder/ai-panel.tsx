@@ -34,7 +34,7 @@ export function AiPanel({ turns, busy, pending, onSend, onApply, onDiscard }: Pr
     if (!prompt || busy) return;
     onSend(prompt);
     setValue("");
-    requestAnimationFrame(() => scrollRef.current?.scrollTo({ top: 9e6 }));
+    requestAnimationFrame(() => scrollRef.current?.scrollIntoView({ block: "end" }));
   };
 
   return (
