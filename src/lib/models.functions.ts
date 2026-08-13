@@ -20,12 +20,17 @@ function publicClient() {
 }
 
 const MODEL_COLUMNS =
-  "id,slug,name,tagline,description,risk_disclosure,tags,asset_class,strategy_type,timeframe,risk_level,status,pricing_model,price,currency,parameters,sharpe,max_drawdown,win_rate,cagr,live_return_30d,rating,rating_count,active_users,executions,listed_at,contributor_id,divergence_flagged,last_validated_at,validation_job_id,backtest_config,overfitting_risk,consistency_score,interface_manifest";
+  "id,team_id,visibility,slug,name,tagline,description,risk_disclosure,tags,asset_class,strategy_type,timeframe,risk_level,status,pricing_model,price,currency,parameters,sharpe,max_drawdown,win_rate,cagr,live_return_30d,rating,rating_count,active_users,executions,listed_at,contributor_id,divergence_flagged,last_validated_at,validation_job_id,backtest_config,overfitting_risk,consistency_score,interface_manifest";
 
 export const listPublicModels = createServerFn({ method: "GET" }).handler(async () => {
   const supabase = publicClient();
   const [{ data: models }, { data: contributors }] = await Promise.all([
-    supabase.from("ai_models").select(MODEL_COLUMNS).eq("status", "live").order("active_users", { ascending: false }),
+    supabase
+      .from("ai_models")
+      .select(MODEL_COLUMNS)
+      .eq("status", "live")
+      .eq("visibility", "public")
+      .order("active_users", { ascending: false }),
     supabase.from("contributor_profiles").select("id,handle,display_name,avatar_url,verified,country"),
   ]);
   const byId = new Map((contributors ?? []).map((c) => [c.id, c]));
@@ -45,7 +50,8 @@ export const getPublicModel = createServerFn({ method: "GET" })
       .from("ai_models")
       .select(MODEL_COLUMNS)
       .eq("slug", data.slug)
-      .eq("status", "live")
+      .neq("visibility", "private")
+      .in("status", ["live", "paper_trading"])
       .maybeSingle();
     if (!model) return null;
 
