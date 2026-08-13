@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { queryOptions, useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 import {
   Area,
   AreaChart,
@@ -10,8 +11,13 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { ArrowLeft, ShieldCheck, Star, Users } from "lucide-react";
-import { getPublicModel } from "@/lib/models.functions";
+import { ArrowLeft, BadgeCheck, ShieldCheck, Star, Users } from "lucide-react";
+import { getPublicModel, submitReview } from "@/lib/models.functions";
+import { getReviewEligibility } from "@/lib/activations.functions";
+import { daysSince, modelBadges } from "@/lib/model-badges";
+import { useAuth } from "@/hooks/use-auth";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ApplyModelDialog } from "@/components/marketplace/apply-model-dialog";
 import { MetricCard } from "@/components/metric-card";
 import { Button } from "@/components/ui/button";
@@ -74,8 +80,16 @@ function ModelDetail() {
   const { slug } = Route.useParams();
   const { data } = useSuspenseQuery(modelQuery(slug));
   const [applyOpen, setApplyOpen] = useState(false);
+  const currentVersion = data?.versions.find((v) => v.is_current)?.version ?? data?.versions[0]?.version ?? "";
+  const [selectedVersion, setSelectedVersion] = useState(currentVersion);
   if (!data) return <ModelNotFound />;
 
+  const badges = modelBadges({
+    hasBacktest: Boolean(data.backtest),
+    liveDays: daysSince(data.listed_at),
+    rating: Number(data.rating),
+    ratingCount: Number(data.rating_count),
+  });
   const backtestSeries = ((data.backtest?.series as Point[] | null) ?? []).map((p) => ({ ...p, v: Number(p.v) }));
   const liveSeries = ((data.live?.series as Point[] | null) ?? []).map((p) => ({ ...p, v: Number(p.v) }));
 
@@ -101,6 +115,20 @@ function ModelDetail() {
               </Badge>
             </div>
             <h1 className="mt-3 text-3xl font-semibold tracking-tight">{data.name}</h1>
+            {badges.length ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {badges.map((b) => (
+                  <span
+                    key={b.key}
+                    title={b.hint}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary"
+                  >
+                    <BadgeCheck className="h-3.5 w-3.5" aria-hidden />
+                    {b.label}
+                  </span>
+                ))}
+              </div>
+            ) : null}
             <p className="mt-2 text-muted-foreground">{data.tagline}</p>
             <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
               {data.contributor?.avatar_url ? (
@@ -167,8 +195,29 @@ function ModelDetail() {
             </TabsContent>
 
             <TabsContent value="versions" className="mt-4 space-y-3">
+              {data.versions.length > 1 ? (
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-muted-foreground">Viewing changelog for</span>
+                  <Select value={selectedVersion} onValueChange={setSelectedVersion}>
+                    <SelectTrigger className="w-48">
+                      <SelectValue placeholder="Version" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {data.versions.map((v) => (
+                        <SelectItem key={v.id} value={v.version}>
+                          v{v.version}
+                          {v.is_current ? " (latest)" : ""}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              ) : null}
               {data.versions.map((v) => (
-                <Card key={v.id} className="border-border/70">
+                <Card
+                  key={v.id}
+                  className={v.version === selectedVersion ? "border-primary/60" : "border-border/70"}
+                >
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <span className="mono font-semibold">v{v.version}</span>
@@ -184,6 +233,7 @@ function ModelDetail() {
             </TabsContent>
 
             <TabsContent value="reviews" className="mt-4 space-y-3">
+              <ReviewForm modelId={data.id} slug={data.slug} />
               {data.reviews.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No reviews yet.</p>
               ) : (
@@ -225,6 +275,7 @@ function ModelDetail() {
               <Row label="Live 30d" value={`${fmtNum(Number(data.live_return_30d), 2)}%`} cls={pnlClass(Number(data.live_return_30d))} />
               <Row label="Active users" value={data.active_users.toLocaleString()} />
               <Row label="Listed" value={data.listed_at ? fmtDate(data.listed_at) : "—"} />
+              <Row label="Latest version" value={currentVersion ? `v${currentVersion}` : "—"} />
             </CardContent>
           </Card>
         </aside>
@@ -288,6 +339,85 @@ function EquityCard({ title, series }: { title: string; series: Point[] }) {
             </AreaChart>
           </ResponsiveContainer>
         )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function ReviewForm({ modelId, slug }: { modelId: string; slug: string }) {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState("");
+
+  const eligibility = useQuery({
+    queryKey: ["review-eligibility", modelId],
+    queryFn: () => getReviewEligibility({ data: { modelId } }),
+    enabled: Boolean(user),
+  });
+
+  const post = useMutation({
+    mutationFn: () => submitReview({ data: { modelId, rating, comment } }),
+    onSuccess: () => {
+      toast.success("Review posted");
+      setComment("");
+      void qc.invalidateQueries({ queryKey: ["public-model", slug] });
+      void qc.invalidateQueries({ queryKey: ["review-eligibility", modelId] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  if (!user) {
+    return (
+      <Card className="border-border/70">
+        <CardContent className="p-4 text-sm text-muted-foreground">
+          Sign in and run this model for 7+ days to leave a verified rating.
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const e = eligibility.data;
+  if (!e) return null;
+
+  if (!e.eligible) {
+    return (
+      <Card className="border-border/70">
+        <CardContent className="p-4 text-sm text-muted-foreground">
+          {e.hasActivation
+            ? `Verified reviews unlock after ${e.minDays} days of running this model — you are on day ${e.daysActive}.`
+            : `Only traders who have run this model for ${e.minDays}+ days can rate it.`}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="border-border/70">
+      <CardContent className="space-y-3 p-4">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium">Your rating</span>
+          {[1, 2, 3, 4, 5].map((n) => (
+            <button key={n} type="button" onClick={() => setRating(n)} aria-label={`${n} stars`}>
+              <Star
+                className={`h-5 w-5 ${n <= rating ? "fill-warning text-warning" : "text-muted-foreground"}`}
+                aria-hidden
+              />
+            </button>
+          ))}
+          <Badge variant="outline" className="ml-auto">
+            Verified · {e.daysActive}d running
+          </Badge>
+        </div>
+        <Textarea
+          value={comment}
+          onChange={(ev) => setComment(ev.target.value)}
+          placeholder="How did this model perform against your expectations?"
+          rows={3}
+        />
+        <Button size="sm" onClick={() => post.mutate()} disabled={post.isPending || comment.trim().length < 10}>
+          {e.existingReview ? "Update review" : "Post review"}
+        </Button>
       </CardContent>
     </Card>
   );
