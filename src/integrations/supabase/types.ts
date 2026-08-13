@@ -33,6 +33,7 @@ export type Database = {
           interface_manifest: Json
           last_validated_at: string | null
           listed_at: string | null
+          listing_kind: Database["public"]["Enums"]["listing_kind"]
           live_return_30d: number
           max_drawdown: number
           name: string
@@ -51,6 +52,7 @@ export type Database = {
           sharpe: number
           slug: string
           status: Database["public"]["Enums"]["model_listing_status"]
+          strategy_id: string | null
           strategy_type: Database["public"]["Enums"]["model_strategy_type"]
           tagline: string | null
           tags: string[]
@@ -80,6 +82,7 @@ export type Database = {
           interface_manifest?: Json
           last_validated_at?: string | null
           listed_at?: string | null
+          listing_kind?: Database["public"]["Enums"]["listing_kind"]
           live_return_30d?: number
           max_drawdown?: number
           name: string
@@ -98,6 +101,7 @@ export type Database = {
           sharpe?: number
           slug: string
           status?: Database["public"]["Enums"]["model_listing_status"]
+          strategy_id?: string | null
           strategy_type?: Database["public"]["Enums"]["model_strategy_type"]
           tagline?: string | null
           tags?: string[]
@@ -127,6 +131,7 @@ export type Database = {
           interface_manifest?: Json
           last_validated_at?: string | null
           listed_at?: string | null
+          listing_kind?: Database["public"]["Enums"]["listing_kind"]
           live_return_30d?: number
           max_drawdown?: number
           name?: string
@@ -145,6 +150,7 @@ export type Database = {
           sharpe?: number
           slug?: string
           status?: Database["public"]["Enums"]["model_listing_status"]
+          strategy_id?: string | null
           strategy_type?: Database["public"]["Enums"]["model_strategy_type"]
           tagline?: string | null
           tags?: string[]
@@ -162,6 +168,13 @@ export type Database = {
             columns: ["contributor_id"]
             isOneToOne: false
             referencedRelation: "contributor_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_models_strategy_id_fkey"
+            columns: ["strategy_id"]
+            isOneToOne: false
+            referencedRelation: "strategies"
             referencedColumns: ["id"]
           },
           {
@@ -2421,6 +2434,7 @@ export type Database = {
     Enums: {
       app_role: "free" | "pro" | "admin"
       asset_class: "stocks" | "crypto" | "forex" | "futures"
+      listing_kind: "algo" | "ai_model"
       model_access_role: "viewer" | "beta_tester"
       model_listing_status:
         | "draft"
@@ -2572,6 +2586,7 @@ export const Constants = {
     Enums: {
       app_role: ["free", "pro", "admin"],
       asset_class: ["stocks", "crypto", "forex", "futures"],
+      listing_kind: ["algo", "ai_model"],
       model_access_role: ["viewer", "beta_tester"],
       model_listing_status: [
         "draft",

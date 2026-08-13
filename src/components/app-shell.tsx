@@ -1,39 +1,19 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  Activity,
-  BarChart3,
-  Boxes,
-  Building2,
-  ChevronLeft,
-  CreditCard,
-  Database,
-  Banknote,
-  BookOpen,
-  FlaskConical,
-  Gauge,
-  Library,
-  Gavel,
-  Package,
-  Sparkles,
-  LayoutDashboard,
-  Layers,
-  LineChart,
-  LogOut,
-  Moon,
-  PlugZap,
-  Zap,
-  Settings,
-  ShieldAlert,
-  Store,
-  Sun,
-  TrendingUp,
-  Wallet,
-} from "lucide-react";
+import { ChevronDown, ChevronLeft, LogOut, Moon, Search, Settings, Sun, Wallet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/hooks/use-theme";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { Separator } from "@/components/ui/separator";
 import { useMarketStore } from "@/store/market-store";
 import { useLiveMarket } from "@/hooks/use-live-market";
@@ -45,39 +25,23 @@ import { UPGRADE_EVENT } from "@/lib/upgrade-events";
 import { useI18n } from "@/lib/i18n";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { NotificationBell } from "@/components/notification-bell";
+import { FLAT_NAV, NAV_GROUPS, type NavItem } from "@/lib/nav";
 
 import { cn } from "@/lib/utils";
 
-const NAV = [
-  { to: "/dashboard", key: "nav.overview", icon: LayoutDashboard, exact: true },
-  { to: "/dashboard/strategies", key: "nav.strategies", icon: Boxes, exact: false },
-  { to: "/dashboard/strategies/builder", key: "nav.builder", icon: LineChart, exact: true },
-  { to: "/dashboard/strategies/templates", key: "nav.templates", icon: BarChart3, exact: true },
-  { to: "/dashboard/strategies/backtest", key: "nav.backtest", icon: TrendingUp, exact: true },
-  { to: "/dashboard/paper-trading", key: "nav.paperTrading", icon: Activity, exact: true },
-  { to: "/dashboard/marketplace", key: "nav.marketplace", icon: Store, exact: false },
-  { to: "/models", key: "nav.models", icon: Sparkles, exact: false },
-  { to: "/dashboard/my-models", key: "nav.myModels", icon: Layers, exact: true },
-  { to: "/dashboard/models", key: "nav.contributor", icon: Package, exact: true },
-  { to: "/dashboard/models/backtests", key: "nav.validation", icon: Gauge, exact: true },
-  { to: "/dashboard/models/playground", key: "nav.playground", icon: FlaskConical, exact: true },
-  { to: "/dashboard/models/payouts", key: "nav.payouts", icon: Banknote, exact: true },
-  { to: "/models/data-library", key: "nav.dataLibrary", icon: Library, exact: true },
-  { to: "/models/docs", key: "nav.docs", icon: BookOpen, exact: true },
-  { to: "/models/api-status", key: "nav.apiStatus", icon: Activity, exact: true },
-  { to: "/dashboard/teams", key: "nav.teams", icon: Building2, exact: false },
-  { to: "/dashboard/wallet", key: "nav.wallet", icon: Wallet, exact: true },
-  { to: "/dashboard/admin", key: "nav.admin", icon: Gavel, exact: true },
-  { to: "/dashboard/risk", key: "nav.risk", icon: ShieldAlert, exact: true },
-  { to: "/dashboard/execution", key: "nav.execution", icon: Zap, exact: true },
-  { to: "/dashboard/accounts", key: "nav.accounts", icon: PlugZap, exact: true },
-  { to: "/dashboard/brokers", key: "nav.brokers", icon: PlugZap, exact: true },
-  { to: "/dashboard/data-sources", key: "nav.dataSources", icon: Database, exact: true },
-  { to: "/dashboard/billing", key: "nav.billing", icon: CreditCard, exact: true },
-  { to: "/dashboard/settings", key: "nav.settings", icon: Settings, exact: true },
-] as const;
+
+const OPEN_KEY = "algoforge.nav.open";
+
+function isActive(item: NavItem, pathname: string) {
+  return item.exact === false ? pathname.startsWith(item.to) : pathname === item.to;
+}
+
+function branchActive(item: NavItem, pathname: string) {
+  return isActive(item, pathname) || (item.children ?? []).some((c) => isActive(c, pathname));
+}
 
 export function AppShell({ children }: { children: ReactNode }) {
+
   const [collapsed, setCollapsed] = useState(false);
   const { theme, toggle } = useTheme();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -91,6 +55,47 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [upgradeReason, setUpgradeReason] = useState<string | null>(null);
   const { tier } = useEntitlements();
   const { t } = useI18n();
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>(() => {
+    if (typeof window === "undefined") return {};
+    try {
+      return JSON.parse(window.localStorage.getItem(OPEN_KEY) ?? "{}") as Record<string, boolean>;
+    } catch {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(OPEN_KEY, JSON.stringify(expanded));
+    } catch {
+      /* ignore */
+    }
+  }, [expanded]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setPaletteOpen((o) => !o);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  const paletteGroups = useMemo(() => {
+    const out: { label: string; items: typeof FLAT_NAV }[] = [];
+    for (const item of FLAT_NAV) {
+      const label = item.groupKey ? t(item.groupKey) : t("nav.overview");
+      const found = out.find((g) => g.label === label);
+      if (found) found.items.push(item);
+      else out.push({ label, items: [item] });
+    }
+    return out;
+  }, [t]);
+
+
 
   useLiveMarket();
 
@@ -146,30 +151,125 @@ export function AppShell({ children }: { children: ReactNode }) {
             <ChevronLeft className={cn("h-4 w-4 transition-transform", collapsed && "rotate-180")} aria-hidden />
           </Button>
         </div>
-        <nav id="main-navigation" className="flex-1 space-y-0.5 overflow-y-auto p-2" aria-label={t("shell.mainNavigation")}>
-          {NAV.map((item) => {
-            const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={cn(
-                  "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors",
-                  active
-                    ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
-                    : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
-                )}
-                title={t(item.key)}
-              >
-                <Icon className="h-4 w-4 shrink-0" aria-hidden />
-                {!collapsed ? <span className="truncate">{t(item.key)}</span> : null}
-              </Link>
-            );
-          })}
+        {!collapsed ? (
+          <div className="px-2 pt-2">
+            <button
+              type="button"
+              onClick={() => setPaletteOpen(true)}
+              className="flex w-full items-center gap-2 rounded-md border border-sidebar-border bg-background/40 px-2.5 py-1.5 text-left text-xs text-muted-foreground transition-colors hover:text-foreground"
+              aria-label={t("shell.searchMenu")}
+            >
+              <Search className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              <span className="flex-1 truncate">{t("shell.searchPlaceholder")}</span>
+              <kbd className="mono rounded border border-border px-1 text-[10px]">⌘K</kbd>
+            </button>
+          </div>
+        ) : (
+          <div className="px-2 pt-2">
+            <Button variant="ghost" size="icon" className="h-8 w-full" onClick={() => setPaletteOpen(true)} aria-label={t("shell.searchMenu")}>
+              <Search className="h-4 w-4" aria-hidden />
+            </Button>
+          </div>
+        )}
+        <nav id="main-navigation" className="flex-1 space-y-3 overflow-y-auto p-2" aria-label={t("shell.mainNavigation")}>
+          {NAV_GROUPS.map((group, gi) => (
+            <div key={group.key ?? `g${gi}`} className="space-y-0.5">
+              {group.key && !collapsed ? (
+                <p className="px-2.5 pb-1 pt-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">
+                  {t(group.key)}
+                </p>
+              ) : null}
+              {group.items.map((item) => {
+                const Icon = item.icon;
+                const active = isActive(item, pathname);
+                const open = expanded[item.to] ?? branchActive(item, pathname);
+                return (
+                  <div key={item.to}>
+                    <div className="flex items-center">
+                      <Link
+                        to={item.to}
+                        className={cn(
+                          "flex flex-1 items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors",
+                          active
+                            ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
+                            : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+                        )}
+                        title={t(item.key)}
+                      >
+                        <Icon className="h-4 w-4 shrink-0" aria-hidden />
+                        {!collapsed ? <span className="truncate">{t(item.key)}</span> : null}
+                      </Link>
+                      {item.children && !collapsed ? (
+                        <button
+                          type="button"
+                          onClick={() => setExpanded((s) => ({ ...s, [item.to]: !open }))}
+                          className="ml-0.5 rounded p-1 text-muted-foreground hover:text-foreground"
+                          aria-label={t(item.key)}
+                          aria-expanded={open}
+                        >
+                          <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", !open && "-rotate-90")} aria-hidden />
+                        </button>
+                      ) : null}
+                    </div>
+                    {item.children && !collapsed && open ? (
+                      <div className="ml-4 mt-0.5 space-y-0.5 border-l border-sidebar-border pl-2">
+                        {item.children.map((child) => {
+                          const ChildIcon = child.icon;
+                          const childActive = isActive(child, pathname);
+                          return (
+                            <Link
+                              key={child.to + child.key}
+                              to={child.to}
+                              className={cn(
+                                "flex items-center gap-2 rounded-md px-2 py-1.5 text-[13px] transition-colors",
+                                childActive
+                                  ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
+                                  : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+                              )}
+                            >
+                              <ChildIcon className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                              <span className="truncate">{t(child.key)}</span>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    ) : null}
+                  </div>
+                );
+              })}
+            </div>
+          ))}
         </nav>
         <div className="border-t border-sidebar-border p-2" />
       </aside>
+
+      <CommandDialog open={paletteOpen} onOpenChange={setPaletteOpen}>
+        <CommandInput placeholder={t("shell.searchPlaceholder")} />
+        <CommandList>
+          <CommandEmpty>{t("shell.searchEmpty")}</CommandEmpty>
+          {paletteGroups.map((g) => (
+            <CommandGroup key={g.label} heading={g.label}>
+              {g.items.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <CommandItem
+                    key={item.to + item.key}
+                    value={`${t(item.key)} ${g.label} ${item.terms.join(" ")} ${item.to}`}
+                    onSelect={() => {
+                      setPaletteOpen(false);
+                      void navigate({ to: item.to });
+                    }}
+                  >
+                    <Icon className="mr-2 h-4 w-4" aria-hidden />
+                    <span>{t(item.key)}</span>
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+          ))}
+        </CommandList>
+      </CommandDialog>
+
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-20 flex h-14 items-center justify-between gap-4 border-b border-border bg-background/85 px-4 backdrop-blur">

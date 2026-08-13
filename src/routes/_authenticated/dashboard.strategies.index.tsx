@@ -9,6 +9,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/empty-state";
 import { DataTable, type Column } from "@/components/data-table";
 import { fmtDate } from "@/lib/format";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { listMyModels } from "@/lib/contributor.functions";
+import { publishStrategyListing } from "@/lib/algo-listing.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/strategies/")({
   component: StrategyLibrary,
@@ -43,6 +53,8 @@ function StrategyLibrary() {
     },
   });
 
+  const myModels = useQuery({ queryKey: ["my-models"], queryFn: () => listMyModels() });
+
   const remove = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("strategies").delete().eq("id", id);
@@ -56,17 +68,15 @@ function StrategyLibrary() {
   });
 
   const publish = useMutation({
-    mutationFn: async (row: Row) => {
-      const { error } = await supabase
-        .from("strategies")
-        .update({ is_public: !row.is_public })
-        .eq("id", row.id);
-      if (error) throw new Error(error.message);
-      return !row.is_public;
-    },
-    onSuccess: (isPublic) => {
-      toast.success(isPublic ? "Published to the marketplace" : "Removed from the marketplace");
+    mutationFn: (row: Row) => publishStrategyListing({ data: { strategyId: row.id } }),
+    onSuccess: (res) => {
+      toast.success(
+        res.created
+          ? "Listing created — finish pricing and run validation in My listings."
+          : "This strategy already has a listing.",
+      );
       qc.invalidateQueries({ queryKey: ["my-strategies"] });
+      navigate({ to: "/dashboard/models" });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -167,7 +177,8 @@ function StrategyLibrary() {
           <Button
             size="icon"
             variant="ghost"
-            aria-label={r.is_public ? `Unpublish ${r.name}` : `Publish ${r.name}`}
+            aria-label={`Publish ${r.name} to the marketplace`}
+            title="Publish as a marketplace listing"
             onClick={() => publish.mutate(r)}
           >
             <Upload className="h-4 w-4" aria-hidden />
@@ -189,14 +200,27 @@ function StrategyLibrary() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Strategy library</h1>
-          <p className="text-sm text-muted-foreground">Everything you have built, cloned or bought.</p>
+          <h1 className="text-2xl font-semibold tracking-tight">My work</h1>
+          <p className="text-sm text-muted-foreground">
+            Everything you have built: visual algo strategies and uploaded AI models.
+          </p>
         </div>
-        <Button asChild>
-          <Link to="/dashboard/strategies/builder">
-            <Plus className="mr-1 h-4 w-4" aria-hidden /> New strategy
-          </Link>
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button>
+              <Plus className="mr-1 h-4 w-4" aria-hidden /> New
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-60">
+            <DropdownMenuLabel>Create</DropdownMenuLabel>
+            <DropdownMenuItem onSelect={() => navigate({ to: "/dashboard/strategies/builder" })}>
+              <LineChart className="mr-2 h-4 w-4" aria-hidden /> Algo strategy (builder)
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => navigate({ to: "/dashboard/models/new" })}>
+              <Upload className="mr-2 h-4 w-4" aria-hidden /> Upload AI model
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {isLoading ? (
@@ -225,6 +249,40 @@ function StrategyLibrary() {
           caption="Your saved trading strategies"
         />
       )}
+
+      <Card className="border-border/70">
+        <CardHeader className="flex-row items-center justify-between gap-4 space-y-0">
+          <div>
+            <CardTitle className="text-base">AI models</CardTitle>
+            <CardDescription>Models you uploaded. Validation, versions and pricing live in My listings.</CardDescription>
+          </div>
+          <Button asChild variant="outline" size="sm">
+            <Link to="/dashboard/models/new">
+              <Upload className="mr-1.5 h-3.5 w-3.5" aria-hidden /> Upload AI model
+            </Link>
+          </Button>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {(myModels.data?.models ?? []).length === 0 ? (
+            <p className="text-sm text-muted-foreground">No AI models yet.</p>
+          ) : (
+            (myModels.data?.models ?? []).map((m) => (
+              <div
+                key={m.id}
+                className="flex items-center justify-between gap-3 rounded-md border border-border/60 px-3 py-2"
+              >
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-medium">{m.name}</div>
+                  <div className="text-xs text-muted-foreground capitalize">{String(m.status).replace(/_/g, " ")}</div>
+                </div>
+                <Button asChild size="sm" variant="ghost">
+                  <Link to="/dashboard/models">Manage</Link>
+                </Button>
+              </div>
+            ))
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

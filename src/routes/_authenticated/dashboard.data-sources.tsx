@@ -27,12 +27,12 @@ import {
 export const Route = createFileRoute("/_authenticated/dashboard/data-sources")({
   head: () => ({
     meta: [
-      { title: "Data Sources · AlgoForge" },
+      { title: "Market Data Sources · AlgoForge" },
       {
         name: "description",
         content: "Connect market data providers, verify API keys and run live and historical data syncs.",
       },
-      { property: "og:title", content: "Data Sources · AlgoForge" },
+      { property: "og:title", content: "Market Data Sources · AlgoForge" },
       {
         property: "og:description",
         content: "Connect market data providers and run live and historical data syncs on AlgoForge.",
@@ -122,7 +122,7 @@ function DataSources() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
-            <Database className="h-5 w-5 text-primary" /> Data Sources
+            <Database className="h-5 w-5 text-primary" /> Market data sources
           </h1>
           <p className="text-sm text-muted-foreground">
             Connect market data APIs. Quotes route through your enabled providers in priority order, falling back
