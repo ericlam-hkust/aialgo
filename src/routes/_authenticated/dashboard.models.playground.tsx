@@ -27,11 +27,12 @@ export const Route = createFileRoute("/_authenticated/dashboard/models/playgroun
 
 function Playground() {
   const models = useQuery({ queryKey: ["my-models"], queryFn: () => listMyModels() });
+  const myModels = models.data?.models ?? [];
   const [modelId, setModelId] = useState("");
   const [config, setConfig] = useState<BacktestConfig>(emptyBacktestConfig());
   const [jobId, setJobId] = useState<string | null>(null);
 
-  const selected = (models.data ?? []).find((m) => m.id === modelId);
+  const selected = myModels.find((m) => m.id === modelId);
 
   const job = useQuery({
     queryKey: ["sandbox-job", jobId],
@@ -97,7 +98,7 @@ function Playground() {
                 <SelectValue placeholder="Select one of your models" />
               </SelectTrigger>
               <SelectContent>
-                {(models.data ?? []).map((m) => (
+                {myModels.map((m) => (
                   <SelectItem key={m.id} value={m.id}>
                     {m.name} · {m.status}
                   </SelectItem>

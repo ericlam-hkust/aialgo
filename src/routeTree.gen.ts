@@ -36,6 +36,7 @@ import { Route as AuthenticatedDashboardModelsIndexRouteImport } from './routes/
 import { Route as AuthenticatedDashboardModelsBacktestsRouteImport } from './routes/_authenticated/dashboard.models.backtests'
 import { Route as AuthenticatedDashboardModelsNewRouteImport } from './routes/_authenticated/dashboard.models.new'
 import { Route as AuthenticatedDashboardModelsPayoutsRouteImport } from './routes/_authenticated/dashboard.models.payouts'
+import { Route as AuthenticatedDashboardModelsPlaygroundRouteImport } from './routes/_authenticated/dashboard.models.playground'
 import { Route as AuthenticatedDashboardStrategiesIndexRouteImport } from './routes/_authenticated/dashboard.strategies.index'
 import { Route as AuthenticatedDashboardStrategiesBacktestRouteImport } from './routes/_authenticated/dashboard.strategies.backtest'
 import { Route as AuthenticatedDashboardStrategiesBuilderRouteImport } from './routes/_authenticated/dashboard.strategies.builder'
@@ -191,6 +192,12 @@ const AuthenticatedDashboardModelsPayoutsRoute =
     path: '/models/payouts',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardModelsPlaygroundRoute =
+  AuthenticatedDashboardModelsPlaygroundRouteImport.update({
+    id: '/models/playground',
+    path: '/models/playground',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardStrategiesIndexRoute =
   AuthenticatedDashboardStrategiesIndexRouteImport.update({
     id: '/strategies/',
@@ -248,6 +255,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/models/backtests': typeof AuthenticatedDashboardModelsBacktestsRoute
   '/dashboard/models/new': typeof AuthenticatedDashboardModelsNewRoute
   '/dashboard/models/payouts': typeof AuthenticatedDashboardModelsPayoutsRoute
+  '/dashboard/models/playground': typeof AuthenticatedDashboardModelsPlaygroundRoute
   '/dashboard/strategies/backtest': typeof AuthenticatedDashboardStrategiesBacktestRoute
   '/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
@@ -278,6 +286,7 @@ export interface FileRoutesByTo {
   '/dashboard/models/backtests': typeof AuthenticatedDashboardModelsBacktestsRoute
   '/dashboard/models/new': typeof AuthenticatedDashboardModelsNewRoute
   '/dashboard/models/payouts': typeof AuthenticatedDashboardModelsPayoutsRoute
+  '/dashboard/models/playground': typeof AuthenticatedDashboardModelsPlaygroundRoute
   '/dashboard/strategies/backtest': typeof AuthenticatedDashboardStrategiesBacktestRoute
   '/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
@@ -313,6 +322,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/models/backtests': typeof AuthenticatedDashboardModelsBacktestsRoute
   '/_authenticated/dashboard/models/new': typeof AuthenticatedDashboardModelsNewRoute
   '/_authenticated/dashboard/models/payouts': typeof AuthenticatedDashboardModelsPayoutsRoute
+  '/_authenticated/dashboard/models/playground': typeof AuthenticatedDashboardModelsPlaygroundRoute
   '/_authenticated/dashboard/strategies/backtest': typeof AuthenticatedDashboardStrategiesBacktestRoute
   '/_authenticated/dashboard/strategies/builder': typeof AuthenticatedDashboardStrategiesBuilderRoute
   '/_authenticated/dashboard/strategies/templates': typeof AuthenticatedDashboardStrategiesTemplatesRoute
@@ -348,6 +358,7 @@ export interface FileRouteTypes {
     | '/dashboard/models/backtests'
     | '/dashboard/models/new'
     | '/dashboard/models/payouts'
+    | '/dashboard/models/playground'
     | '/dashboard/strategies/backtest'
     | '/dashboard/strategies/builder'
     | '/dashboard/strategies/templates'
@@ -378,6 +389,7 @@ export interface FileRouteTypes {
     | '/dashboard/models/backtests'
     | '/dashboard/models/new'
     | '/dashboard/models/payouts'
+    | '/dashboard/models/playground'
     | '/dashboard/strategies/backtest'
     | '/dashboard/strategies/builder'
     | '/dashboard/strategies/templates'
@@ -412,6 +424,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/models/backtests'
     | '/_authenticated/dashboard/models/new'
     | '/_authenticated/dashboard/models/payouts'
+    | '/_authenticated/dashboard/models/playground'
     | '/_authenticated/dashboard/strategies/backtest'
     | '/_authenticated/dashboard/strategies/builder'
     | '/_authenticated/dashboard/strategies/templates'
@@ -620,6 +633,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardModelsPayoutsRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/models/playground': {
+      id: '/_authenticated/dashboard/models/playground'
+      path: '/models/playground'
+      fullPath: '/dashboard/models/playground'
+      preLoaderRoute: typeof AuthenticatedDashboardModelsPlaygroundRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/strategies/': {
       id: '/_authenticated/dashboard/strategies/'
       path: '/strategies'
@@ -673,6 +693,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardModelsBacktestsRoute: typeof AuthenticatedDashboardModelsBacktestsRoute
   AuthenticatedDashboardModelsNewRoute: typeof AuthenticatedDashboardModelsNewRoute
   AuthenticatedDashboardModelsPayoutsRoute: typeof AuthenticatedDashboardModelsPayoutsRoute
+  AuthenticatedDashboardModelsPlaygroundRoute: typeof AuthenticatedDashboardModelsPlaygroundRoute
   AuthenticatedDashboardStrategiesBacktestRoute: typeof AuthenticatedDashboardStrategiesBacktestRoute
   AuthenticatedDashboardStrategiesBuilderRoute: typeof AuthenticatedDashboardStrategiesBuilderRoute
   AuthenticatedDashboardStrategiesTemplatesRoute: typeof AuthenticatedDashboardStrategiesTemplatesRoute
@@ -701,6 +722,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardModelsNewRoute: AuthenticatedDashboardModelsNewRoute,
     AuthenticatedDashboardModelsPayoutsRoute:
       AuthenticatedDashboardModelsPayoutsRoute,
+    AuthenticatedDashboardModelsPlaygroundRoute:
+      AuthenticatedDashboardModelsPlaygroundRoute,
     AuthenticatedDashboardStrategiesBacktestRoute:
       AuthenticatedDashboardStrategiesBacktestRoute,
     AuthenticatedDashboardStrategiesBuilderRoute:
