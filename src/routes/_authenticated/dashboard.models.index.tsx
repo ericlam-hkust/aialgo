@@ -23,6 +23,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { setModelNamespace, setModelVisibility } from "@/lib/model-access.functions";
+import { listMyTeams } from "@/lib/teams.functions";
+import { VISIBILITY_OPTIONS, namespacedSlug, type ModelVisibility } from "@/lib/teams";
+import { ModelAccessDialog } from "@/components/marketplace/model-access-dialog";
 import { fmtDate, fmtMoney } from "@/lib/format";
 import { PLATFORM_COMMISSION, pricingLabel } from "@/lib/marketplace";
 
@@ -182,11 +187,25 @@ function ModelRow({
   model,
   onChanged,
 }: {
-  model: { id: string; slug: string; name: string; status: string; active_users: number; price: number; currency: string; pricing_model: string };
+  model: {
+    id: string;
+    slug: string;
+    name: string;
+    status: string;
+    active_users: number;
+    price: number;
+    currency: string;
+    pricing_model: string;
+    visibility?: ModelVisibility;
+    team_id?: string | null;
+  };
   onChanged: () => void;
 }) {
   const [version, setVersion] = useState("");
   const [changelog, setChangelog] = useState("");
+  const teams = useQuery({ queryKey: ["my-teams"], queryFn: () => listMyTeams() });
+  const teamSlug = (teams.data ?? []).find((t) => t.id === model.team_id)?.slug ?? null;
+  const visibility: ModelVisibility = model.visibility ?? "public";
 
   const status = useMutation({
     mutationFn: (s: "live" | "paused" | "delisted") => setModelStatus({ data: { modelId: model.id, status: s } }),
@@ -217,9 +236,60 @@ function ModelRow({
             <Badge variant="outline">{String(model.status).replace(/_/g, " ")}</Badge>
           </div>
           <p className="mono mt-1 text-xs text-muted-foreground">
+            {namespacedSlug(teamSlug, model.slug)} ·{" "}
             {pricingLabel(model.pricing_model as never, Number(model.price), model.currency)} ·{" "}
             {model.active_users.toLocaleString()} active users
           </p>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <Select
+              value={model.team_id ?? "none"}
+              onValueChange={async (v) => {
+                try {
+                  await setModelNamespace({ data: { modelId: model.id, teamId: v === "none" ? null : v } });
+                  toast.success("Namespace updated");
+                  onChanged();
+                } catch (e) {
+                  toast.error(e instanceof Error ? e.message : "Could not update namespace");
+                }
+              }}
+            >
+              <SelectTrigger className="h-8 w-44">
+                <SelectValue placeholder="Personal namespace" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Personal namespace</SelectItem>
+                {(teams.data ?? []).map((t) => (
+                  <SelectItem key={t.id} value={t.id}>
+                    {t.slug}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select
+              value={visibility}
+              onValueChange={async (v) => {
+                try {
+                  await setModelVisibility({ data: { modelId: model.id, visibility: v as ModelVisibility } });
+                  toast.success("Visibility updated");
+                  onChanged();
+                } catch (e) {
+                  toast.error(e instanceof Error ? e.message : "Could not update visibility");
+                }
+              }}
+            >
+              <SelectTrigger className="h-8 w-36">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {VISIBILITY_OPTIONS.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>
+                    {o.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <ModelAccessDialog modelId={model.id} modelName={model.name} />
+          </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button asChild variant="ghost" size="sm">
