@@ -27,6 +27,7 @@ import { Route as MarketplaceApiStatusRouteImport } from './routes/marketplace.a
 import { Route as MarketplaceCompareRouteImport } from './routes/marketplace.compare'
 import { Route as MarketplaceDataLibraryRouteImport } from './routes/marketplace.data-library'
 import { Route as MarketplaceDocsRouteImport } from './routes/marketplace.docs'
+import { Route as MarketplaceFineTuningGuideRouteImport } from './routes/marketplace.fine-tuning-guide'
 import { Route as MarketplaceVerificationRouteImport } from './routes/marketplace.verification'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardAccountsRouteImport } from './routes/_authenticated/dashboard.accounts'
@@ -43,6 +44,8 @@ import { Route as AuthenticatedDashboardRiskRouteImport } from './routes/_authen
 import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
 import { Route as AuthenticatedDashboardWalletRouteImport } from './routes/_authenticated/dashboard.wallet'
 import { Route as ApiPublicSyncRouteImport } from './routes/api/public/sync'
+import { Route as MarketplaceBaseModelsIndexRouteImport } from './routes/marketplace.base-models.index'
+import { Route as MarketplaceBaseModelsIdRouteImport } from './routes/marketplace.base-models.$id'
 import { Route as AuthenticatedDashboardAdminBacktestRouteImport } from './routes/_authenticated/dashboard.admin.backtest'
 import { Route as AuthenticatedDashboardAdminRevenueRouteImport } from './routes/_authenticated/dashboard.admin.revenue'
 import { Route as AuthenticatedDashboardModelsIndexRouteImport } from './routes/_authenticated/dashboard.models.index'
@@ -58,6 +61,7 @@ import { Route as AuthenticatedDashboardTeamsIndexRouteImport } from './routes/_
 import { Route as AuthenticatedDashboardTeamsSlugRouteImport } from './routes/_authenticated/dashboard.teams.$slug'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicV1ModelsRouteImport } from './routes/api/public/v1/models'
+import { Route as AuthenticatedDashboardModelsFineTuneIdRouteImport } from './routes/_authenticated/dashboard.models.fine-tune.$id'
 import { Route as AuthenticatedDashboardStrategiesListIdRouteImport } from './routes/_authenticated/dashboard.strategies.list.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -149,6 +153,12 @@ const MarketplaceDocsRoute = MarketplaceDocsRouteImport.update({
   path: '/docs',
   getParentRoute: () => MarketplaceRoute,
 } as any)
+const MarketplaceFineTuningGuideRoute =
+  MarketplaceFineTuningGuideRouteImport.update({
+    id: '/fine-tuning-guide',
+    path: '/fine-tuning-guide',
+    getParentRoute: () => MarketplaceRoute,
+  } as any)
 const MarketplaceVerificationRoute = MarketplaceVerificationRouteImport.update({
   id: '/verification',
   path: '/verification',
@@ -243,6 +253,17 @@ const ApiPublicSyncRoute = ApiPublicSyncRouteImport.update({
   path: '/api/public/sync',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MarketplaceBaseModelsIndexRoute =
+  MarketplaceBaseModelsIndexRouteImport.update({
+    id: '/base-models/',
+    path: '/base-models/',
+    getParentRoute: () => MarketplaceRoute,
+  } as any)
+const MarketplaceBaseModelsIdRoute = MarketplaceBaseModelsIdRouteImport.update({
+  id: '/base-models/$id',
+  path: '/base-models/$id',
+  getParentRoute: () => MarketplaceRoute,
+} as any)
 const AuthenticatedDashboardAdminBacktestRoute =
   AuthenticatedDashboardAdminBacktestRouteImport.update({
     id: '/backtest',
@@ -332,6 +353,12 @@ const ApiPublicV1ModelsRoute = ApiPublicV1ModelsRouteImport.update({
   path: '/api/public/v1/models',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedDashboardModelsFineTuneIdRoute =
+  AuthenticatedDashboardModelsFineTuneIdRouteImport.update({
+    id: '/models/fine-tune/$id',
+    path: '/models/fine-tune/$id',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardStrategiesListIdRoute =
   AuthenticatedDashboardStrategiesListIdRouteImport.update({
     id: '/strategies/list/$id',
@@ -355,6 +382,7 @@ export interface FileRoutesByFullPath {
   '/marketplace/compare': typeof MarketplaceCompareRoute
   '/marketplace/data-library': typeof MarketplaceDataLibraryRoute
   '/marketplace/docs': typeof MarketplaceDocsRoute
+  '/marketplace/fine-tuning-guide': typeof MarketplaceFineTuningGuideRoute
   '/marketplace/verification': typeof MarketplaceVerificationRoute
   '/auth/': typeof AuthIndexRoute
   '/marketplace/': typeof MarketplaceIndexRoute
@@ -372,7 +400,9 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/wallet': typeof AuthenticatedDashboardWalletRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
+  '/marketplace/base-models/$id': typeof MarketplaceBaseModelsIdRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/marketplace/base-models/': typeof MarketplaceBaseModelsIndexRoute
   '/dashboard/admin/backtest': typeof AuthenticatedDashboardAdminBacktestRoute
   '/dashboard/admin/revenue': typeof AuthenticatedDashboardAdminRevenueRoute
   '/dashboard/models/backtests': typeof AuthenticatedDashboardModelsBacktestsRoute
@@ -388,6 +418,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/models/': typeof AuthenticatedDashboardModelsIndexRoute
   '/dashboard/strategies/': typeof AuthenticatedDashboardStrategiesIndexRoute
   '/dashboard/teams/': typeof AuthenticatedDashboardTeamsIndexRoute
+  '/dashboard/models/fine-tune/$id': typeof AuthenticatedDashboardModelsFineTuneIdRoute
   '/dashboard/strategies/list/$id': typeof AuthenticatedDashboardStrategiesListIdRoute
 }
 export interface FileRoutesByTo {
@@ -403,6 +434,7 @@ export interface FileRoutesByTo {
   '/marketplace/compare': typeof MarketplaceCompareRoute
   '/marketplace/data-library': typeof MarketplaceDataLibraryRoute
   '/marketplace/docs': typeof MarketplaceDocsRoute
+  '/marketplace/fine-tuning-guide': typeof MarketplaceFineTuningGuideRoute
   '/marketplace/verification': typeof MarketplaceVerificationRoute
   '/auth': typeof AuthIndexRoute
   '/marketplace': typeof MarketplaceIndexRoute
@@ -420,7 +452,9 @@ export interface FileRoutesByTo {
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/wallet': typeof AuthenticatedDashboardWalletRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
+  '/marketplace/base-models/$id': typeof MarketplaceBaseModelsIdRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
+  '/marketplace/base-models': typeof MarketplaceBaseModelsIndexRoute
   '/dashboard/admin/backtest': typeof AuthenticatedDashboardAdminBacktestRoute
   '/dashboard/admin/revenue': typeof AuthenticatedDashboardAdminRevenueRoute
   '/dashboard/models/backtests': typeof AuthenticatedDashboardModelsBacktestsRoute
@@ -436,6 +470,7 @@ export interface FileRoutesByTo {
   '/dashboard/models': typeof AuthenticatedDashboardModelsIndexRoute
   '/dashboard/strategies': typeof AuthenticatedDashboardStrategiesIndexRoute
   '/dashboard/teams': typeof AuthenticatedDashboardTeamsIndexRoute
+  '/dashboard/models/fine-tune/$id': typeof AuthenticatedDashboardModelsFineTuneIdRoute
   '/dashboard/strategies/list/$id': typeof AuthenticatedDashboardStrategiesListIdRoute
 }
 export interface FileRoutesById {
@@ -456,6 +491,7 @@ export interface FileRoutesById {
   '/marketplace/compare': typeof MarketplaceCompareRoute
   '/marketplace/data-library': typeof MarketplaceDataLibraryRoute
   '/marketplace/docs': typeof MarketplaceDocsRoute
+  '/marketplace/fine-tuning-guide': typeof MarketplaceFineTuningGuideRoute
   '/marketplace/verification': typeof MarketplaceVerificationRoute
   '/auth/': typeof AuthIndexRoute
   '/marketplace/': typeof MarketplaceIndexRoute
@@ -473,7 +509,9 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/_authenticated/dashboard/wallet': typeof AuthenticatedDashboardWalletRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
+  '/marketplace/base-models/$id': typeof MarketplaceBaseModelsIdRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/marketplace/base-models/': typeof MarketplaceBaseModelsIndexRoute
   '/_authenticated/dashboard/admin/backtest': typeof AuthenticatedDashboardAdminBacktestRoute
   '/_authenticated/dashboard/admin/revenue': typeof AuthenticatedDashboardAdminRevenueRoute
   '/_authenticated/dashboard/models/backtests': typeof AuthenticatedDashboardModelsBacktestsRoute
@@ -489,6 +527,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/models/': typeof AuthenticatedDashboardModelsIndexRoute
   '/_authenticated/dashboard/strategies/': typeof AuthenticatedDashboardStrategiesIndexRoute
   '/_authenticated/dashboard/teams/': typeof AuthenticatedDashboardTeamsIndexRoute
+  '/_authenticated/dashboard/models/fine-tune/$id': typeof AuthenticatedDashboardModelsFineTuneIdRoute
   '/_authenticated/dashboard/strategies/list/$id': typeof AuthenticatedDashboardStrategiesListIdRoute
 }
 export interface FileRouteTypes {
@@ -509,6 +548,7 @@ export interface FileRouteTypes {
     | '/marketplace/compare'
     | '/marketplace/data-library'
     | '/marketplace/docs'
+    | '/marketplace/fine-tuning-guide'
     | '/marketplace/verification'
     | '/auth/'
     | '/marketplace/'
@@ -526,7 +566,9 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/wallet'
     | '/api/public/sync'
+    | '/marketplace/base-models/$id'
     | '/dashboard/'
+    | '/marketplace/base-models/'
     | '/dashboard/admin/backtest'
     | '/dashboard/admin/revenue'
     | '/dashboard/models/backtests'
@@ -542,6 +584,7 @@ export interface FileRouteTypes {
     | '/dashboard/models/'
     | '/dashboard/strategies/'
     | '/dashboard/teams/'
+    | '/dashboard/models/fine-tune/$id'
     | '/dashboard/strategies/list/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -557,6 +600,7 @@ export interface FileRouteTypes {
     | '/marketplace/compare'
     | '/marketplace/data-library'
     | '/marketplace/docs'
+    | '/marketplace/fine-tuning-guide'
     | '/marketplace/verification'
     | '/auth'
     | '/marketplace'
@@ -574,7 +618,9 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/wallet'
     | '/api/public/sync'
+    | '/marketplace/base-models/$id'
     | '/dashboard'
+    | '/marketplace/base-models'
     | '/dashboard/admin/backtest'
     | '/dashboard/admin/revenue'
     | '/dashboard/models/backtests'
@@ -590,6 +636,7 @@ export interface FileRouteTypes {
     | '/dashboard/models'
     | '/dashboard/strategies'
     | '/dashboard/teams'
+    | '/dashboard/models/fine-tune/$id'
     | '/dashboard/strategies/list/$id'
   id:
     | '__root__'
@@ -609,6 +656,7 @@ export interface FileRouteTypes {
     | '/marketplace/compare'
     | '/marketplace/data-library'
     | '/marketplace/docs'
+    | '/marketplace/fine-tuning-guide'
     | '/marketplace/verification'
     | '/auth/'
     | '/marketplace/'
@@ -626,7 +674,9 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/settings'
     | '/_authenticated/dashboard/wallet'
     | '/api/public/sync'
+    | '/marketplace/base-models/$id'
     | '/_authenticated/dashboard/'
+    | '/marketplace/base-models/'
     | '/_authenticated/dashboard/admin/backtest'
     | '/_authenticated/dashboard/admin/revenue'
     | '/_authenticated/dashboard/models/backtests'
@@ -642,6 +692,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/models/'
     | '/_authenticated/dashboard/strategies/'
     | '/_authenticated/dashboard/teams/'
+    | '/_authenticated/dashboard/models/fine-tune/$id'
     | '/_authenticated/dashboard/strategies/list/$id'
   fileRoutesById: FileRoutesById
 }
@@ -786,6 +837,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketplaceDocsRouteImport
       parentRoute: typeof MarketplaceRoute
     }
+    '/marketplace/fine-tuning-guide': {
+      id: '/marketplace/fine-tuning-guide'
+      path: '/fine-tuning-guide'
+      fullPath: '/marketplace/fine-tuning-guide'
+      preLoaderRoute: typeof MarketplaceFineTuningGuideRouteImport
+      parentRoute: typeof MarketplaceRoute
+    }
     '/marketplace/verification': {
       id: '/marketplace/verification'
       path: '/verification'
@@ -898,6 +956,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicSyncRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/marketplace/base-models/': {
+      id: '/marketplace/base-models/'
+      path: '/base-models'
+      fullPath: '/marketplace/base-models/'
+      preLoaderRoute: typeof MarketplaceBaseModelsIndexRouteImport
+      parentRoute: typeof MarketplaceRoute
+    }
+    '/marketplace/base-models/$id': {
+      id: '/marketplace/base-models/$id'
+      path: '/base-models/$id'
+      fullPath: '/marketplace/base-models/$id'
+      preLoaderRoute: typeof MarketplaceBaseModelsIdRouteImport
+      parentRoute: typeof MarketplaceRoute
+    }
     '/_authenticated/dashboard/admin/backtest': {
       id: '/_authenticated/dashboard/admin/backtest'
       path: '/backtest'
@@ -1003,6 +1075,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicV1ModelsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/dashboard/models/fine-tune/$id': {
+      id: '/_authenticated/dashboard/models/fine-tune/$id'
+      path: '/models/fine-tune/$id'
+      fullPath: '/dashboard/models/fine-tune/$id'
+      preLoaderRoute: typeof AuthenticatedDashboardModelsFineTuneIdRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/strategies/list/$id': {
       id: '/_authenticated/dashboard/strategies/list/$id'
       path: '/strategies/list/$id'
@@ -1057,6 +1136,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardModelsIndexRoute: typeof AuthenticatedDashboardModelsIndexRoute
   AuthenticatedDashboardStrategiesIndexRoute: typeof AuthenticatedDashboardStrategiesIndexRoute
   AuthenticatedDashboardTeamsIndexRoute: typeof AuthenticatedDashboardTeamsIndexRoute
+  AuthenticatedDashboardModelsFineTuneIdRoute: typeof AuthenticatedDashboardModelsFineTuneIdRoute
   AuthenticatedDashboardStrategiesListIdRoute: typeof AuthenticatedDashboardStrategiesListIdRoute
 }
 
@@ -1099,6 +1179,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardStrategiesIndexRoute,
     AuthenticatedDashboardTeamsIndexRoute:
       AuthenticatedDashboardTeamsIndexRoute,
+    AuthenticatedDashboardModelsFineTuneIdRoute:
+      AuthenticatedDashboardModelsFineTuneIdRoute,
     AuthenticatedDashboardStrategiesListIdRoute:
       AuthenticatedDashboardStrategiesListIdRoute,
   }
@@ -1141,8 +1223,11 @@ interface MarketplaceRouteChildren {
   MarketplaceCompareRoute: typeof MarketplaceCompareRoute
   MarketplaceDataLibraryRoute: typeof MarketplaceDataLibraryRoute
   MarketplaceDocsRoute: typeof MarketplaceDocsRoute
+  MarketplaceFineTuningGuideRoute: typeof MarketplaceFineTuningGuideRoute
   MarketplaceVerificationRoute: typeof MarketplaceVerificationRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
+  MarketplaceBaseModelsIdRoute: typeof MarketplaceBaseModelsIdRoute
+  MarketplaceBaseModelsIndexRoute: typeof MarketplaceBaseModelsIndexRoute
 }
 
 const MarketplaceRouteChildren: MarketplaceRouteChildren = {
@@ -1151,8 +1236,11 @@ const MarketplaceRouteChildren: MarketplaceRouteChildren = {
   MarketplaceCompareRoute: MarketplaceCompareRoute,
   MarketplaceDataLibraryRoute: MarketplaceDataLibraryRoute,
   MarketplaceDocsRoute: MarketplaceDocsRoute,
+  MarketplaceFineTuningGuideRoute: MarketplaceFineTuningGuideRoute,
   MarketplaceVerificationRoute: MarketplaceVerificationRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
+  MarketplaceBaseModelsIdRoute: MarketplaceBaseModelsIdRoute,
+  MarketplaceBaseModelsIndexRoute: MarketplaceBaseModelsIndexRoute,
 }
 
 const MarketplaceRouteWithChildren = MarketplaceRoute._addFileChildren(

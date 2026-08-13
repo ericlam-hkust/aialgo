@@ -213,7 +213,7 @@ function StrategyLibrary() {
               <LineChart className="mr-2 h-4 w-4" aria-hidden /> Algo strategy (builder)
             </DropdownMenuItem>
             <DropdownMenuItem onSelect={() => navigate({ to: "/dashboard/models/new" })}>
-              <Upload className="mr-2 h-4 w-4" aria-hidden /> Upload AI model
+              <Upload className="mr-2 h-4 w-4" aria-hidden /> AI Model
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -254,7 +254,7 @@ function StrategyLibrary() {
           </div>
           <Button asChild variant="outline" size="sm">
             <Link to="/dashboard/models/new">
-              <Upload className="mr-1.5 h-3.5 w-3.5" aria-hidden /> Upload AI model
+              <Upload className="mr-1.5 h-3.5 w-3.5" aria-hidden /> AI Model
             </Link>
           </Button>
         </CardHeader>

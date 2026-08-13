@@ -1,6 +1,11 @@
 import { useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMutation } from "@tanstack/react-query";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { listBaseModels } from "@/lib/base-models.functions";
+import { PipelineBuilder, emptyPipeline, emptyResources } from "@/components/marketplace/pipeline-builder";
+import type { PipelineSpec, ResourceSpec } from "@/lib/base-models";
+import { Lock } from "lucide-react";
 import { toast } from "sonner";
 import { ArrowLeft, ArrowRight, CheckCircle2, Circle, Loader2 } from "lucide-react";
 import { submitModel, type ModelDraft } from "@/lib/contributor.functions";
@@ -45,6 +50,12 @@ function UploadWizard() {
   const [submitted, setSubmitted] = useState(false);
   const [config, setConfig] = useState<BacktestConfig>(emptyBacktestConfig());
   const [manifest, setManifest] = useState<InterfaceManifest>(() => emptyManifest());
+  const [pipeline, setPipeline] = useState<PipelineSpec>(() => emptyPipeline());
+  const [resources, setResources] = useState<ResourceSpec>(() => emptyResources());
+  const [baseModelId, setBaseModelId] = useState<string>("none");
+  const basesFn = useServerFn(listBaseModels);
+  const { data: bases } = useQuery({ queryKey: ["base-models"], queryFn: () => basesFn({}) });
+  const selectedBase = bases?.find((b) => b.id === baseModelId) ?? null;
   const [draft, setDraft] = useState<ModelDraft>({
     name: "",
     slug: "",
@@ -68,7 +79,17 @@ function UploadWizard() {
 
   const submit = useMutation({
     mutationFn: async () => {
-      const model = await submitModel({ data: { ...draft, manifest } });
+      const model = await submitModel({
+        data: {
+          ...draft,
+          manifest,
+          pipeline,
+          resources,
+          ...(selectedBase
+            ? { baseModelId: selectedBase.id, baseVersion: selectedBase.version, finetuneMethod: "local" as const }
+            : {}),
+        },
+      });
       await submitForValidation({ data: { modelId: model.id, config } });
       return model;
     },
@@ -189,6 +210,30 @@ function UploadWizard() {
 
           {step === 1 ? (
             <>
+              <div className="space-y-1.5">
+                <Picker
+                  label="Base model (lineage)"
+                  value={baseModelId}
+                  onChange={(v) => setBaseModelId(v)}
+                  options={[
+                    { value: "none", label: "From scratch — no base model" },
+                    ...(bases ?? []).map((b) => ({ value: b.id, label: `aialgo/${b.id} v${b.version}` })),
+                  ]}
+                />
+                {selectedBase ? (
+                  <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Lock className="h-3.5 w-3.5" aria-hidden /> Derivative: the base feature schema and output
+                    contract are locked. Prefer the no-code path?{" "}
+                    <Link
+                      to="/dashboard/models/fine-tune/$id"
+                      params={{ id: selectedBase.id }}
+                      className="text-primary hover:underline"
+                    >
+                      Cloud fine-tune
+                    </Link>
+                  </p>
+                ) : null}
+              </div>
               <Picker
                 label="Delivery"
                 value={draft.packageKind}
@@ -224,7 +269,40 @@ function UploadWizard() {
             </>
           ) : null}
 
-          {step === 2 ? <InterfaceDefinitionStep value={manifest} onChange={setManifest} /> : null}
+          {step === 1 ? (
+            <PipelineBuilder
+              pipeline={pipeline}
+              resources={resources}
+              onPipelineChange={setPipeline}
+              onResourcesChange={setResources}
+            />
+          ) : null}
+
+          {step === 2 ? (
+            selectedBase ? (
+              <div className="space-y-3">
+                <div className="flex items-start gap-2 rounded-md border border-border/70 bg-muted/30 p-3 text-xs text-muted-foreground">
+                  <Lock className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+                  Inherited from aialgo/{selectedBase.id} v{selectedBase.version}. Derivatives cannot modify the base
+                  feature schema or the output contract.
+                </div>
+                <div className="rounded-md border border-border/70 p-3 text-xs">
+                  <div className="mb-1 font-medium">Locked input schema</div>
+                  <ul className="space-y-1 text-muted-foreground">
+                    {selectedBase.feature_schema.map((f) => (
+                      <li key={f.field} className="mono">
+                        {f.field}: {f.type}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-2 font-medium">Locked output contract</div>
+                  <div className="mono text-muted-foreground">{"{ action, confidence, size }"}</div>
+                </div>
+              </div>
+            ) : (
+              <InterfaceDefinitionStep value={manifest} onChange={setManifest} />
+            )
+          ) : null}
 
           {step === 3 ? (
             <>

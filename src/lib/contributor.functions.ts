@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import type { InterfaceManifest } from "@/lib/model-interface";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { AssetClass, ModelPricingModel, ModelRiskLevel, ModelStrategyType } from "@/lib/marketplace";
+import { checkResources, type FinetuneMethod, type PipelineSpec, type ResourceSpec } from "@/lib/base-models";
 
 export const getContributorProfile = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -106,6 +107,11 @@ export type ModelDraft = {
   pricingModel: ModelPricingModel;
   price: number;
   manifest?: InterfaceManifest;
+  baseModelId?: string;
+  baseVersion?: string;
+  finetuneMethod?: FinetuneMethod;
+  pipeline?: PipelineSpec;
+  resources?: ResourceSpec;
 };
 
 export const submitModel = createServerFn({ method: "POST" })
@@ -114,6 +120,10 @@ export const submitModel = createServerFn({ method: "POST" })
     if (!/^[a-z0-9-]{3,80}$/.test(data.slug)) throw new Error("Slug must be lowercase letters, numbers and dashes");
     if (!data.name.trim()) throw new Error("Name is required");
     if (data.price < 0) throw new Error("Price must be positive");
+    if (data.resources) {
+      const violations = checkResources(data.resources, data.pipeline ?? null);
+      if (violations.length) throw new Error(`${violations[0]!.message} ${violations[0]!.remediation}`);
+    }
     return data;
   })
   .handler(async ({ data, context }) => {
@@ -155,6 +165,11 @@ export const submitModel = createServerFn({ method: "POST" })
         package_path: data.packagePath ?? null,
         parameters: data.parameters,
         interface_manifest: (data.manifest ?? null) as never,
+        base_model_id: data.baseModelId ?? null,
+        base_version: data.baseVersion ?? null,
+        finetune_method: data.baseModelId ? (data.finetuneMethod ?? "local") : null,
+        pipeline: (data.pipeline?.enabled ? data.pipeline : null) as never,
+        resources: (data.resources ?? null) as never,
       })
       .select("id,slug")
       .single();
