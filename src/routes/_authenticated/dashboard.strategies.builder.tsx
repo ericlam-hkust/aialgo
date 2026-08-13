@@ -656,8 +656,9 @@ function Builder() {
                 )}
               </div>
             </Tabs>
-          </aside>
-        </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
+
       </div>
     </BuilderProvider>
   );
