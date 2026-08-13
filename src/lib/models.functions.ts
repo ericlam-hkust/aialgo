@@ -205,12 +205,14 @@ export const getMyModelAccess = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const [{ data: purchases }, { data: activations }] = await Promise.all([
-      supabase.from("model_purchases").select("*").eq("user_id", userId).eq("status", "active"),
-      supabase.from("model_activations").select("*").eq("user_id", userId).order("activated_at", { ascending: false }),
-    ]);
-    return { purchases: purchases ?? [], activations: activations ?? [] };
+    const { data: activations } = await supabase
+      .from("model_activations")
+      .select("*")
+      .eq("user_id", userId)
+      .order("activated_at", { ascending: false });
+    return { activations: activations ?? [] };
   });
+
 
 export const listMyActivations = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
