@@ -554,7 +554,7 @@ function Builder() {
             <NodePalette onAdd={(spec) => placeNode(spec)} />
           </ResizablePanel>
 
-          <ResizableHandle withHandle className="mx-1.5 my-1.5 bg-transparent" />
+          <ResizableHandle withHandle className={isWide ? "mx-1.5 w-px bg-border" : "my-1.5 h-px w-full bg-border"} />
 
           <ResizablePanel defaultSize={isWide ? "56%" : "48%"} minSize="20%" className="h-full overflow-hidden rounded-xl border border-border bg-card/40">
 
@@ -629,7 +629,7 @@ function Builder() {
             )}
           </ResizablePanel>
 
-          <ResizableHandle withHandle className="mx-1.5 my-1.5 bg-transparent" />
+          <ResizableHandle withHandle className={isWide ? "mx-1.5 w-px bg-border" : "my-1.5 h-px w-full bg-border"} />
 
           <ResizablePanel defaultSize={isWide ? "26%" : "30%"} minSize="12%" className="flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card">
 
