@@ -65,6 +65,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard/strategies/builder")({
   validateSearch: (search: Record<string, unknown>): { id?: string } =>
@@ -140,6 +142,15 @@ function Builder() {
   const [description, setDescription] = useState("");
   const [saving, setSaving] = useState(false);
   const [strategyId, setStrategyId] = useState<string | null>(id ?? null);
+
+  const [isWide, setIsWide] = useState(true);
+  useEffect(() => {
+    const mql = window.matchMedia("(min-width: 1280px)");
+    const apply = () => setIsWide(mql.matches);
+    apply();
+    mql.addEventListener("change", apply);
+    return () => mql.removeEventListener("change", apply);
+  }, []);
 
   const [view, setView] = useState<"canvas" | "code">("canvas");
   const [sidePanel, setSidePanel] = useState<"ai" | "properties">("ai");
@@ -534,12 +545,20 @@ function Builder() {
           </div>
         </header>
 
-        <div className="grid gap-3 xl:grid-cols-[224px_minmax(0,1fr)_320px]">
-          <aside className="order-2 h-[300px] overflow-hidden rounded-xl border border-border bg-card xl:order-1 xl:h-[640px]">
+        <div style={{ height: isWide ? "min(72vh, 720px)" : 1180 }}>
+        <ResizablePanelGroup
+          key={isWide ? "wide" : "narrow"}
+          orientation={isWide ? "horizontal" : "vertical"}
+        >
+          <ResizablePanel defaultSize={isWide ? "18%" : "22%"} minSize="10%" className="h-full overflow-hidden rounded-xl border border-border bg-card">
             <NodePalette onAdd={(spec) => placeNode(spec)} />
-          </aside>
+          </ResizablePanel>
 
-          <main className="order-1 h-[640px] overflow-hidden rounded-xl border border-border bg-card/40 xl:order-2">
+          <ResizableHandle withHandle className={isWide ? "mx-1.5 w-px bg-border" : "my-1.5 h-px w-full bg-border"} />
+
+          <ResizablePanel defaultSize={isWide ? "56%" : "48%"} minSize="20%" className="h-full overflow-hidden rounded-xl border border-border bg-card/40">
+
+
             {view === "canvas" ? (
               <div className="h-full" onDrop={onDrop} onDragOver={(e) => e.preventDefault()}>
                 <ReactFlow
@@ -608,9 +627,12 @@ function Builder() {
                 onRegenerate={regenerate}
               />
             )}
-          </main>
+          </ResizablePanel>
 
-          <aside className="order-3 flex h-[640px] flex-col overflow-hidden rounded-xl border border-border bg-card">
+          <ResizableHandle withHandle className={isWide ? "mx-1.5 w-px bg-border" : "my-1.5 h-px w-full bg-border"} />
+
+          <ResizablePanel defaultSize={isWide ? "26%" : "30%"} minSize="12%" className="flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card">
+
             <Tabs value={sidePanel} onValueChange={(v) => setSidePanel(v as "ai" | "properties")} className="flex h-full flex-col">
               <TabsList className="m-2 grid grid-cols-2">
                 <TabsTrigger value="ai" className="text-xs">
@@ -645,8 +667,10 @@ function Builder() {
                 )}
               </div>
             </Tabs>
-          </aside>
+          </ResizablePanel>
+        </ResizablePanelGroup>
         </div>
+
       </div>
     </BuilderProvider>
   );
