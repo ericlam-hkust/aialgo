@@ -48,13 +48,15 @@ Algo backtests, validation runs and live execution all read through the existing
 ```text
 Overview
 
-BUILD                        (your own work)
-  My strategies
-  Builder
+BUILD                        (your own work — both kinds)
+  My work            (algo strategies + AI models you own)
+  Algo builder       (visual canvas + AI assist)
+  Upload AI model    (submission wizard)
   Templates
   Backtest
   Playground
   Validation queue
+
 
 DISCOVER                     (things others published)
   Marketplace          (algo strategies + AI models, filterable by kind)
