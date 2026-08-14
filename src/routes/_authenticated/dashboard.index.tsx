@@ -83,7 +83,7 @@ function Overview() {
         </div>
         <div className="flex gap-2">
           <Button asChild variant="outline">
-            <Link to="/dashboard/strategies/templates">Browse templates</Link>
+            <Link to="/dashboard/resource-library">Browse Resource Library</Link>
           </Button>
           <Button asChild>
             <Link to="/dashboard/strategies/builder">
@@ -216,7 +216,7 @@ function Overview() {
                 description="Deploy a strategy to paper trading and its fills will appear here."
                 action={
                   <Button asChild size="sm">
-                    <Link to="/dashboard/strategies/templates">Start from a template</Link>
+                    <Link to="/dashboard/resource-library">Start from a resource</Link>
                   </Button>
                 }
               />
