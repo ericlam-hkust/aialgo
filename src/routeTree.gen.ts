@@ -39,6 +39,7 @@ import { Route as AuthenticatedDashboardEarningsRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardExecutionRouteImport } from './routes/_authenticated/dashboard.execution'
 import { Route as AuthenticatedDashboardMyModelsRouteImport } from './routes/_authenticated/dashboard.my-models'
 import { Route as AuthenticatedDashboardPaperTradingRouteImport } from './routes/_authenticated/dashboard.paper-trading'
+import { Route as AuthenticatedDashboardResourceLibraryRouteImport } from './routes/_authenticated/dashboard.resource-library'
 import { Route as AuthenticatedDashboardRiskRouteImport } from './routes/_authenticated/dashboard.risk'
 import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
 import { Route as ApiPublicSyncRouteImport } from './routes/api/public/sync'
@@ -220,6 +221,12 @@ const AuthenticatedDashboardPaperTradingRoute =
     path: '/paper-trading',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardResourceLibraryRoute =
+  AuthenticatedDashboardResourceLibraryRouteImport.update({
+    id: '/resource-library',
+    path: '/resource-library',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardRiskRoute =
   AuthenticatedDashboardRiskRouteImport.update({
     id: '/risk',
@@ -367,6 +374,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/execution': typeof AuthenticatedDashboardExecutionRoute
   '/dashboard/my-models': typeof AuthenticatedDashboardMyModelsRoute
   '/dashboard/paper-trading': typeof AuthenticatedDashboardPaperTradingRoute
+  '/dashboard/resource-library': typeof AuthenticatedDashboardResourceLibraryRoute
   '/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
@@ -415,6 +423,7 @@ export interface FileRoutesByTo {
   '/dashboard/execution': typeof AuthenticatedDashboardExecutionRoute
   '/dashboard/my-models': typeof AuthenticatedDashboardMyModelsRoute
   '/dashboard/paper-trading': typeof AuthenticatedDashboardPaperTradingRoute
+  '/dashboard/resource-library': typeof AuthenticatedDashboardResourceLibraryRoute
   '/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
@@ -468,6 +477,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/execution': typeof AuthenticatedDashboardExecutionRoute
   '/_authenticated/dashboard/my-models': typeof AuthenticatedDashboardMyModelsRoute
   '/_authenticated/dashboard/paper-trading': typeof AuthenticatedDashboardPaperTradingRoute
+  '/_authenticated/dashboard/resource-library': typeof AuthenticatedDashboardResourceLibraryRoute
   '/_authenticated/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
   '/_authenticated/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
@@ -521,6 +531,7 @@ export interface FileRouteTypes {
     | '/dashboard/execution'
     | '/dashboard/my-models'
     | '/dashboard/paper-trading'
+    | '/dashboard/resource-library'
     | '/dashboard/risk'
     | '/dashboard/settings'
     | '/api/public/sync'
@@ -569,6 +580,7 @@ export interface FileRouteTypes {
     | '/dashboard/execution'
     | '/dashboard/my-models'
     | '/dashboard/paper-trading'
+    | '/dashboard/resource-library'
     | '/dashboard/risk'
     | '/dashboard/settings'
     | '/api/public/sync'
@@ -621,6 +633,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/execution'
     | '/_authenticated/dashboard/my-models'
     | '/_authenticated/dashboard/paper-trading'
+    | '/_authenticated/dashboard/resource-library'
     | '/_authenticated/dashboard/risk'
     | '/_authenticated/dashboard/settings'
     | '/api/public/sync'
@@ -869,6 +882,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardPaperTradingRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/resource-library': {
+      id: '/_authenticated/dashboard/resource-library'
+      path: '/resource-library'
+      fullPath: '/dashboard/resource-library'
+      preLoaderRoute: typeof AuthenticatedDashboardResourceLibraryRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/risk': {
       id: '/_authenticated/dashboard/risk'
       path: '/risk'
@@ -1022,6 +1042,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardExecutionRoute: typeof AuthenticatedDashboardExecutionRoute
   AuthenticatedDashboardMyModelsRoute: typeof AuthenticatedDashboardMyModelsRoute
   AuthenticatedDashboardPaperTradingRoute: typeof AuthenticatedDashboardPaperTradingRoute
+  AuthenticatedDashboardResourceLibraryRoute: typeof AuthenticatedDashboardResourceLibraryRoute
   AuthenticatedDashboardRiskRoute: typeof AuthenticatedDashboardRiskRoute
   AuthenticatedDashboardSettingsRoute: typeof AuthenticatedDashboardSettingsRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
@@ -1053,6 +1074,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardMyModelsRoute: AuthenticatedDashboardMyModelsRoute,
     AuthenticatedDashboardPaperTradingRoute:
       AuthenticatedDashboardPaperTradingRoute,
+    AuthenticatedDashboardResourceLibraryRoute:
+      AuthenticatedDashboardResourceLibraryRoute,
     AuthenticatedDashboardRiskRoute: AuthenticatedDashboardRiskRoute,
     AuthenticatedDashboardSettingsRoute: AuthenticatedDashboardSettingsRoute,
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
