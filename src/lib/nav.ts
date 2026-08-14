@@ -1,6 +1,5 @@
 import {
   Activity,
-  BarChart3,
   Banknote,
   BookOpen,
   Boxes,
@@ -68,16 +67,15 @@ export const NAV_GROUPS: NavGroup[] = [
             exact: true,
             terms: ["submit model", "publish model", "wizard", "upload ai model", "pipeline bundle"],
           },
-          {
-            to: "/marketplace/base-models",
-            key: "nav.baseModels",
-            icon: Library,
-            exact: false,
-            terms: ["pretrained", "fine-tune", "foundation", "base model", "derivative"],
-          },
         ],
       },
-      { to: "/dashboard/strategies/templates", key: "nav.templates", icon: BarChart3, exact: true, terms: ["presets"] },
+      {
+        to: "/dashboard/resource-library",
+        key: "nav.resourceLibrary",
+        icon: Library,
+        exact: false,
+        terms: ["templates", "presets", "pretrained", "fine-tune", "foundation", "base models", "starting points"],
+      },
       {
         to: "/dashboard/backtest",
         key: "nav.backtest",

@@ -81,7 +81,7 @@ function Guide() {
         </p>
         <div className="flex flex-wrap gap-2 pt-1">
           <Button asChild size="sm">
-            <Link to="/marketplace/base-models">Browse base models</Link>
+            <Link to="/dashboard/resource-library">Browse Resource Library</Link>
           </Button>
           <Button asChild size="sm" variant="outline">
             <Link to="/marketplace/docs">Model interface docs</Link>

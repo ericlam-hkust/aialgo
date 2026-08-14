@@ -123,8 +123,8 @@ function FineTuneWizard() {
   return (
     <div className="mx-auto max-w-4xl space-y-6 p-4 md:p-6">
       <div className="space-y-1.5">
-        <Link to="/marketplace/base-models/$id" params={{ id }} className="text-xs text-muted-foreground hover:underline">
-          ← Back to base model
+        <Link to="/dashboard/resource-library" className="text-xs text-muted-foreground hover:underline">
+          ← Resource Library
         </Link>
         <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
           <Cloud className="h-5 w-5 text-primary" aria-hidden /> Cloud fine-tune

@@ -68,8 +68,8 @@ aialgo push ./dist --derivative-of aialgo/${data.id}@${data.version}`;
     <div className="mx-auto max-w-6xl space-y-6 px-4 py-8">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-1.5">
-          <Link to="/marketplace/base-models" className="text-xs text-muted-foreground hover:underline">
-            ← Base Models
+          <Link to="/dashboard/resource-library" className="text-xs text-muted-foreground hover:underline">
+            ← Resource Library
           </Link>
           <h1 className="mono text-2xl font-semibold tracking-tight">{data.name}</h1>
           <p className="max-w-2xl text-sm text-muted-foreground">{data.tagline}</p>

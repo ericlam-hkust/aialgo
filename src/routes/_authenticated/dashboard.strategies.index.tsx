@@ -229,7 +229,7 @@ function StrategyLibrary() {
           action={
             <div className="flex gap-2">
               <Button asChild variant="outline">
-                <Link to="/dashboard/strategies/templates">Browse templates</Link>
+                <Link to="/dashboard/resource-library">Browse Resource Library</Link>
               </Button>
               <Button asChild>
                 <Link to="/dashboard/strategies/builder">Open builder</Link>
