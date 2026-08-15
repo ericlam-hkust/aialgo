@@ -21,20 +21,28 @@ function GuideLink({ href, icon: Icon, label }: { href: string; icon: typeof Boo
 }
 
 export function ConnectionGuide({ meta, className }: Props) {
+  const mode = LINKING_MODES[meta.linking];
   return (
     <section className={cn("rounded-md border border-border/70 bg-muted/30 p-3", className)}>
-      <h3 className="text-sm font-medium">How to connect {meta.label}</h3>
+      <h3 className="text-sm font-medium">How to link {meta.label}</h3>
+      <p className={cn("mt-1 inline-flex rounded border px-1.5 py-0.5 text-[11px]", mode.tone)}>{mode.label}</p>
+      <p className="mt-2 text-xs text-muted-foreground">{mode.hint}</p>
       <ol className="mt-2 list-decimal space-y-1 pl-4 text-xs text-muted-foreground">
         {meta.steps.map((s) => (
           <li key={s}>{s}</li>
         ))}
       </ol>
       <div className="mt-3 flex flex-wrap gap-2">
-        {meta.docsUrl ? <GuideLink href={meta.docsUrl} icon={BookOpen} label="API docs" /> : null}
-        {meta.keysUrl ? <GuideLink href={meta.keysUrl} icon={KeyRound} label="Create keys" /> : null}
+        {meta.docsUrl ? <GuideLink href={meta.docsUrl} icon={BookOpen} label="Broker docs" /> : null}
         {meta.downloadUrl ? <GuideLink href={meta.downloadUrl} icon={Download} label="Gateway download" /> : null}
       </div>
-      {meta.permissionNote ? <p className="mt-2 text-xs text-muted-foreground">{meta.permissionNote}</p> : null}
+      {meta.unverifiedProgram ? (
+        <p className="mt-2 text-xs text-warning">
+          Read-only linking for this broker is pending verification of its partner program terms. Until then the local
+          agent is the supported path.
+        </p>
+      ) : null}
     </section>
   );
 }
+
