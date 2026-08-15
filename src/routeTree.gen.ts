@@ -32,7 +32,6 @@ import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authe
 import { Route as AuthenticatedDashboardAccountsRouteImport } from './routes/_authenticated/dashboard.accounts'
 import { Route as AuthenticatedDashboardBacktestRouteImport } from './routes/_authenticated/dashboard.backtest'
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
-import { Route as AuthenticatedDashboardBrokersRouteImport } from './routes/_authenticated/dashboard.brokers'
 import { Route as AuthenticatedDashboardDataSourcesRouteImport } from './routes/_authenticated/dashboard.data-sources'
 import { Route as AuthenticatedDashboardExecutionRouteImport } from './routes/_authenticated/dashboard.execution'
 import { Route as AuthenticatedDashboardMyModelsRouteImport } from './routes/_authenticated/dashboard.my-models'
@@ -175,12 +174,6 @@ const AuthenticatedDashboardBillingRoute =
   AuthenticatedDashboardBillingRouteImport.update({
     id: '/billing',
     path: '/billing',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
-const AuthenticatedDashboardBrokersRoute =
-  AuthenticatedDashboardBrokersRouteImport.update({
-    id: '/brokers',
-    path: '/brokers',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardDataSourcesRoute =
@@ -347,7 +340,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/accounts': typeof AuthenticatedDashboardAccountsRoute
   '/dashboard/backtest': typeof AuthenticatedDashboardBacktestRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
-  '/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
   '/dashboard/data-sources': typeof AuthenticatedDashboardDataSourcesRoute
   '/dashboard/execution': typeof AuthenticatedDashboardExecutionRoute
   '/dashboard/my-models': typeof AuthenticatedDashboardMyModelsRoute
@@ -393,7 +385,6 @@ export interface FileRoutesByTo {
   '/dashboard/accounts': typeof AuthenticatedDashboardAccountsRoute
   '/dashboard/backtest': typeof AuthenticatedDashboardBacktestRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
-  '/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
   '/dashboard/data-sources': typeof AuthenticatedDashboardDataSourcesRoute
   '/dashboard/execution': typeof AuthenticatedDashboardExecutionRoute
   '/dashboard/my-models': typeof AuthenticatedDashboardMyModelsRoute
@@ -444,7 +435,6 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/accounts': typeof AuthenticatedDashboardAccountsRoute
   '/_authenticated/dashboard/backtest': typeof AuthenticatedDashboardBacktestRoute
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
-  '/_authenticated/dashboard/brokers': typeof AuthenticatedDashboardBrokersRoute
   '/_authenticated/dashboard/data-sources': typeof AuthenticatedDashboardDataSourcesRoute
   '/_authenticated/dashboard/execution': typeof AuthenticatedDashboardExecutionRoute
   '/_authenticated/dashboard/my-models': typeof AuthenticatedDashboardMyModelsRoute
@@ -495,7 +485,6 @@ export interface FileRouteTypes {
     | '/dashboard/accounts'
     | '/dashboard/backtest'
     | '/dashboard/billing'
-    | '/dashboard/brokers'
     | '/dashboard/data-sources'
     | '/dashboard/execution'
     | '/dashboard/my-models'
@@ -541,7 +530,6 @@ export interface FileRouteTypes {
     | '/dashboard/accounts'
     | '/dashboard/backtest'
     | '/dashboard/billing'
-    | '/dashboard/brokers'
     | '/dashboard/data-sources'
     | '/dashboard/execution'
     | '/dashboard/my-models'
@@ -591,7 +579,6 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/accounts'
     | '/_authenticated/dashboard/backtest'
     | '/_authenticated/dashboard/billing'
-    | '/_authenticated/dashboard/brokers'
     | '/_authenticated/dashboard/data-sources'
     | '/_authenticated/dashboard/execution'
     | '/_authenticated/dashboard/my-models'
@@ -794,13 +781,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardBillingRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
-    '/_authenticated/dashboard/brokers': {
-      id: '/_authenticated/dashboard/brokers'
-      path: '/brokers'
-      fullPath: '/dashboard/brokers'
-      preLoaderRoute: typeof AuthenticatedDashboardBrokersRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
     '/_authenticated/dashboard/data-sources': {
       id: '/_authenticated/dashboard/data-sources'
       path: '/data-sources'
@@ -976,7 +956,6 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardAccountsRoute: typeof AuthenticatedDashboardAccountsRoute
   AuthenticatedDashboardBacktestRoute: typeof AuthenticatedDashboardBacktestRoute
   AuthenticatedDashboardBillingRoute: typeof AuthenticatedDashboardBillingRoute
-  AuthenticatedDashboardBrokersRoute: typeof AuthenticatedDashboardBrokersRoute
   AuthenticatedDashboardDataSourcesRoute: typeof AuthenticatedDashboardDataSourcesRoute
   AuthenticatedDashboardExecutionRoute: typeof AuthenticatedDashboardExecutionRoute
   AuthenticatedDashboardMyModelsRoute: typeof AuthenticatedDashboardMyModelsRoute
@@ -1004,7 +983,6 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardAccountsRoute: AuthenticatedDashboardAccountsRoute,
     AuthenticatedDashboardBacktestRoute: AuthenticatedDashboardBacktestRoute,
     AuthenticatedDashboardBillingRoute: AuthenticatedDashboardBillingRoute,
-    AuthenticatedDashboardBrokersRoute: AuthenticatedDashboardBrokersRoute,
     AuthenticatedDashboardDataSourcesRoute:
       AuthenticatedDashboardDataSourcesRoute,
     AuthenticatedDashboardExecutionRoute: AuthenticatedDashboardExecutionRoute,
