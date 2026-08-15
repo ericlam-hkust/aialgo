@@ -19,7 +19,7 @@ export async function loadConnections(supabase: SupabaseClient): Promise<Connect
   const { data, error } = await supabase
     .from("data_source_connections")
     .select(
-      "provider, api_key_encrypted, use_platform_key, priority, enabled, broker_connection_id, broker:broker_connections(id, broker_name, nickname, config, credentials_encrypted, status)",
+      "provider, api_key_encrypted, use_platform_key, priority, enabled",
     )
     .order("priority", { ascending: true });
   if (error) throw new Error(error.message);
@@ -34,24 +34,6 @@ export async function buildChain(rows: ConnectionRow[], symbol: string): Promise
   for (const row of rows) {
     if (!row.enabled) continue;
 
-    // Broker-backed data source: uses the account's own market data entitlement.
-    if (row.broker_connection_id && row.broker) {
-      const b = row.broker;
-      if (!brokerSupportsData(b.broker_name)) continue;
-      chain.push({
-        provider: `broker:${b.broker_name}`,
-        key: "",
-        source: "broker",
-        broker: {
-          id: b.broker_name,
-          connectionId: b.id,
-          label: b.nickname ?? b.broker_name,
-          config: (b.config ?? {}) as Record<string, unknown>,
-          credentialsEncrypted: b.credentials_encrypted,
-        },
-      });
-      continue;
-    }
 
     const provider = row.provider as ProviderId;
     if (!ADAPTERS[provider] || !providerCoversSymbol(provider, symbol)) continue;
@@ -89,7 +71,6 @@ export type QuoteResult = {
 export async function quoteWithFallback(chain: ChainLink[], symbol: string): Promise<QuoteResult> {
   let lastError: string | null = chain.length === 0 ? "No data provider configured for this symbol" : null;
   for (const link of chain) {
-    if (isBroker(link)) continue; // brokers serve history, not streaming quotes
     try {
       const q = await ADAPTERS[link.provider].getQuote(symbol, link.key);
       if (q) return { quote: q, provider: link.provider, error: null };
@@ -110,13 +91,7 @@ export async function barsWithFallback(
   let lastError: string | null = chain.length === 0 ? "No data provider configured for this symbol" : null;
   for (const link of chain) {
     try {
-      const bars = isBroker(link)
-        ? await fetchBrokerBars(link.broker.id, link.broker.config, link.broker.credentialsEncrypted, {
-            symbol,
-            from,
-            to,
-          })
-        : await ADAPTERS[link.provider].getDailyBars(symbol, link.key, from, to);
+      const bars = await ADAPTERS[link.provider].getDailyBars(symbol, link.key, from, to);
       if (bars.length > 0) return { bars, provider: link.provider, error: null };
       lastError = `${link.provider} returned no bars for ${symbol}`;
     } catch (err) {
