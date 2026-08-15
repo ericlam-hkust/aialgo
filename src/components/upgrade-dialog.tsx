@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StripeEmbeddedCheckout } from "@/components/stripe-embedded-checkout";
 import { PaymentTestModeBanner } from "@/components/payment-test-mode-banner";
-import { PLAN_FEATURES, PLAN_PRICE_USD, PLAN_PRICE_IDS, type PlanTier } from "@/lib/entitlements";
-import { FEE_DISCLOSURE } from "@/lib/monetization";
+import { PLAN_FEATURES, PLAN_LABEL, PLAN_PRICE_USD, PLAN_PRICE_IDS, type PlanTier } from "@/lib/entitlements";
+import { NO_COMMISSION_PROMISE } from "@/lib/monetization";
+
+const PAID_TIERS = ["pro", "elite"] as const;
 
 export function UpgradeDialog({
   open,
@@ -27,19 +29,15 @@ export function UpgradeDialog({
     onOpenChange(next);
   };
 
-  const price = yearly ? PLAN_PRICE_USD.basic.yearly : PLAN_PRICE_USD.basic.monthly;
-  const priceId = yearly ? PLAN_PRICE_IDS.basic.yearly : PLAN_PRICE_IDS.basic.monthly;
-  const isCurrent = currentTier === "basic";
-
   return (
     <Dialog open={open} onOpenChange={close}>
-      <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
+      <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-primary" aria-hidden /> Go live with Basic
+            <Sparkles className="h-4 w-4 text-primary" aria-hidden /> Choose your plan
           </DialogTitle>
           <DialogDescription>
-            {reason ?? "Paper trading is always free. Live execution needs the Basic plan."}
+            {reason ?? "Subscription only — aiAlgo never takes a commission or per-trade fee."}
           </DialogDescription>
         </DialogHeader>
 
@@ -71,28 +69,47 @@ export function UpgradeDialog({
               </button>
             </div>
 
-            <div className="rounded-lg border border-primary/50 p-5">
-              <div className="flex items-center justify-between">
-                <h3 className="font-semibold">Basic</h3>
-                <Badge>The only plan</Badge>
-              </div>
-              <p className="mono mt-3 text-3xl font-semibold">
-                ${price.toLocaleString()}
-                <span className="ml-1 text-sm font-normal text-muted-foreground">/ {yearly ? "year" : "month"}</span>
-              </p>
-              <ul className="mt-4 space-y-2 text-sm">
-                {PLAN_FEATURES.basic.map((f) => (
-                  <li key={f} className="flex items-start gap-2">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-profit" aria-hidden />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Button className="mt-5 w-full" disabled={isCurrent} onClick={() => setCheckoutPriceId(priceId)}>
-                {isCurrent ? "Current plan" : "Upgrade to Basic"}
-              </Button>
-              <p className="mt-3 text-xs text-muted-foreground">{FEE_DISCLOSURE}</p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {PAID_TIERS.map((key) => {
+                const price = yearly ? PLAN_PRICE_USD[key].yearly : PLAN_PRICE_USD[key].monthly;
+                const priceId = yearly ? PLAN_PRICE_IDS[key].yearly : PLAN_PRICE_IDS[key].monthly;
+                const isCurrent = currentTier === key;
+                return (
+                  <div
+                    key={key}
+                    className={`rounded-lg border p-5 ${key === "pro" ? "border-primary/50" : "border-border/70"}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold">{PLAN_LABEL[key]}</h3>
+                      {key === "pro" ? <Badge>Most popular</Badge> : null}
+                    </div>
+                    <p className="mono mt-3 text-3xl font-semibold">
+                      ${price.toLocaleString()}
+                      <span className="ml-1 text-sm font-normal text-muted-foreground">
+                        / {yearly ? "year" : "month"}
+                      </span>
+                    </p>
+                    <ul className="mt-4 space-y-2 text-sm">
+                      {PLAN_FEATURES[key].map((f) => (
+                        <li key={f} className="flex items-start gap-2">
+                          <Check className="mt-0.5 h-4 w-4 shrink-0 text-profit" aria-hidden />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                    <Button
+                      className="mt-5 w-full"
+                      variant={key === "pro" ? "default" : "outline"}
+                      disabled={isCurrent}
+                      onClick={() => setCheckoutPriceId(priceId)}
+                    >
+                      {isCurrent ? "Current plan" : `Upgrade to ${PLAN_LABEL[key]}`}
+                    </Button>
+                  </div>
+                );
+              })}
             </div>
+            <p className="text-xs text-muted-foreground">{NO_COMMISSION_PROMISE}</p>
           </div>
         )}
       </DialogContent>
