@@ -183,7 +183,7 @@ export async function intradayWithFallback(
 }
 
 
-export async function persistQuotes(rows: { symbol: string; quote: NormalizedQuote; provider: ProviderId }[]) {
+export async function persistQuotes(rows: { symbol: string; quote: NormalizedQuote; provider: string }[]) {
   if (rows.length === 0) return;
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   await supabaseAdmin.from("market_quotes").upsert(
