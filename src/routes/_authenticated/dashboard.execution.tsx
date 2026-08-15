@@ -250,7 +250,8 @@ function TradingDesk() {
           </Card>
 
           <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
-            <OrderTicket
+            {simulated ? (
+              <OrderTicket
               symbols={SYMBOLS.map((s) => s.symbol)}
               lastPrice={priceOf}
               currency={currency}
@@ -259,8 +260,19 @@ function TradingDesk() {
               strategies={strategies}
               activations={activations}
               pending={place.isPending}
-              onSubmit={(payload) => place.mutate(payload)}
-            />
+                onSubmit={(payload) => place.mutate(payload)}
+              />
+            ) : (
+              <Card className="border-border/70">
+                <CardHeader>
+                  <CardTitle className="text-base">Read-only monitoring</CardTitle>
+                  <CardDescription>
+                    aiAlgo never transmits orders to your broker. Orders for this account are placed by your
+                    self-hosted runner package; this desk mirrors the resulting fills and positions.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            )}
             <div className="space-y-6">
               <OrderBook
                 orders={workingOrders}
