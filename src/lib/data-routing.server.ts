@@ -2,24 +2,9 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { ADAPTERS, platformKey, type Bar, type NormalizedQuote } from "@/lib/market-providers.server";
 import { decryptSecret } from "@/lib/crypto.server";
 import { PROVIDERS, providerCoversSymbol, type ProviderId } from "@/lib/data-providers";
-import { brokerSupportsData, fetchBrokerBars } from "@/lib/brokers.server";
 
 export type ProviderLink = { provider: ProviderId; key: string; source: "user" | "platform" };
-export type BrokerLink = {
-  provider: string;
-  key: string;
-  source: "broker";
-  broker: {
-    id: string;
-    connectionId: string;
-    label: string;
-    config: Record<string, unknown>;
-    credentialsEncrypted: string | null;
-  };
-};
-export type ChainLink = ProviderLink | BrokerLink;
-
-const isBroker = (link: ChainLink): link is BrokerLink => link.source === "broker";
+export type ChainLink = ProviderLink;
 
 type ConnectionRow = {
   provider: string;
@@ -27,16 +12,8 @@ type ConnectionRow = {
   use_platform_key: boolean;
   priority: number;
   enabled: boolean;
-  broker_connection_id?: string | null;
-  broker?: {
-    id: string;
-    broker_name: string;
-    nickname: string | null;
-    config: Record<string, unknown> | null;
-    credentials_encrypted: string | null;
-    status: string | null;
-  } | null;
 };
+
 
 export async function loadConnections(supabase: SupabaseClient): Promise<ConnectionRow[]> {
   const { data, error } = await supabase
