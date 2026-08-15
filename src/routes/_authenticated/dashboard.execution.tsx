@@ -11,6 +11,7 @@ import {
   Loader2,
   Pause,
   Play,
+  Plus,
   RefreshCw,
   ShieldAlert,
   Wallet,
