@@ -22,7 +22,6 @@ export const listTradingAccounts = createServerFn({ method: "GET" })
     );
     return (accounts.data ?? []).map((a) => ({
       ...a,
-      has_credentials: undefined as never | undefined,
       data_source: dataByAccount.get(a.id) ?? null,
     }));
   });
