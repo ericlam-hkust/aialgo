@@ -82,7 +82,7 @@ export const publishStrategyListing = createServerFn({ method: "POST" })
   });
 
 const LISTING_COLUMNS =
-  "id,slug,name,tagline,description,risk_disclosure,tags,asset_class,strategy_type,timeframe,risk_level,status,visibility,pricing_model,price,currency,listing_kind,strategy_id,validation_job_id,backtest_config,sharpe,max_drawdown,win_rate,loss_rate,profit_factor,total_trades,total_return,cagr,consistency_score,overfitting_risk,suggested_price,pricing_score,data_source_kind,data_source_label,data_source_id,backtest_ran_at,listed_at,last_validated_at";
+  "id,slug,name,tagline,description,risk_disclosure,tags,asset_class,strategy_type,timeframe,risk_level,status,visibility,pricing_model,price,currency,listing_kind,strategy_id,validation_job_id,backtest_config,sharpe,max_drawdown,win_rate,loss_rate,profit_factor,total_trades,total_return,cagr,consistency_score,overfitting_risk,suggested_price,pricing_score,data_source_kind,data_source_label,data_source_id,backtest_ran_at,listed_at,last_validated_at,pricing_mode,price_set_at,price_source_note,likes_count,comments_count,sentiment_avg,demand_score";
 
 /** Loads the persisted listing draft (and its latest backtest job) for the wizard. */
 export const getStrategyListing = createServerFn({ method: "POST" })

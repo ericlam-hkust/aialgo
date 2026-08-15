@@ -14,6 +14,7 @@ import {
 import { advanceBacktestJob, submitForValidation, checkDataAvailability } from "@/lib/backtest-validation.functions";
 import { listDataSources } from "@/lib/data-sources.functions";
 import { DATA_INPUTS, SIGNAL_FREQUENCIES, type BacktestConfig, type BacktestReport } from "@/lib/backtest-protocol";
+import { repriceListing, setListingPricingMode } from "@/lib/pricing.functions";
 import { suggestPricing } from "@/lib/pricing-suggestion";
 import { ASSET_CLASSES, PRICING_MODELS, RISK_LEVELS, STRATEGY_TYPES, TIMEFRAMES, pricingLabel } from "@/lib/marketplace";
 import { BacktestReportView } from "@/components/marketplace/backtest-report";
@@ -527,6 +528,32 @@ function PricingStep({ listing, strategyId, onSaved }: { listing: Listing; strat
   );
   const [pricingModel, setPricingModel] = useState(listing.pricing_model ?? "subscription");
   const [price, setPrice] = useState(String(Number(listing.price) || suggestion.suggested));
+  const [mode, setMode] = useState<"builder" | "platform">(listing.pricing_mode ?? "builder");
+
+  const applyMode = useMutation({
+    mutationFn: (next: "builder" | "platform") => setListingPricingMode({ data: { listingId: listing.id, mode: next } }),
+    onSuccess: (res) => {
+      setMode(res.mode);
+      if (res.price != null) {
+        setPrice(String(res.price));
+        toast.success(res.summary ?? "aiAlgo priced this listing");
+      } else {
+        toast.success("You control this price");
+      }
+      qc.invalidateQueries({ queryKey: ["strategy-listing", strategyId] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const reprice = useMutation({
+    mutationFn: () => repriceListing({ data: { listingId: listing.id } }),
+    onSuccess: (res) => {
+      if (res.price != null) setPrice(String(res.price));
+      toast.success(res.summary || "Repriced");
+      qc.invalidateQueries({ queryKey: ["strategy-listing", strategyId] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   const save = useMutation({
     mutationFn: () =>
@@ -607,6 +634,31 @@ function PricingStep({ listing, strategyId, onSaved }: { listing: Listing; strat
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label>Who sets the price?</Label>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {([
+                { key: "builder", label: "I set it", hint: "You choose the price and it never changes on its own." },
+                { key: "platform", label: "aiAlgo sets it", hint: "Priced automatically from performance, likes and comment sentiment." },
+              ] as const).map((o) => (
+                <button
+                  key={o.key}
+                  type="button"
+                  onClick={() => applyMode.mutate(o.key)}
+                  disabled={applyMode.isPending}
+                  className={`rounded-lg border p-3 text-left text-sm transition ${
+                    mode === o.key ? "border-primary bg-primary/10" : "border-border/70 hover:border-primary/50"
+                  }`}
+                >
+                  <span className="font-medium">{o.label}</span>
+                  <span className="mt-1 block text-xs text-muted-foreground">{o.hint}</span>
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Buyers always see which of the two set the price on your listing.
+            </p>
+          </div>
           <Field label="Pricing model">
             <Select value={pricingModel} onValueChange={(v) => setPricingModel(v as typeof pricingModel)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
@@ -617,7 +669,7 @@ function PricingStep({ listing, strategyId, onSaved }: { listing: Listing; strat
           </Field>
           <div className="space-y-1.5">
             <Label htmlFor="price">Price ({listing.currency ?? "HKD"})</Label>
-            <Input id="price" type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} />
+            <Input id="price" type="number" min={0} value={price} disabled={mode === "platform"} onChange={(e) => setPrice(e.target.value)} />
             <p className="text-xs text-muted-foreground">
               Suggested range {suggestion.min}–{suggestion.max}. Tap to use {suggestion.suggested}.
             </p>
@@ -625,8 +677,13 @@ function PricingStep({ listing, strategyId, onSaved }: { listing: Listing; strat
               Use suggested price
             </Button>
           </div>
-          <Button className="w-full" onClick={() => save.mutate()} disabled={save.isPending}>
-            {save.isPending ? "Saving…" : "Save pricing"}
+          {mode === "platform" ? (
+            <Button variant="outline" className="w-full" onClick={() => reprice.mutate()} disabled={reprice.isPending}>
+              {reprice.isPending ? "Recomputing…" : "Recompute aiAlgo price now"}
+            </Button>
+          ) : null}
+          <Button className="w-full" onClick={() => save.mutate()} disabled={save.isPending || mode === "platform"}>
+            {save.isPending ? "Saving…" : mode === "platform" ? "Managed by aiAlgo" : "Save pricing"}
           </Button>
         </CardContent>
       </Card>

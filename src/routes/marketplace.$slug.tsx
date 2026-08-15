@@ -34,6 +34,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { fmtDate, fmtNum, pnlClass } from "@/lib/format";
+import { CommunityPanel } from "@/components/marketplace/community-panel";
+import { PricingSourceBadge } from "@/components/marketplace/pricing-source-badge";
 import { ASSET_CLASSES, STRATEGY_TYPES, labelFor, pricingLabel, riskTone } from "@/lib/marketplace";
 
 const modelQuery = (slug: string) =>
@@ -225,6 +227,7 @@ function ModelDetail() {
               <TabsTrigger value="live">Live since listing</TabsTrigger>
               <TabsTrigger value="versions">Versions</TabsTrigger>
               <TabsTrigger value="reviews">Reviews</TabsTrigger>
+              <TabsTrigger value="community">Community</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="mt-4 space-y-4">
@@ -451,6 +454,10 @@ function ModelDetail() {
                 ))
               )}
             </TabsContent>
+
+            <TabsContent value="community" className="mt-4">
+              <CommunityPanel modelId={data.id} currency={data.currency} />
+            </TabsContent>
           </Tabs>
         </div>
 
@@ -460,6 +467,9 @@ function ModelDetail() {
               <CardTitle className="text-base">
                 {pricingLabel(data.pricing_model, Number(data.price), data.currency)}
               </CardTitle>
+              <div className="pt-1">
+                <PricingSourceBadge mode={data.pricing_mode} note={data.price_source_note} />
+              </div>
             </CardHeader>
             <CardContent className="space-y-3">
               <Button className="w-full" size="lg" onClick={() => setApplyOpen(true)}>
