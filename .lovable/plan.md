@@ -30,6 +30,27 @@ Each hosted account card gains: region, uptime, last heartbeat, **Restart bridge
 ### 4. Beta gating and cost
 Hosted bridges are limited: one per broker per user, invite/entitlement gated (`managed_bridge` entitlement), with a clear beta notice that sessions may restart and that self-hosting remains the most private option.
 
+### 5. Trading authorisation consent (required before any hosted bridge or live routing)
+
+Because aiAlgo is not a broker, adviser or asset manager and has no discretionary authority, a hosted bridge can only be provisioned after the user accepts an explicit **Trading Authorisation & Disclaimer**. It appears as a scroll-to-end dialog with individually ticked statements, not a single blanket checkbox:
+
+- aiAlgo is a software tool. It does not provide investment advice, recommendations or discretionary management, and holds no licence to trade on your behalf.
+- Every order is placed under **your** authority, using the broker account and credentials **you** supply, executing the strategy **you** selected, configured and enabled. aiAlgo never selects a strategy or initiates a trade on its own.
+- Signals produced by any Algo or AI model are informational outputs of your chosen strategy. Acting on them — including running a strategy in automated mode — is your own decision and remains your responsibility.
+- Enabling automated routing is an instruction *from you* to transmit orders that your selected strategy generates, within the limits you set. You may pause, disable or disconnect at any time, and you remain responsible for monitoring open positions.
+- Past and backtested performance does not predict future results. Trading involves risk of loss, including total loss of capital.
+- You confirm you are permitted to trade these markets and that using automated order routing complies with your broker agreement and local law.
+- A hosted bridge means aiAlgo operates infrastructure that relays your instructions to your broker; aiAlgo does not hold your assets and exercises no discretion over them.
+
+Mechanics:
+- Acceptance is versioned and recorded (user, version, timestamp, IP hash) and re-prompted when the text version changes.
+- Provisioning a bridge, enabling live routing on a strategy activation, and placing a manual live order are all blocked server-side until the current version is accepted — not just hidden in the UI.
+- A short standing reminder line sits on the Trading Desk and on each hosted account card: "Orders are sent on your instruction, from your strategy selection. aiAlgo has no discretionary authority."
+- The full text also lives on a public, owner-authored `/trading-disclaimer` page linked from the dialog, the Trading Desk and the accounts page.
+- Every order stored keeps its decision origin (Manual / Algo / AI, with the strategy and version) as it already does — this is the audit trail showing which of *your* strategies authorised each trade, and it is surfaced in the blotter and any exported statement.
+
+
+
 ## Technical notes
 
 - **Migration**: add to `broker_connections` — `hosting_mode` (`self` | `managed`), `bridge_id`, `bridge_status`, `bridge_region`, `bridge_last_heartbeat`, `bridge_last_error`. New `managed_bridges` table (id, user_id, broker, container_ref, internal_url, status, created_at, expires_at) with owner-scoped RLS and the standard GRANT block; internal URL and control token never leave the server.
@@ -44,6 +65,8 @@ Hosted bridges are limited: one per broker per user, invite/entitlement gated (`
 - **`src/routes/_authenticated/dashboard.execution.tsx`**: status dot reflects bridge health; a stale IBKR session shows "Re-login required" with a link.
 - **Health**: a `/api/public/bridge-heartbeat` route the host posts to (HMAC-signed), updating `bridge_last_heartbeat`; a stale bridge flips the account to "Needs attention" and notifies the user.
 - **Security**: broker credentials stay AES-GCM encrypted via `crypto.server`, decrypted only at provisioning/login time and never returned to the browser; bridge URLs and control tokens are server-only; logs redacted before display.
+- **Consent**: new `trading_consents` table (user_id, version, accepted_at, ip_hash) with owner-scoped RLS + GRANTs; consent text and current version in `src/lib/trading-consent.ts`; a shared `requireTradingConsent` server-side check called by `provisionBridge`, live activation and manual order server functions; new public route `src/routes/trading-disclaimer.tsx` with its own head metadata.
+
 
 ## Suggested sequencing
 
