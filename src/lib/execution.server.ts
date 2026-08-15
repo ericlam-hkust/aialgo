@@ -29,7 +29,7 @@ export async function runExecutionTick(supabase: AnyClient, userId: string): Pro
   const { data: activations } = await supabase
     .from("model_activations")
     .select(
-      "id,model_id,status,mode,capital_allocation,max_position_size_pct,daily_loss_limit_pct,max_open_positions,kill_switch_drawdown_pct,peak_equity,pnl,pnl_pct,signals_consumed,executions_count,broker_connection_id, model:ai_models(name,slug,interface_manifest)",
+      "id,model_id,status,mode,capital_allocation,max_position_size_pct,daily_loss_limit_pct,max_open_positions,kill_switch_drawdown_pct,peak_equity,pnl,pnl_pct,signals_consumed,executions_count,broker_connection_id, model:ai_models(name,slug,listing_kind,interface_manifest)",
     )
     .eq("user_id", userId)
     .eq("status", "active");
@@ -37,7 +37,7 @@ export async function runExecutionTick(supabase: AnyClient, userId: string): Pro
   const events: TickEvent[] = [];
 
   for (const a of activations ?? []) {
-    const model = a.model as unknown as { name: string; slug: string; interface_manifest: unknown } | null;
+    const model = a.model as unknown as { name: string; slug: string; listing_kind: string; interface_manifest: unknown } | null;
     const manifest = normalizeManifest(model?.interface_manifest);
     const symbols = manifest.instruments.length ? manifest.instruments : FALLBACK_SYMBOLS;
     const symbol = pick(symbols);
@@ -102,11 +102,42 @@ export async function runExecutionTick(supabase: AnyClient, userId: string): Pro
       const notional = (capital * requestedSizePct) / 100;
       const quantity = price > 0 ? Math.round((notional / price) * 100) / 100 : 0;
       pnlDelta = Math.round((notional * (Math.random() * 0.03 - 0.012)) * 100) / 100;
+      const source = model?.listing_kind === "algo" ? "algo" : "ai_model";
+
+      let brokerOrderRowId: string | null = null;
+      if (a.broker_connection_id) {
+        // Mirror the fill into the order book so the desk blotter can attribute it.
+        const { data: brokerRow } = await supabase
+          .from("broker_orders")
+          .insert({
+            user_id: userId,
+            broker_connection_id: a.broker_connection_id,
+            broker_order_id: `aialgo-exec-${crypto.randomUUID().slice(0, 18)}`,
+            symbol,
+            side: action.toLowerCase(),
+            order_type: "market",
+            quantity,
+            filled_quantity: quantity,
+            avg_fill_price: price,
+            status: "filled",
+            source,
+            model_id: a.model_id,
+            activation_id: a.id,
+            placed_at: new Date().toISOString(),
+            synced_at: new Date().toISOString(),
+          })
+          .select("id")
+          .single();
+        brokerOrderRowId = brokerRow?.id ?? null;
+      }
+
       await supabase.from("execution_orders").insert({
         user_id: userId,
         activation_id: a.id,
         signal_id: signal?.id ?? null,
         broker_connection_id: a.broker_connection_id,
+        broker_order_id: brokerOrderRowId,
+        source,
         symbol,
         side: action,
         quantity,
