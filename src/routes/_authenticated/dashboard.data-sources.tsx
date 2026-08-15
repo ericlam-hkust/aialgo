@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { handleActionError } from "@/lib/upgrade-events";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -140,6 +140,31 @@ function DataSources() {
           </Button>
         </div>
       </div>
+
+      <Card className="border-border/70">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Broker accounts as data sources</CardTitle>
+          <CardDescription>
+            Linked brokers can serve historical candles for backtests using your own market data entitlement. Toggle
+            them on from{" "}
+            <Link to="/dashboard/accounts" className="underline">
+              Trading accounts
+            </Link>
+            .
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-2">
+          {(data?.brokerSources ?? []).length === 0 ? (
+            <p className="text-sm text-muted-foreground">No broker account is being used for market data yet.</p>
+          ) : (
+            (data?.brokerSources ?? []).map((b) => (
+              <Badge key={b.id} variant={b.enabled ? "default" : "outline"}>
+                {b.label} · priority {b.priority}
+              </Badge>
+            ))
+          )}
+        </CardContent>
+      </Card>
 
       <Tabs defaultValue="providers">
         <TabsList>
