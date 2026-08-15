@@ -72,7 +72,7 @@ export const placeManualOrder = createServerFn({ method: "POST" })
 
     const { data: account, error: accountError } = await supabase
       .from("broker_connections")
-      .select("id,broker_name,nickname,mode,status,currency,account_id,buying_power,config,credentials_encrypted")
+      .select("id,broker_name,nickname,mode,status,currency,account_id,buying_power,account_balance,config,credentials_encrypted")
       .eq("id", data.accountId)
       .single();
     if (accountError) throw new Error(accountError.message);
