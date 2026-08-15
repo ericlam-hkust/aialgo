@@ -11,14 +11,16 @@ import {
   Loader2,
   Pause,
   Play,
+  RefreshCw,
   ShieldAlert,
   Wallet,
   Zap,
 } from "lucide-react";
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { getExecutionOverview, tickExecution, triggerKillSwitch } from "@/lib/execution.functions";
+import { cancelDeskOrder, getDeskState, placeManualOrder, refreshOrderBook } from "@/lib/trading-desk.functions";
 import { resumeActivation } from "@/lib/activations.functions";
 import { providerLabel } from "@/lib/trading-accounts";
+import { SYMBOLS } from "@/lib/market";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -27,27 +29,234 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { EmptyState } from "@/components/empty-state";
+import { OrderTicket, type TicketPayload } from "@/components/trade/order-ticket";
+import { OrderBook, PositionsTable, isWorking, type DeskOrder } from "@/components/trade/order-book";
+import { TradeBlotter } from "@/components/trade/trade-blotter";
 import { fmtMoney } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/dashboard/execution")({
-  component: ExecutionDashboard,
+  component: TradingDesk,
   head: () => ({
     meta: [
-      { title: "Execution Monitor — aiAlgo" },
+      { title: "Trading Desk — aiAlgo" },
       {
         name: "description",
-        content: "Live monitoring of every active model: signals, risk-engine decisions, orders, P&L and kill switch.",
+        content:
+          "Live order book on your connected broker accounts, manual order entry, and a blotter showing whether each trade was human executed or strategy driven.",
       },
-      { property: "og:title", content: "Execution Monitor — aiAlgo" },
-      { property: "og:description", content: "Watch signals flow through the risk engine into your broker account." },
+      { property: "og:title", content: "Trading Desk — aiAlgo" },
+      {
+        property: "og:description",
+        content: "Trade manually or watch your Algo and AI strategies work — every fill clearly attributed.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
 });
 
-function ExecutionDashboard() {
+type BlotterOrder = DeskOrder & { broker_connection_id: string };
+
+function TradingDesk() {
+  const qc = useQueryClient();
+  const desk = useQuery({ queryKey: ["desk-state"], queryFn: () => getDeskState(), refetchInterval: 20_000 });
+  const [accountId, setAccountId] = useState<string>("");
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
+
+  const accounts = desk.data?.accounts ?? [];
+  const account = useMemo(
+    () => accounts.find((a) => a.id === accountId) ?? accounts.find((a) => a.is_default) ?? accounts[0],
+    [accounts, accountId],
+  );
+  const currency = account?.currency ?? "USD";
+  const simulated = account?.mode === "simulation" || account?.broker_name === "paper";
+
+  const orders = (desk.data?.orders ?? []) as BlotterOrder[];
+  const accountOrders = orders.filter((o) => o.broker_connection_id === account?.id);
+  const workingOrders = accountOrders.filter((o) => isWorking(o.status));
+  const positions = (desk.data?.positions ?? []).filter(
+    (p) => (p as { broker_connection_id: string }).broker_connection_id === account?.id,
+  );
+
+  const strategies = (desk.data?.strategies ?? []).map((s) => ({ id: s.id, name: s.name }));
+  const activations = (desk.data?.activations ?? []).map((a) => {
+    const model = a.model as unknown as { name: string } | null;
+    return { id: a.id, name: model?.name ?? "AI model", modelId: a.model_id as string | null };
+  });
+
+  const quotes = desk.data?.quotes ?? [];
+  const priceOf = (symbol: string) => {
+    const q = quotes.find((x) => x.symbol === symbol);
+    return q ? Number(q.price) : null;
+  };
+
+  const nameFor = (o: DeskOrder) => ({
+    strategyName: strategies.find((s) => s.id === o.strategy_id)?.name ?? null,
+    modelName: activations.find((a) => a.id === o.activation_id || a.modelId === o.model_id)?.name ?? null,
+  });
+  const accountName = (o: { broker_connection_id?: string }) => {
+    const acc = accounts.find((a) => a.id === o.broker_connection_id);
+    return acc ? acc.nickname || providerLabel(acc.broker_name) : "—";
+  };
+
+  const place = useMutation({
+    mutationFn: (payload: TicketPayload) =>
+      placeManualOrder({ data: { accountId: account!.id, ...payload } }),
+    onSuccess: (res) => {
+      if (res.ok) toast.success(res.message);
+      else toast.error(res.message);
+      void qc.invalidateQueries({ queryKey: ["desk-state"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const cancel = useMutation({
+    mutationFn: (id: string) => {
+      setCancellingId(id);
+      return cancelDeskOrder({ data: { orderId: id } });
+    },
+    onSuccess: () => {
+      toast.success("Order cancelled");
+      void qc.invalidateQueries({ queryKey: ["desk-state"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+    onSettled: () => setCancellingId(null),
+  });
+
+  const sync = useMutation({
+    mutationFn: () => refreshOrderBook({ data: { accountId: account!.id } }),
+    onSuccess: (res) => {
+      if (res.ok) toast.success(res.message);
+      else toast.error(res.message);
+      void qc.invalidateQueries({ queryKey: ["desk-state"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  if (desk.isLoading) {
+    return (
+      <div className="flex justify-center py-16">
+        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" aria-hidden />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Trading desk</h1>
+          <p className="text-sm text-muted-foreground">
+            Live order book, manual trading, and every fill attributed to a person or a strategy.
+          </p>
+        </div>
+        {accounts.length > 0 ? (
+          <div className="flex items-center gap-2">
+            <Select value={account?.id ?? ""} onValueChange={setAccountId}>
+              <SelectTrigger className="w-64">
+                <SelectValue placeholder="Select account" />
+              </SelectTrigger>
+              <SelectContent>
+                {accounts.map((a) => (
+                  <SelectItem key={a.id} value={a.id}>
+                    {a.nickname || providerLabel(a.broker_name)} · {a.mode}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button variant="outline" onClick={() => sync.mutate()} disabled={sync.isPending || !account}>
+              {sync.isPending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden />
+              ) : (
+                <RefreshCw className="mr-2 h-4 w-4" aria-hidden />
+              )}
+              Sync now
+            </Button>
+          </div>
+        ) : null}
+      </div>
+
+      {!account ? (
+        <EmptyState
+          icon={<Wallet className="h-6 w-6" aria-hidden />}
+          title="No connected account"
+          description="Connect a broker account under Trade → Connected Accounts to trade and see your live order book."
+        />
+      ) : (
+        <>
+          <Card className="border-border/70">
+            <CardContent className="flex flex-wrap items-center gap-4 py-4 text-sm">
+              <div>
+                <div className="text-xs text-muted-foreground">Account</div>
+                <div className="font-medium">
+                  {account.nickname || providerLabel(account.broker_name)}{" "}
+                  <span className="mono text-xs text-muted-foreground">{account.account_id ?? ""}</span>
+                </div>
+              </div>
+              <Separator orientation="vertical" className="h-8" />
+              <div>
+                <div className="text-xs text-muted-foreground">Balance</div>
+                <div className="mono">{fmtMoney(Number(account.account_balance ?? 0), currency)}</div>
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground">Buying power</div>
+                <div className="mono">{fmtMoney(Number(account.buying_power ?? 0), currency)}</div>
+              </div>
+              <Separator orientation="vertical" className="h-8" />
+              <div>
+                <div className="text-xs text-muted-foreground">Status</div>
+                <Badge variant={account.status === "error" ? "destructive" : "outline"}>{account.status}</Badge>
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Last sync {account.last_synced_at ? new Date(account.last_synced_at).toLocaleString() : "never"}
+              </div>
+              {simulated ? (
+                <Badge variant="outline" className="ml-auto">
+                  Simulation mode — orders are filled inside aiAlgo, not routed to a broker
+                </Badge>
+              ) : null}
+              {account.last_error ? (
+                <p className="w-full text-xs text-loss">{account.last_error}</p>
+              ) : null}
+            </CardContent>
+          </Card>
+
+          <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
+            <OrderTicket
+              symbols={SYMBOLS.map((s) => s.symbol)}
+              lastPrice={priceOf}
+              currency={currency}
+              accountLabel={account.nickname || providerLabel(account.broker_name)}
+              simulated={Boolean(simulated)}
+              strategies={strategies}
+              activations={activations}
+              pending={place.isPending}
+              onSubmit={(payload) => place.mutate(payload)}
+            />
+            <div className="space-y-6">
+              <OrderBook
+                orders={workingOrders}
+                currency={currency}
+                nameFor={nameFor}
+                onCancel={(id) => cancel.mutate(id)}
+                cancellingId={cancellingId}
+              />
+              <PositionsTable positions={positions as never} currency={currency} />
+            </div>
+          </div>
+
+          <TradeBlotter orders={orders} accountName={accountName} nameFor={nameFor} currency={currency} />
+        </>
+      )}
+
+      <StrategyMonitor />
+    </div>
+  );
+}
+
+/** The original signal → risk engine → account monitor, kept as its own section. */
+function StrategyMonitor() {
   const qc = useQueryClient();
   const overview = useQuery({ queryKey: ["execution-overview"], queryFn: () => getExecutionOverview() });
   const [selectedId, setSelectedId] = useState<string>("");
@@ -55,7 +264,10 @@ function ExecutionDashboard() {
 
   const tick = useMutation({
     mutationFn: () => tickExecution(),
-    onSuccess: () => void qc.invalidateQueries({ queryKey: ["execution-overview"] }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["execution-overview"] });
+      void qc.invalidateQueries({ queryKey: ["desk-state"] });
+    },
   });
 
   useEffect(() => {
@@ -88,44 +300,19 @@ function ExecutionDashboard() {
       void qc.invalidateQueries({ queryKey: ["execution-overview"] });
     },
   });
-  const kill = useMutation({
-    mutationFn: (id: string) => triggerKillSwitch({ data: { activationId: id } }),
-    onSuccess: () => {
-      toast.error("Kill switch engaged — model stopped");
-      void qc.invalidateQueries({ queryKey: ["execution-overview"] });
-    },
-  });
-
-  const equity = useMemo(() => {
-    const capital = Number(active?.capital_allocation ?? 0);
-    let running = 0;
-    return [...orders]
-      .reverse()
-      .map((o, i) => {
-        running += Number(o.realized_pnl ?? 0);
-        return { i, equity: Math.round((capital + running) * 100) / 100 };
-      })
-      .slice(-60);
-  }, [orders, active]);
 
   const todayPnl = orders
     .filter((o) => new Date(o.created_at).toDateString() === new Date().toDateString())
     .reduce((n, o) => n + Number(o.realized_pnl ?? 0), 0);
 
-  if (overview.isLoading) {
-    return (
-      <div className="flex justify-center py-16">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" aria-hidden />
-      </div>
-    );
-  }
+  if (overview.isLoading) return null;
 
   if (!active) {
     return (
       <EmptyState
         icon={<Activity className="h-6 w-6" aria-hidden />}
-        title="No active models"
-        description="Apply a model from the marketplace to see its live execution chain here."
+        title="No strategies running"
+        description="Apply a model or deploy an algo strategy to see its live execution chain here."
       />
     );
   }
@@ -134,10 +321,10 @@ function ExecutionDashboard() {
   const latest = signals[0];
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Execution monitor</h1>
+          <h2 className="text-lg font-semibold tracking-tight">Strategy execution monitor</h2>
           <p className="text-sm text-muted-foreground">Signal → risk engine → account, with a live audit trail.</p>
         </div>
         <div className="flex items-center gap-3">
@@ -156,7 +343,7 @@ function ExecutionDashboard() {
             Run cycle
           </Button>
           <Select value={active.id} onValueChange={setSelectedId}>
-            <SelectTrigger className="w-64">
+            <SelectTrigger className="w-56">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -182,21 +369,21 @@ function ExecutionDashboard() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-wrap items-center gap-3">
-            <Link
+            <Node
               icon={Cpu}
               label={model?.name ?? "Model"}
               status={active.status === "active" ? "ok" : "off"}
               detail={active.status}
             />
             <ArrowRight className="h-4 w-4 text-muted-foreground" aria-hidden />
-            <Link
+            <Node
               icon={ShieldAlert}
               label="Risk engine"
               status="ok"
               detail={`${Number(active.max_position_size_pct)}% pos · ${Number(active.max_open_positions ?? 5)} open`}
             />
             <ArrowRight className="h-4 w-4 text-muted-foreground" aria-hidden />
-            <Link
+            <Node
               icon={Wallet}
               label={account ? account.nickname || providerLabel(account.broker_name) : "Paper account"}
               status={account?.status === "error" ? "error" : "ok"}
@@ -232,70 +419,21 @@ function ExecutionDashboard() {
                 <Play className="mr-1.5 h-3.5 w-3.5" aria-hidden /> Resume
               </Button>
             )}
-            <Button variant="destructive" size="sm" onClick={() => kill.mutate(active.id)}>
+            <Button variant="destructive" size="sm" onClick={() => pause.mutate(active.id)}>
               <ShieldAlert className="mr-1.5 h-3.5 w-3.5" aria-hidden /> Kill switch
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="border-border/70">
-          <CardHeader>
-            <CardTitle className="text-base">Latest signal</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {latest ? (
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center gap-2">
-                  <Badge variant={latest.status === "passed" ? "default" : "destructive"}>
-                    {latest.status === "passed" ? "Passed risk engine" : "Blocked"}
-                  </Badge>
-                  <span className="mono text-xs text-muted-foreground">
-                    {new Date(latest.created_at).toLocaleTimeString()}
-                  </span>
-                </div>
-                <p className="mono">
-                  {latest.action} {latest.symbol} · conf {Number(latest.confidence).toFixed(2)} · size{" "}
-                  {Number(latest.position_size_pct)}%
-                </p>
-                {latest.block_reason ? <p className="text-xs text-loss">{latest.block_reason}</p> : null}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">No signals yet — run a cycle.</p>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/70">
-          <CardHeader>
-            <CardTitle className="text-base">Cumulative P&L</CardTitle>
-          </CardHeader>
-          <CardContent className="h-48">
-            {equity.length > 1 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={equity}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                  <XAxis dataKey="i" hide />
-                  <YAxis tick={{ fontSize: 10 }} width={60} domain={["auto", "auto"]} />
-                  <Tooltip />
-                  <Area dataKey="equity" stroke="var(--color-chart-2)" fill="var(--color-chart-2)" fillOpacity={0.15} />
-                </AreaChart>
-              </ResponsiveContainer>
-            ) : (
-              <p className="text-sm text-muted-foreground">Not enough fills yet.</p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
       <Card className="border-border/70">
         <CardHeader>
-          <CardTitle className="text-base">Execution log</CardTitle>
+          <CardTitle className="text-base">Signal log</CardTitle>
           <CardDescription>Every signal, risk decision and fill.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-2">
-          {signals.slice(0, 40).map((s) => {
+          {latest === undefined ? <p className="text-sm text-muted-foreground">Nothing logged yet.</p> : null}
+          {signals.slice(0, 30).map((s) => {
             const order = orders.find((o) => o.signal_id === s.id);
             return (
               <div key={s.id} className="rounded-md border border-border/70 p-2.5 text-xs">
@@ -329,14 +467,13 @@ function ExecutionDashboard() {
               </div>
             );
           })}
-          {signals.length === 0 ? <p className="text-sm text-muted-foreground">Nothing logged yet.</p> : null}
         </CardContent>
       </Card>
     </div>
   );
 }
 
-function Link({
+function Node({
   icon: Icon,
   label,
   detail,

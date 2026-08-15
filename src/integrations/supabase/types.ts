@@ -699,61 +699,106 @@ export type Database = {
       broker_orders: {
         Row: {
           account_id: string | null
+          activation_id: string | null
           avg_fill_price: number | null
           broker_connection_id: string
           broker_order_id: string
+          client_order_id: string | null
           filled_quantity: number
           id: string
           limit_price: number | null
+          model_id: string | null
           order_type: string | null
           placed_at: string | null
+          placed_by_user_id: string | null
           quantity: number
+          reject_reason: string | null
           side: string
+          source: string
           status: string
+          strategy_id: string | null
           symbol: string
           synced_at: string
+          time_in_force: string | null
           user_id: string
         }
         Insert: {
           account_id?: string | null
+          activation_id?: string | null
           avg_fill_price?: number | null
           broker_connection_id: string
           broker_order_id: string
+          client_order_id?: string | null
           filled_quantity?: number
           id?: string
           limit_price?: number | null
+          model_id?: string | null
           order_type?: string | null
           placed_at?: string | null
+          placed_by_user_id?: string | null
           quantity?: number
+          reject_reason?: string | null
           side: string
+          source?: string
           status?: string
+          strategy_id?: string | null
           symbol: string
           synced_at?: string
+          time_in_force?: string | null
           user_id: string
         }
         Update: {
           account_id?: string | null
+          activation_id?: string | null
           avg_fill_price?: number | null
           broker_connection_id?: string
           broker_order_id?: string
+          client_order_id?: string | null
           filled_quantity?: number
           id?: string
           limit_price?: number | null
+          model_id?: string | null
           order_type?: string | null
           placed_at?: string | null
+          placed_by_user_id?: string | null
           quantity?: number
+          reject_reason?: string | null
           side?: string
+          source?: string
           status?: string
+          strategy_id?: string | null
           symbol?: string
           synced_at?: string
+          time_in_force?: string | null
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "broker_orders_activation_id_fkey"
+            columns: ["activation_id"]
+            isOneToOne: false
+            referencedRelation: "model_activations"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "broker_orders_broker_connection_id_fkey"
             columns: ["broker_connection_id"]
             isOneToOne: false
             referencedRelation: "broker_connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "broker_orders_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "ai_models"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "broker_orders_strategy_id_fkey"
+            columns: ["strategy_id"]
+            isOneToOne: false
+            referencedRelation: "strategies"
             referencedColumns: ["id"]
           },
         ]
@@ -1088,6 +1133,7 @@ export type Database = {
         Row: {
           activation_id: string
           broker_connection_id: string | null
+          broker_order_id: string | null
           created_at: string
           id: string
           notional: number
@@ -1096,6 +1142,7 @@ export type Database = {
           realized_pnl: number
           side: string
           signal_id: string | null
+          source: string
           status: string
           symbol: string
           user_id: string
@@ -1103,6 +1150,7 @@ export type Database = {
         Insert: {
           activation_id: string
           broker_connection_id?: string | null
+          broker_order_id?: string | null
           created_at?: string
           id?: string
           notional?: number
@@ -1111,6 +1159,7 @@ export type Database = {
           realized_pnl?: number
           side: string
           signal_id?: string | null
+          source?: string
           status?: string
           symbol: string
           user_id: string
@@ -1118,6 +1167,7 @@ export type Database = {
         Update: {
           activation_id?: string
           broker_connection_id?: string | null
+          broker_order_id?: string | null
           created_at?: string
           id?: string
           notional?: number
@@ -1126,6 +1176,7 @@ export type Database = {
           realized_pnl?: number
           side?: string
           signal_id?: string | null
+          source?: string
           status?: string
           symbol?: string
           user_id?: string
@@ -1143,6 +1194,13 @@ export type Database = {
             columns: ["broker_connection_id"]
             isOneToOne: false
             referencedRelation: "broker_connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "execution_orders_broker_order_id_fkey"
+            columns: ["broker_order_id"]
+            isOneToOne: false
+            referencedRelation: "broker_orders"
             referencedColumns: ["id"]
           },
           {

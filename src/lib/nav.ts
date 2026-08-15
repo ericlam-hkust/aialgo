@@ -124,7 +124,7 @@ export const NAV_GROUPS: NavGroup[] = [
     key: "group.trade",
     items: [
       { to: "/dashboard/paper-trading", key: "nav.paperTrading", icon: Activity, exact: true, terms: ["simulate", "demo"] },
-      { to: "/dashboard/execution", key: "nav.execution", icon: Zap, exact: true, terms: ["orders", "signals", "live"] },
+      { to: "/dashboard/execution", key: "nav.execution", icon: Zap, exact: true, terms: ["orders", "signals", "live", "trade", "desk", "manual", "blotter"] },
       { to: "/dashboard/risk", key: "nav.risk", icon: ShieldAlert, exact: true, terms: ["kill switch", "limits"] },
       {
         to: "/dashboard/accounts",
