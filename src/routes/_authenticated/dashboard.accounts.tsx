@@ -4,6 +4,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   AlertTriangle,
+  BookOpen,
+
   CheckCircle2,
   Database,
   Loader2,
@@ -50,7 +52,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { ConnectionGuide } from "@/components/accounts/connection-guide";
 import { fmtMoney } from "@/lib/format";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard/accounts")({
   component: AccountsPage,
@@ -220,7 +224,10 @@ function AccountsPage() {
               </div>
             </div>
 
+            <ConnectionGuide meta={meta} />
+
             <div className="grid gap-3">
+
               {meta.fields.map((f) => (
                 <div key={f.id} className="space-y-1.5">
                   <Label>
@@ -353,9 +360,17 @@ function AccountsPage() {
                           <Star className="mr-1.5 h-3.5 w-3.5" aria-hidden /> Make default
                         </Button>
                       ) : null}
+                      {pm?.docsUrl ? (
+                        <Button size="sm" variant="ghost" asChild>
+                          <a href={pm.docsUrl} target="_blank" rel="noopener noreferrer">
+                            <BookOpen className="mr-1.5 h-3.5 w-3.5" aria-hidden /> Setup guide
+                          </a>
+                        </Button>
+                      ) : null}
                       <Button size="sm" variant="ghost" onClick={() => setDisconnectId(a.id)}>
                         <Unplug className="mr-1.5 h-3.5 w-3.5" aria-hidden /> Disconnect
                       </Button>
+
                     </div>
                   </div>
                 );
