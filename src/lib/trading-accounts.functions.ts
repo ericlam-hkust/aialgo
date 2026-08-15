@@ -92,7 +92,7 @@ export const connectTradingAccount = createServerFn({ method: "POST" })
 
     let id = data.accountId ?? null;
     if (id) {
-      const { error } = await context.supabase.from("broker_connections").update(row).eq("id", id);
+      const { error } = await context.supabase.from("broker_connections").update(row as never).eq("id", id);
       if (error) throw new Error(error.message);
     } else {
       const { data: inserted, error } = await context.supabase
