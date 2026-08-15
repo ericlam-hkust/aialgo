@@ -368,6 +368,60 @@ export type Database = {
         }
         Relationships: []
       }
+      approvals: {
+        Row: {
+          change_kind: string
+          created_at: string
+          decided_at: string | null
+          deployment_id: string | null
+          diff: string
+          id: string
+          release_id: string | null
+          status: string
+          summary: string
+          user_id: string
+        }
+        Insert: {
+          change_kind?: string
+          created_at?: string
+          decided_at?: string | null
+          deployment_id?: string | null
+          diff?: string
+          id?: string
+          release_id?: string | null
+          status?: string
+          summary?: string
+          user_id: string
+        }
+        Update: {
+          change_kind?: string
+          created_at?: string
+          decided_at?: string | null
+          deployment_id?: string | null
+          diff?: string
+          id?: string
+          release_id?: string | null
+          status?: string
+          summary?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "approvals_deployment_id_fkey"
+            columns: ["deployment_id"]
+            isOneToOne: false
+            referencedRelation: "deployments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "approvals_release_id_fkey"
+            columns: ["release_id"]
+            isOneToOne: false
+            referencedRelation: "releases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -637,61 +691,70 @@ export type Database = {
         Row: {
           account_balance: number
           account_id: string | null
+          auth_status: string
           auto_sync_minutes: number
           broker_name: string
           buying_power: number
           config: Json
           created_at: string
           credentials: Json | null
-          credentials_encrypted: string | null
           currency: string
           id: string
           is_default: boolean
           last_error: string | null
           last_synced_at: string | null
+          linking_mode: string
           mode: string
           nickname: string | null
+          scope: string | null
           status: string
+          token_ref: string | null
           user_id: string
         }
         Insert: {
           account_balance?: number
           account_id?: string | null
+          auth_status?: string
           auto_sync_minutes?: number
           broker_name: string
           buying_power?: number
           config?: Json
           created_at?: string
           credentials?: Json | null
-          credentials_encrypted?: string | null
           currency?: string
           id?: string
           is_default?: boolean
           last_error?: string | null
           last_synced_at?: string | null
+          linking_mode?: string
           mode?: string
           nickname?: string | null
+          scope?: string | null
           status?: string
+          token_ref?: string | null
           user_id: string
         }
         Update: {
           account_balance?: number
           account_id?: string | null
+          auth_status?: string
           auto_sync_minutes?: number
           broker_name?: string
           buying_power?: number
           config?: Json
           created_at?: string
           credentials?: Json | null
-          credentials_encrypted?: string | null
           currency?: string
           id?: string
           is_default?: boolean
           last_error?: string | null
           last_synced_at?: string | null
+          linking_mode?: string
           mode?: string
           nickname?: string | null
+          scope?: string | null
           status?: string
+          token_ref?: string | null
           user_id?: string
         }
         Relationships: []
@@ -1140,6 +1203,107 @@ export type Database = {
         }
         Relationships: []
       }
+      deployment_events: {
+        Row: {
+          created_at: string
+          deployment_id: string | null
+          from_version: string | null
+          id: string
+          message: string | null
+          phase: string
+          status: string
+          to_version: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          deployment_id?: string | null
+          from_version?: string | null
+          id?: string
+          message?: string | null
+          phase: string
+          status?: string
+          to_version?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          deployment_id?: string | null
+          from_version?: string | null
+          id?: string
+          message?: string | null
+          phase?: string
+          status?: string
+          to_version?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deployment_events_deployment_id_fkey"
+            columns: ["deployment_id"]
+            isOneToOne: false
+            referencedRelation: "deployments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      deployments: {
+        Row: {
+          agent_token_hash: string | null
+          channel: string
+          created_at: string
+          host_kind: string
+          id: string
+          last_heartbeat_at: string | null
+          last_known_good_version: string | null
+          machine_label: string
+          notes: string | null
+          package_version: string
+          pinned_version: string | null
+          status: string
+          strategy_id: string | null
+          sync_enabled: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          agent_token_hash?: string | null
+          channel?: string
+          created_at?: string
+          host_kind?: string
+          id?: string
+          last_heartbeat_at?: string | null
+          last_known_good_version?: string | null
+          machine_label: string
+          notes?: string | null
+          package_version?: string
+          pinned_version?: string | null
+          status?: string
+          strategy_id?: string | null
+          sync_enabled?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          agent_token_hash?: string | null
+          channel?: string
+          created_at?: string
+          host_kind?: string
+          id?: string
+          last_heartbeat_at?: string | null
+          last_known_good_version?: string | null
+          machine_label?: string
+          notes?: string | null
+          package_version?: string
+          pinned_version?: string | null
+          status?: string
+          strategy_id?: string | null
+          sync_enabled?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       execution_orders: {
         Row: {
           activation_id: string
@@ -1285,48 +1449,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      fee_batches: {
-        Row: {
-          amount: number
-          attempts: number
-          charged_at: string | null
-          created_at: string
-          id: string
-          last_error: string | null
-          period_end: string | null
-          period_start: string | null
-          status: string
-          trigger: string
-          user_id: string
-        }
-        Insert: {
-          amount?: number
-          attempts?: number
-          charged_at?: string | null
-          created_at?: string
-          id?: string
-          last_error?: string | null
-          period_end?: string | null
-          period_start?: string | null
-          status?: string
-          trigger?: string
-          user_id: string
-        }
-        Update: {
-          amount?: number
-          attempts?: number
-          charged_at?: string | null
-          created_at?: string
-          id?: string
-          last_error?: string | null
-          period_end?: string | null
-          period_start?: string | null
-          status?: string
-          trigger?: string
-          user_id?: string
-        }
-        Relationships: []
       }
       fine_tune_jobs: {
         Row: {
@@ -1753,81 +1875,6 @@ export type Database = {
           },
         ]
       }
-      model_transactions: {
-        Row: {
-          buyer_id: string | null
-          commission_amount: number
-          commission_rate: number
-          contributor_id: string | null
-          created_at: string
-          currency: string
-          gross_amount: number
-          hosting_mode: Database["public"]["Enums"]["hosting_mode"]
-          id: string
-          kind: string
-          listing_kind: Database["public"]["Enums"]["listing_kind"]
-          model_id: string | null
-          model_name: string | null
-          net_amount: number
-          payout_batch_id: string | null
-          status: string
-          tier_bonus: number
-        }
-        Insert: {
-          buyer_id?: string | null
-          commission_amount?: number
-          commission_rate?: number
-          contributor_id?: string | null
-          created_at?: string
-          currency?: string
-          gross_amount?: number
-          hosting_mode?: Database["public"]["Enums"]["hosting_mode"]
-          id?: string
-          kind?: string
-          listing_kind?: Database["public"]["Enums"]["listing_kind"]
-          model_id?: string | null
-          model_name?: string | null
-          net_amount?: number
-          payout_batch_id?: string | null
-          status?: string
-          tier_bonus?: number
-        }
-        Update: {
-          buyer_id?: string | null
-          commission_amount?: number
-          commission_rate?: number
-          contributor_id?: string | null
-          created_at?: string
-          currency?: string
-          gross_amount?: number
-          hosting_mode?: Database["public"]["Enums"]["hosting_mode"]
-          id?: string
-          kind?: string
-          listing_kind?: Database["public"]["Enums"]["listing_kind"]
-          model_id?: string | null
-          model_name?: string | null
-          net_amount?: number
-          payout_batch_id?: string | null
-          status?: string
-          tier_bonus?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "model_transactions_contributor_id_fkey"
-            columns: ["contributor_id"]
-            isOneToOne: false
-            referencedRelation: "contributor_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "model_transactions_model_id_fkey"
-            columns: ["model_id"]
-            isOneToOne: false
-            referencedRelation: "ai_models"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       model_versions: {
         Row: {
           changelog: string
@@ -2035,163 +2082,6 @@ export type Database = {
           },
         ]
       }
-      payout_batches: {
-        Row: {
-          amount: number
-          contributor_id: string
-          created_at: string
-          currency: string
-          id: string
-          paid_at: string | null
-          period: string
-          status: Database["public"]["Enums"]["payout_status"]
-          stripe_transfer_id: string | null
-        }
-        Insert: {
-          amount?: number
-          contributor_id: string
-          created_at?: string
-          currency?: string
-          id?: string
-          paid_at?: string | null
-          period: string
-          status?: Database["public"]["Enums"]["payout_status"]
-          stripe_transfer_id?: string | null
-        }
-        Update: {
-          amount?: number
-          contributor_id?: string
-          created_at?: string
-          currency?: string
-          id?: string
-          paid_at?: string | null
-          period?: string
-          status?: Database["public"]["Enums"]["payout_status"]
-          stripe_transfer_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "payout_batches_contributor_id_fkey"
-            columns: ["contributor_id"]
-            isOneToOne: false
-            referencedRelation: "contributor_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      performance_fees: {
-        Row: {
-          activation_id: string | null
-          batch_id: string | null
-          closed_at: string
-          commission_rate: number
-          contributor_amount: number
-          contributor_id: string | null
-          created_at: string
-          exempt: boolean
-          exempt_reason: string | null
-          fee_amount: number
-          fee_pct: number
-          gross_profit: number
-          id: string
-          listing_kind: Database["public"]["Enums"]["listing_kind"]
-          model_id: string
-          order_id: string | null
-          platform_amount: number
-          simulated: boolean
-          status: string
-          symbol: string
-          user_id: string
-        }
-        Insert: {
-          activation_id?: string | null
-          batch_id?: string | null
-          closed_at?: string
-          commission_rate?: number
-          contributor_amount?: number
-          contributor_id?: string | null
-          created_at?: string
-          exempt?: boolean
-          exempt_reason?: string | null
-          fee_amount?: number
-          fee_pct?: number
-          gross_profit?: number
-          id?: string
-          listing_kind?: Database["public"]["Enums"]["listing_kind"]
-          model_id: string
-          order_id?: string | null
-          platform_amount?: number
-          simulated?: boolean
-          status?: string
-          symbol?: string
-          user_id: string
-        }
-        Update: {
-          activation_id?: string | null
-          batch_id?: string | null
-          closed_at?: string
-          commission_rate?: number
-          contributor_amount?: number
-          contributor_id?: string | null
-          created_at?: string
-          exempt?: boolean
-          exempt_reason?: string | null
-          fee_amount?: number
-          fee_pct?: number
-          gross_profit?: number
-          id?: string
-          listing_kind?: Database["public"]["Enums"]["listing_kind"]
-          model_id?: string
-          order_id?: string | null
-          platform_amount?: number
-          simulated?: boolean
-          status?: string
-          symbol?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "performance_fees_batch_id_fkey"
-            columns: ["batch_id"]
-            isOneToOne: false
-            referencedRelation: "fee_batches"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      platform_revenue_events: {
-        Row: {
-          amount: number
-          category: string
-          cost: number
-          created_at: string
-          currency: string
-          id: string
-          occurred_on: string
-          subcategory: string
-        }
-        Insert: {
-          amount?: number
-          category: string
-          cost?: number
-          created_at?: string
-          currency?: string
-          id?: string
-          occurred_on?: string
-          subcategory?: string
-        }
-        Update: {
-          amount?: number
-          category?: string
-          cost?: number
-          created_at?: string
-          currency?: string
-          id?: string
-          occurred_on?: string
-          subcategory?: string
-        }
-        Relationships: []
-      }
       platform_settings: {
         Row: {
           key: string
@@ -2270,6 +2160,48 @@ export type Database = {
           timezone?: string
           updated_at?: string
           website?: string | null
+        }
+        Relationships: []
+      }
+      releases: {
+        Row: {
+          artifact_hash: string | null
+          changelog: string
+          channel: string
+          created_at: string
+          id: string
+          kind: string
+          min_tier: string
+          published_at: string
+          signature: string | null
+          title: string
+          version: string
+        }
+        Insert: {
+          artifact_hash?: string | null
+          changelog?: string
+          channel?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          min_tier?: string
+          published_at?: string
+          signature?: string | null
+          title: string
+          version: string
+        }
+        Update: {
+          artifact_hash?: string | null
+          changelog?: string
+          channel?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          min_tier?: string
+          published_at?: string
+          signature?: string | null
+          title?: string
+          version?: string
         }
         Relationships: []
       }
@@ -2468,45 +2400,6 @@ export type Database = {
           },
         ]
       }
-      strategy_watermarks: {
-        Row: {
-          activation_id: string
-          created_at: string
-          cumulative_pnl: number
-          fees_accrued: number
-          high_water_mark: number
-          id: string
-          model_id: string
-          simulated: boolean
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          activation_id: string
-          created_at?: string
-          cumulative_pnl?: number
-          fees_accrued?: number
-          high_water_mark?: number
-          id?: string
-          model_id: string
-          simulated?: boolean
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          activation_id?: string
-          created_at?: string
-          cumulative_pnl?: number
-          fees_accrued?: number
-          high_water_mark?: number
-          id?: string
-          model_id?: string
-          simulated?: boolean
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       subscriptions: {
         Row: {
           cancel_at_period_end: boolean
@@ -2552,6 +2445,36 @@ export type Database = {
           stripe_subscription_id?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      sync_consents: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          enabled: boolean
+          scope: string
+          updated_at: string
+          user_id: string
+          version: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          enabled?: boolean
+          scope?: string
+          updated_at?: string
+          user_id: string
+          version?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          enabled?: boolean
+          scope?: string
+          updated_at?: string
+          user_id?: string
+          version?: string
         }
         Relationships: []
       }
@@ -2670,6 +2593,45 @@ export type Database = {
           slug?: string
           updated_at?: string
           website?: string | null
+        }
+        Relationships: []
+      }
+      update_policies: {
+        Row: {
+          auto_rollback: boolean
+          canary_pct: number
+          created_at: string
+          infra_patches: string
+          logic_changes: string
+          paper_run_first: boolean
+          param_bound_pct: number
+          parameter_changes: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auto_rollback?: boolean
+          canary_pct?: number
+          created_at?: string
+          infra_patches?: string
+          logic_changes?: string
+          paper_run_first?: boolean
+          param_bound_pct?: number
+          parameter_changes?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auto_rollback?: boolean
+          canary_pct?: number
+          created_at?: string
+          infra_patches?: string
+          logic_changes?: string
+          paper_run_first?: boolean
+          param_bound_pct?: number
+          parameter_changes?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

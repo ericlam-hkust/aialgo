@@ -39,7 +39,8 @@ export async function getPlanTier(supabase: Client, userId: string): Promise<Pla
       (row.status === "canceled" && row.current_period_end && new Date(row.current_period_end) > new Date());
     if (!active) continue;
     const rowTier = tierFromPriceId(row.price_id);
-    if (rowTier === "basic") return "basic";
+    if (rowTier === "elite") return "elite";
+    if (rowTier === "pro") tier = "pro";
   }
   return tier;
 }
@@ -73,12 +74,13 @@ export function requireFeature(
   tier: PlanTier,
   feature: keyof Pick<
     PlanLimits,
-    "liveDataSources" | "paperDeployments" | "brokerConnections" | "intradaySync" | "marketplacePublish"
+    "walkForward" | "codeEditor" | "autoUpdates" | "cloudDeploy" | "advancedPipeline" | "liveMonitoring" | "realtimeData" | "teamWorkspaces" | "marketplacePublish"
   >,
   label: string,
 ) {
   if (PLAN_LIMITS[tier][feature]) return;
-  throw new Error(upgradeMessage(label, "basic"));
+  const needed: PlanTier = feature === "advancedPipeline" || feature === "teamWorkspaces" ? "elite" : "pro";
+  throw new Error(upgradeMessage(label, needed as "pro" | "elite"));
 }
 
 /** Increments a monthly counter using the service role (RLS blocks user writes). */
@@ -112,7 +114,7 @@ export async function assertQuota(
     throw new Error(
       upgradeMessage(
         `You have used all ${ent.limits.maxBacktestsPerMonth} backtests included this month — more backtests`,
-        "basic",
+        "pro",
       ),
     );
   }
@@ -120,7 +122,7 @@ export async function assertQuota(
     throw new Error(
       upgradeMessage(
         `You have used all ${ent.limits.maxAiCallsPerMonth} AI requests included this month — more AI assistance`,
-        "basic",
+        "pro",
       ),
     );
   }
@@ -128,7 +130,7 @@ export async function assertQuota(
     throw new Error(
       upgradeMessage(
         `Your plan includes ${ent.limits.maxStrategies} strategies — more strategies`,
-        "basic",
+        "pro",
       ),
     );
   }

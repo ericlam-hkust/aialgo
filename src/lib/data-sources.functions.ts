@@ -279,7 +279,7 @@ export const syncIntraday = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    requireFeature(await getPlanTier(context.supabase, context.userId), "intradaySync", "Intraday data sync");
+    requireFeature(await getPlanTier(context.supabase, context.userId), "realtimeData", "Intraday data sync");
     const rows = await loadConnections(context.supabase);
     const results: { symbol: string; rows: number; provider: string | null; error: string | null }[] = [];
 

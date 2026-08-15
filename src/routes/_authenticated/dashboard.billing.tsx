@@ -1,33 +1,30 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Check, CreditCard, ExternalLink, Sparkles } from "lucide-react";
+import { Check, CreditCard, ExternalLink, ShieldCheck, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ModelUsageCard } from "@/components/model-usage-card";
-import { ContributorEarnings } from "@/components/contributor-earnings";
 import { UpgradeDialog } from "@/components/upgrade-dialog";
 import { PaymentTestModeBanner } from "@/components/payment-test-mode-banner";
 import { useEntitlements } from "@/hooks/use-entitlements";
-import { createPortalSession, getMyFeeSummary } from "@/lib/payments.functions";
+import { createPortalSession } from "@/lib/payments.functions";
 import { getStripeEnvironmentSafe } from "@/lib/stripe";
 import { PLAN_LABEL } from "@/lib/entitlements";
-import { usd } from "@/lib/monetization";
+import { CONSUMER_PLANS, NO_COMMISSION_PROMISE, SELF_HOSTED_PROMISE } from "@/lib/monetization";
 
 export const Route = createFileRoute("/_authenticated/dashboard/billing")({
   head: () => ({
     meta: [
-      { title: "Billing & Earnings | aiAlgo" },
+      { title: "Subscription & Billing | aiAlgo" },
       {
         name: "description",
         content:
-          "Manage your aiAlgo plan, track performance fees charged only on winning trades, and see your contributor earnings.",
+          "Manage your aiAlgo subscription. Subscription only — no commissions, per-trade charges or performance fees.",
       },
-      { property: "og:title", content: "Billing & Earnings | aiAlgo" },
-      { property: "og:description", content: "Your plan, performance fees and contributor earnings in one place." },
+      { property: "og:title", content: "Subscription & Billing | aiAlgo" },
+      { property: "og:description", content: "Your aiAlgo plan, invoices and feature entitlements." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -35,20 +32,10 @@ export const Route = createFileRoute("/_authenticated/dashboard/billing")({
   component: BillingPage,
 });
 
-const BASIC_UNLOCKS = [
-  "Live execution with real capital",
-  "Real-time market data",
-  "Premium data feeds",
-  "Multiple trading accounts",
-  "Broker connections",
-  "Intraday sync",
-];
-
 function BillingPage() {
   const { tier, subscription, refetch } = useEntitlements();
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
-  const fees = useQuery({ queryKey: ["fee-summary"], queryFn: () => getMyFeeSummary() });
 
   const openPortal = async () => {
     setPortalLoading(true);
@@ -65,19 +52,14 @@ function BillingPage() {
     }
   };
 
-  const nextCharge = new Date();
-  nextCharge.setUTCMonth(nextCharge.getUTCMonth() + 1, 1);
-
   return (
     <>
       <PaymentTestModeBanner />
       <div className="space-y-8 p-6">
         <header className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Billing &amp; earnings</h1>
-            <p className="text-sm text-muted-foreground">
-              What you pay, and — if you publish on the marketplace — what you earn.
-            </p>
+            <h1 className="text-2xl font-semibold tracking-tight">Subscription</h1>
+            <p className="text-sm text-muted-foreground">{NO_COMMISSION_PROMISE}</p>
           </div>
           <div className="flex gap-2">
             {subscription ? (
@@ -88,118 +70,73 @@ function BillingPage() {
             ) : null}
             <Button onClick={() => setUpgradeOpen(true)}>
               <Sparkles className="mr-2 h-4 w-4" aria-hidden />
-              {tier === "basic" ? "Change plan" : "Go live for $12"}
+              {tier === "free" ? "Upgrade" : "Change plan"}
             </Button>
           </div>
         </header>
 
-        <section className="space-y-4">
-          <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">What you pay</h2>
-
-          <div className="grid gap-6 lg:grid-cols-3">
-            <Card className="lg:col-span-1">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  Current plan <Badge variant={tier === "free" ? "secondary" : "default"}>{PLAN_LABEL[tier]}</Badge>
-                </CardTitle>
-                <CardDescription>
-                  {subscription
-                    ? `Status: ${subscription.status}${
-                        subscription.currentPeriodEnd
-                          ? ` · ${subscription.cancelAtPeriodEnd ? "Ends" : "Renews"} ${new Date(
-                              subscription.currentPeriodEnd,
-                            ).toLocaleDateString()}`
-                          : ""
-                      }`
-                    : "You are on the free plan — browsing, backtesting and paper trading are unlimited."}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm">
-                <p className="text-xs text-muted-foreground">Basic — $12/month unlocks:</p>
-                {BASIC_UNLOCKS.map((item) => (
-                  <div key={item} className="flex items-start gap-2">
-                    <Check className="mt-0.5 h-3.5 w-3.5 text-profit" aria-hidden />
-                    <span>{item}</span>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-
-            <Card className="lg:col-span-2">
-              <CardHeader>
-                <CardTitle>Performance fees this period</CardTitle>
-                <CardDescription>
-                  You are charged only on new profit above your previous peak (high-water mark). Losing trades are never
-                  charged, and nothing is billed until the next batch runs on{" "}
-                  {nextCharge.toLocaleDateString(undefined, { month: "short", day: "numeric" })}.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-5">
-                <div className="grid gap-4 sm:grid-cols-3">
-                  <div>
-                    <p className="text-xs text-muted-foreground">Accrued fees</p>
-                    <p className="mono text-2xl">{usd(fees.data?.accrued ?? 0)}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Profit generated</p>
-                    <p className="mono text-2xl text-profit">{usd(fees.data?.grossProfit ?? 0)}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Profitable exits</p>
-                    <p className="mono text-2xl">{fees.data?.chargedTrades ?? 0}</p>
-                  </div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              Current plan <Badge variant={tier === "free" ? "secondary" : "default"}>{PLAN_LABEL[tier]}</Badge>
+            </CardTitle>
+            <CardDescription>
+              {subscription
+                ? `Status: ${subscription.status}${
+                    subscription.currentPeriodEnd
+                      ? ` · ${subscription.cancelAtPeriodEnd ? "Ends" : "Renews"} ${new Date(
+                          subscription.currentPeriodEnd,
+                        ).toLocaleDateString()}`
+                      : ""
+                  }`
+                : "You are on the Starter plan — building, 1 year of backtest history and the downloadable package are free forever."}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-6 md:grid-cols-3">
+            {CONSUMER_PLANS.map((plan) => (
+              <div
+                key={plan.key}
+                className={`rounded-lg border p-4 ${plan.key === tier ? "border-primary/60" : "border-border/70"}`}
+              >
+                <div className="flex items-center justify-between">
+                  <p className="font-medium">{plan.name}</p>
+                  {plan.key === tier ? <Badge variant="outline">Current</Badge> : null}
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Charge history</CardTitle>
-              <CardDescription>Performance-fee batches charged to your card.</CardDescription>
-            </CardHeader>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Trigger</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {(fees.data?.batches ?? []).map((b) => (
-                    <TableRow key={b.id}>
-                      <TableCell className="mono">
-                        {new Date(b.charged_at ?? b.created_at).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell>{b.trigger}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{b.status}</Badge>
-                      </TableCell>
-                      <TableCell className="mono text-right">{usd(Number(b.amount ?? 0))}</TableCell>
-                    </TableRow>
+                <p className="mono mt-1 text-2xl">
+                  ${plan.monthly}
+                  <span className="ml-1 text-xs font-normal text-muted-foreground">/mo</span>
+                </p>
+                <ul className="mt-3 space-y-1.5 text-sm">
+                  {plan.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2">
+                      <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-profit" aria-hidden />
+                      <span>{f}</span>
+                    </li>
                   ))}
-                  {(fees.data?.batches ?? []).length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={4} className="py-8 text-center text-sm text-muted-foreground">
-                        No charges yet.
-                      </TableCell>
-                    </TableRow>
-                  ) : null}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+                </ul>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
 
-          <ModelUsageCard />
-        </section>
+        <Card className="border-border/70">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <ShieldCheck className="h-4 w-4 text-primary" aria-hidden /> What you are never charged for
+            </CardTitle>
+            <CardDescription>{SELF_HOSTED_PROMISE}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm text-muted-foreground">
+            <p>No commission on your trades. No per-trade fees. No performance fees. Ever.</p>
+            <p>
+              Invoices, payment methods and cancellation are handled in the billing portal. If your subscription lapses,
+              your deployed package keeps running its current version on your own infrastructure — only updates and
+              cloud features pause.
+            </p>
+          </CardContent>
+        </Card>
 
-        <section className="space-y-4">
-          <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">What you earn</h2>
-          <ContributorEarnings />
-        </section>
+        <ModelUsageCard />
       </div>
 
       <UpgradeDialog

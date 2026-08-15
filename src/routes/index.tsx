@@ -26,30 +26,27 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import {
-  BASE_COMMISSION,
-  BATCH_RULE_COPY,
   CONSUMER_PLANS,
   CONTRIBUTOR_PROMISE,
-  FEE_MAX_PCT,
-  FEE_MIN_PCT,
-  MICRO_PROFIT_THRESHOLD,
-  WATERMARK_EXAMPLE,
+  NO_COMMISSION_PROMISE,
+  SELF_HOSTED_PROMISE,
+  UPDATE_CONSENT_PROMISE,
 } from "@/lib/monetization";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "aiAlgo — Free to build, $12 to go live, fees only on wins" },
+      { title: "aiAlgo — Build trading strategies, run them on your own infrastructure" },
       {
         name: "description",
         content:
-          "Browse and paper trade AI models and algo strategies for free. Live execution is $12/month plus a performance fee charged only on profitable closed trades. Creators pay nothing and keep 80%.",
+          "Design, backtest and package automated trading strategies, then deploy them to infrastructure you own. Subscription only — no commissions and no per-trade fees.",
       },
-      { property: "og:title", content: "aiAlgo — Pay only on winning trades" },
+      { property: "og:title", content: "aiAlgo — Self-hosted algorithmic trading software" },
       {
         property: "og:description",
         content:
-          "A marketplace of validated AI models and algo strategies. Free to build and paper trade, $12/month to go live, performance fees only on wins.",
+          "Strategy builder, backtesting and a signed self-hosted runner package. Subscription plans only — aiAlgo never holds broker credentials or transmits orders.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -196,12 +193,12 @@ function Landing() {
             {CONSUMER_PLANS.map((plan) => (
               <Card
                 key={plan.key}
-                className={plan.key === "basic" ? "border-primary/60 shadow-[var(--shadow-glow)]" : "border-border/70"}
+                className={plan.key === "pro" ? "border-primary/60 shadow-[var(--shadow-glow)]" : "border-border/70"}
               >
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <h3 className="font-semibold">{plan.name}</h3>
-                    {plan.key === "basic" ? <Badge>{t("landing.mostPopular")}</Badge> : null}
+                    {plan.key === "pro" ? <Badge>{t("landing.mostPopular")}</Badge> : null}
                   </div>
                   <p className="mono mt-4 text-3xl font-semibold">
                     ${plan.monthly}
@@ -221,10 +218,10 @@ function Landing() {
                   <Button
                     asChild
                     className="mt-6 w-full"
-                    variant={plan.key === "basic" ? "default" : "outline"}
+                    variant={plan.key === "pro" ? "default" : "outline"}
                   >
                     <Link to="/auth/register">
-                      {plan.key === "basic" ? t("landing.plan.basic.cta") : t("landing.plan.free.cta")}
+                      {plan.key === "pro" ? t("landing.plan.basic.cta") : t("landing.plan.free.cta")}
                     </Link>
                   </Button>
                 </CardContent>
@@ -237,19 +234,15 @@ function Landing() {
                 <ul className="mt-5 space-y-3 text-sm text-muted-foreground">
                   <li className="flex items-start gap-2">
                     <TrendingUp className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
-                    <span>
-                      {FEE_MIN_PCT}–{FEE_MAX_PCT}% of net profit on a winning closed trade, split{" "}
-                      {Math.round((1 - BASE_COMMISSION) * 100)}/{Math.round(BASE_COMMISSION * 100)} between the
-                      creator and the platform. Profits under ${MICRO_PROFIT_THRESHOLD} are exempt.
-                    </span>
+                    <span>{NO_COMMISSION_PROMISE}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
-                    <span>{WATERMARK_EXAMPLE}</span>
+                    <span>{SELF_HOSTED_PROMISE}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <BadgeCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
-                    <span>{BATCH_RULE_COPY}</span>
+                    <span>{UPDATE_CONSENT_PROMISE}</span>
                   </li>
                 </ul>
                 <Button asChild variant="ghost" className="mt-6 w-full">
@@ -271,7 +264,7 @@ function Landing() {
         <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">{t("landing.trust.body")}</p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <Button asChild variant="outline" size="sm">
-            <Link to="/how-we-make-money">{t("landing.trust.link1")}</Link>
+            <Link to="/pricing">{t("landing.trust.link1")}</Link>
           </Button>
           <Button asChild variant="outline" size="sm">
             <Link to="/marketplace/verification">{t("landing.trust.link2")}</Link>

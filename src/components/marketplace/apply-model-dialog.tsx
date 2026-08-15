@@ -3,9 +3,6 @@ import { useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ArrowLeft, ArrowRight, CheckCircle2, CreditCard, Loader2, ShieldAlert, SlidersHorizontal, Wallet } from "lucide-react";
-import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
-import { getStripe, getStripeEnvironment } from "@/lib/stripe";
-import { createModelCheckoutSession } from "@/lib/marketplace-payments.functions";
 import { activateModel, getMyModelAccess } from "@/lib/models.functions";
 import { listTradingAccounts } from "@/lib/trading-accounts.functions";
 import { providerLabel } from "@/lib/trading-accounts";
@@ -271,22 +268,14 @@ function Row({ label, value }: { label: string; value: string }) {
 }
 
 function PayStep({ model }: { model: { id: string; slug: string } }) {
-  const fetchClientSecret = async () => {
-    const res = await createModelCheckoutSession({
-      data: {
-        modelId: model.id,
-        returnUrl: `${window.location.origin}/marketplace/${model.slug}?purchase=done`,
-        environment: getStripeEnvironment(),
-      },
-    });
-    if ("error" in res) throw new Error(res.error);
-    return res.clientSecret;
-  };
   return (
-    <div id="checkout" className="min-h-[520px]">
-      <EmbeddedCheckoutProvider stripe={getStripe()} options={{ fetchClientSecret }}>
-        <EmbeddedCheckout />
-      </EmbeddedCheckoutProvider>
+    <div className="space-y-3 rounded-lg border border-border/60 bg-muted/20 p-6 text-sm">
+      <p className="font-medium">Included in your subscription</p>
+      <p className="text-muted-foreground">
+        Marketplace strategies are unlocked by your aiAlgo plan — there are no per-strategy charges, commissions or
+        performance fees. Continue to add this strategy to your workspace.
+      </p>
+      <p className="mono text-xs text-muted-foreground">{model.slug}</p>
     </div>
   );
 }

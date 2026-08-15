@@ -72,7 +72,7 @@ export const placeManualOrder = createServerFn({ method: "POST" })
 
     const { data: account, error: accountError } = await supabase
       .from("broker_connections")
-      .select("id,broker_name,nickname,mode,status,currency,account_id,buying_power,account_balance,config,credentials_encrypted")
+      .select("id,broker_name,nickname,mode,status,currency,account_id,buying_power,account_balance,config")
       .eq("id", data.accountId)
       .single();
     if (accountError) throw new Error(accountError.message);
@@ -157,36 +157,9 @@ export const placeManualOrder = createServerFn({ method: "POST" })
       filledQuantity = data.quantity;
       avgFillPrice = refPrice;
     } else {
-      const { placeBrokerOrder, isTradableBroker } = await import("@/lib/brokers.server");
-      if (!isTradableBroker(account.broker_name)) {
-        throw new Error(`${account.broker_name} does not support order placement from aiAlgo yet.`);
-      }
-      if (account.status === "error") throw new Error("This account is in an error state — reconnect it first.");
-      if (!account.credentials_encrypted) throw new Error("This account has no stored credentials — reconnect it.");
-
-      try {
-        const placed = await placeBrokerOrder(
-          account.broker_name,
-          (account.config ?? {}) as Record<string, unknown>,
-          account.credentials_encrypted,
-          {
-            symbol: data.symbol,
-            side: data.side,
-            quantity: data.quantity,
-            orderType: data.orderType,
-            limitPrice: data.limitPrice ?? null,
-            timeInForce: data.timeInForce,
-            clientOrderId,
-          },
-        );
-        brokerOrderId = placed.brokerOrderId;
-        status = placed.status;
-        filledQuantity = placed.filledQuantity;
-        avgFillPrice = placed.avgFillPrice;
-      } catch (err) {
-        status = "rejected";
-        rejectReason = err instanceof Error ? err.message : String(err);
-      }
+      throw new Error(
+        "aiAlgo never transmits orders to a broker. Live orders are placed by your self-hosted runner package — this ticket only supports paper accounts.",
+      );
     }
 
     const { data: row, error } = await supabase
@@ -248,22 +221,13 @@ export const cancelDeskOrder = createServerFn({ method: "POST" })
 
     const { data: account } = await supabase
       .from("broker_connections")
-      .select("broker_name,mode,config,credentials_encrypted")
+      .select("broker_name,mode,config")
       .eq("id", order.broker_connection_id)
       .single();
 
     const simulated = !account || account.mode === "simulation" || account.broker_name === "paper";
     if (!simulated) {
-      const { cancelBrokerOrder, isTradableBroker } = await import("@/lib/brokers.server");
-      if (!isTradableBroker(account.broker_name)) {
-        throw new Error(`${account.broker_name} does not support cancelling from aiAlgo.`);
-      }
-      await cancelBrokerOrder(
-        account.broker_name,
-        (account.config ?? {}) as Record<string, unknown>,
-        account.credentials_encrypted,
-        order.broker_order_id,
-      );
+      throw new Error("Live orders are managed by your self-hosted runner — cancel it there.");
     }
 
     await supabase
@@ -282,7 +246,7 @@ export const refreshOrderBook = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data: account, error } = await supabase
       .from("broker_connections")
-      .select("id,broker_name,mode,account_id,config,credentials_encrypted")
+      .select("id,broker_name,mode,account_id,config")
       .eq("id", data.accountId)
       .single();
     if (error) throw new Error(error.message);
@@ -291,54 +255,9 @@ export const refreshOrderBook = createServerFn({ method: "POST" })
       return { ok: true, synced: 0, message: "Simulation account — orders are managed inside aiAlgo." };
     }
 
-    const { fetchOpenOrders, isTradableBroker } = await import("@/lib/brokers.server");
-    if (!isTradableBroker(account.broker_name)) {
-      return { ok: false, synced: 0, message: `${account.broker_name} order sync is not supported yet.` };
-    }
-
-    try {
-      const orders = await fetchOpenOrders(
-        account.broker_name,
-        (account.config ?? {}) as Record<string, unknown>,
-        account.credentials_encrypted,
-      );
-      if (orders.length > 0) {
-        // Orders aiAlgo placed keep their attribution; unknown ones land as broker-sourced.
-        const { data: known } = await supabase
-          .from("broker_orders")
-          .select("broker_order_id")
-          .eq("broker_connection_id", account.id);
-        const knownIds = new Set((known ?? []).map((k) => k.broker_order_id));
-
-        await supabase.from("broker_orders").upsert(
-          orders.map((o) => ({
-            user_id: userId,
-            broker_connection_id: account.id,
-            account_id: o.accountId || account.account_id,
-            broker_order_id: o.orderId,
-            symbol: o.symbol,
-            side: o.side,
-            order_type: o.orderType,
-            quantity: o.quantity,
-            filled_quantity: o.filledQuantity,
-            limit_price: o.limitPrice,
-            avg_fill_price: o.avgFillPrice,
-            status: o.status,
-            placed_at: o.placedAt,
-            synced_at: new Date().toISOString(),
-            ...(knownIds.has(o.orderId) ? {} : { source: "broker" as const }),
-          })),
-          { onConflict: "broker_connection_id,broker_order_id" },
-        );
-      }
-      await supabase
-        .from("broker_connections")
-        .update({ last_synced_at: new Date().toISOString(), last_error: null, status: "connected" })
-        .eq("id", account.id);
-      return { ok: true, synced: orders.length, message: `Synced ${orders.length} orders from the broker.` };
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      await supabase.from("broker_connections").update({ status: "error", last_error: message }).eq("id", account.id);
-      return { ok: false, synced: 0, message };
-    }
+    return {
+      ok: true,
+      synced: 0,
+      message: "Live order sync comes from your self-hosted runner's read-only telemetry.",
+    };
   });

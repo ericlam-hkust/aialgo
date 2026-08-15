@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Banknote, ExternalLink, Package, Plus } from "lucide-react";
+import { ExternalLink, Package, Plus } from "lucide-react";
 import {
   getContributorProfile,
   listMyModels,
@@ -10,9 +10,6 @@ import {
   setModelStatus,
   publishModelVersion,
 } from "@/lib/contributor.functions";
-import { createConnectOnboardingLink } from "@/lib/marketplace-payments.functions";
-import { getStripeEnvironment } from "@/lib/stripe";
-import { MetricCard } from "@/components/metric-card";
 import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -27,8 +24,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { setModelNamespace, setModelVisibility } from "@/lib/model-access.functions";
 import { listMyTeams } from "@/lib/teams.functions";
 import { VISIBILITY_OPTIONS, namespacedSlug, type ModelVisibility } from "@/lib/teams";
-import { fmtDate, fmtMoney } from "@/lib/format";
-import { PLATFORM_COMMISSION, pricingLabel } from "@/lib/marketplace";
+import { fmtDate } from "@/lib/format";
+import { pricingLabel } from "@/lib/marketplace";
 
 export const Route = createFileRoute("/_authenticated/dashboard/models/")({
   component: ContributorDashboard,
@@ -39,16 +36,6 @@ function ContributorDashboard() {
   const profile = useQuery({ queryKey: ["contributor-profile"], queryFn: () => getContributorProfile() });
   const mine = useQuery({ queryKey: ["my-models"], queryFn: () => listMyModels() });
 
-  const totals = useMemo(() => {
-    const tx = mine.data?.transactions ?? [];
-    const month = new Date().toISOString().slice(0, 7);
-    const thisMonth = tx.filter((t) => String(t.created_at).startsWith(month));
-    const sum = (rows: typeof tx) => rows.reduce((a, t) => a + Number(t.net_amount), 0);
-    const pending = (mine.data?.payouts ?? [])
-      .filter((p) => p.status !== "paid")
-      .reduce((a, p) => a + Number(p.amount), 0);
-    return { month: sum(thisMonth), all: sum(tx), pending, executions: tx.length };
-  }, [mine.data]);
 
   if (!profile.data) {
     return <ContributorOnboarding onDone={() => void qc.invalidateQueries()} />;
@@ -62,11 +49,11 @@ function ContributorDashboard() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Contributor dashboard</h1>
           <p className="text-sm text-muted-foreground">
-            You keep {Math.round((1 - PLATFORM_COMMISSION) * 100)}% of every sale. Payouts run monthly.
+            Publish templates and models to the community library. Listings are free — aiAlgo charges subscriptions,
+            never a commission on anyone's trades.
           </p>
         </div>
         <div className="flex gap-2">
-          <PayoutButton />
           <Button asChild>
             <Link to="/dashboard/models/new">
               <Plus className="mr-1.5 h-4 w-4" aria-hidden /> Submit a model
@@ -75,18 +62,9 @@ function ContributorDashboard() {
         </div>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-4">
-        <MetricCard label="Earnings this month" value={fmtMoney(totals.month)} tone="profit" />
-        <MetricCard label="All-time earnings" value={fmtMoney(totals.all)} />
-        <MetricCard label="Pending payout" value={fmtMoney(totals.pending)} tone="warning" />
-        <MetricCard label="Transactions" value={totals.executions.toLocaleString()} />
-      </div>
-
       <Tabs defaultValue="models">
         <TabsList>
           <TabsTrigger value="models">Models</TabsTrigger>
-          <TabsTrigger value="revenue">Revenue</TabsTrigger>
-          <TabsTrigger value="payouts">Payouts</TabsTrigger>
           <TabsTrigger value="submissions">Submissions</TabsTrigger>
         </TabsList>
 
@@ -95,71 +73,11 @@ function ContributorDashboard() {
             <EmptyState
               icon={<Package className="h-6 w-6" aria-hidden />}
               title="No models yet"
-              description="Submit your first model to start earning from the marketplace."
+              description="Submit your first model to share it with the community."
             />
           ) : (
             models.map((m) => <ModelRow key={m.id} model={m} onChanged={() => void qc.invalidateQueries()} />)
           )}
-        </TabsContent>
-
-        <TabsContent value="revenue" className="mt-4">
-          <Card className="border-border/70">
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Model</TableHead>
-                    <TableHead className="text-right">Gross</TableHead>
-                    <TableHead className="text-right">Commission</TableHead>
-                    <TableHead className="text-right">Net</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {(mine.data?.transactions ?? []).slice(0, 100).map((t) => (
-                    <TableRow key={t.id}>
-                      <TableCell className="mono text-xs">{fmtDate(t.created_at)}</TableCell>
-                      <TableCell>{t.model_name}</TableCell>
-                      <TableCell className="mono text-right">{fmtMoney(Number(t.gross_amount), t.currency)}</TableCell>
-                      <TableCell className="mono text-right text-loss">
-                        -{fmtMoney(Number(t.commission_amount), t.currency)}
-                      </TableCell>
-                      <TableCell className="mono text-right text-profit">
-                        {fmtMoney(Number(t.net_amount), t.currency)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="payouts" className="mt-4">
-          <Card className="border-border/70">
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Period</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
-                    <TableHead className="text-right">Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {(mine.data?.payouts ?? []).map((p) => (
-                    <TableRow key={p.id}>
-                      <TableCell className="mono">{p.period}</TableCell>
-                      <TableCell className="mono text-right">{fmtMoney(Number(p.amount), p.currency)}</TableCell>
-                      <TableCell className="text-right">
-                        <Badge variant={p.status === "paid" ? "secondary" : "outline"}>{p.status}</Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
         </TabsContent>
 
         <TabsContent value="submissions" className="mt-4 space-y-3">
@@ -338,25 +256,6 @@ function ModelRow({
   );
 }
 
-function PayoutButton() {
-  const onboard = useMutation({
-    mutationFn: async () => {
-      const res = await createConnectOnboardingLink({
-        data: { returnUrl: `${window.location.origin}/dashboard/models`, environment: getStripeEnvironment() },
-      });
-      if ("error" in res) throw new Error(res.error);
-      return res.url;
-    },
-    onSuccess: (url) => window.open(url, "_blank", "noopener"),
-    onError: (e: Error) => toast.error(e.message),
-  });
-  return (
-    <Button variant="outline" onClick={() => onboard.mutate()} disabled={onboard.isPending}>
-      <Banknote className="mr-1.5 h-4 w-4" aria-hidden /> Payout settings
-    </Button>
-  );
-}
-
 function ContributorOnboarding({ onDone }: { onDone: () => void }) {
   const [handle, setHandle] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -378,7 +277,7 @@ function ContributorOnboarding({ onDone }: { onDone: () => void }) {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Become a contributor</h1>
         <p className="text-sm text-muted-foreground">
-          List your AI trading models and earn {Math.round((1 - PLATFORM_COMMISSION) * 100)}% of every sale.
+          Share the strategies and models you build with the aiAlgo community.
         </p>
       </div>
       <Card className="border-border/70">
