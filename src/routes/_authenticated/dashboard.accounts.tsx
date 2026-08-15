@@ -50,7 +50,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { ConnectionGuide } from "@/components/accounts/connection-guide";
 import { fmtMoney } from "@/lib/format";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard/accounts")({
   component: AccountsPage,
@@ -220,7 +222,10 @@ function AccountsPage() {
               </div>
             </div>
 
+            <ConnectionGuide meta={meta} />
+
             <div className="grid gap-3">
+
               {meta.fields.map((f) => (
                 <div key={f.id} className="space-y-1.5">
                   <Label>
