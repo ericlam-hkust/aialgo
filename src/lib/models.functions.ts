@@ -20,7 +20,7 @@ function publicClient() {
 }
 
 const MODEL_COLUMNS =
-  "id,team_id,visibility,slug,name,tagline,description,risk_disclosure,tags,asset_class,strategy_type,timeframe,risk_level,status,pricing_model,price,currency,parameters,sharpe,max_drawdown,win_rate,cagr,live_return_30d,rating,rating_count,active_users,executions,listed_at,contributor_id,divergence_flagged,last_validated_at,validation_job_id,backtest_config,overfitting_risk,consistency_score,interface_manifest,listing_kind,hosting_mode,trust_tier,declared_frequency,measured_latency_ms,live_since,promoted,loss_rate,profit_factor,total_trades,total_return,data_source_kind,data_source_label,backtest_ran_at,suggested_price,pricing_score,base_model_id,base_version,finetune_method,pipeline,resources";
+  "id,team_id,visibility,slug,name,tagline,description,risk_disclosure,tags,asset_class,strategy_type,timeframe,risk_level,status,pricing_model,price,currency,parameters,sharpe,max_drawdown,win_rate,cagr,live_return_30d,rating,rating_count,active_users,executions,listed_at,contributor_id,divergence_flagged,last_validated_at,validation_job_id,backtest_config,overfitting_risk,consistency_score,interface_manifest,listing_kind,hosting_mode,trust_tier,declared_frequency,measured_latency_ms,live_since,promoted,loss_rate,profit_factor,total_trades,total_return,data_source_kind,data_source_label,backtest_ran_at,suggested_price,pricing_score,pricing_mode,price_set_at,price_source_note,likes_count,comments_count,sentiment_avg,demand_score,base_model_id,base_version,finetune_method,pipeline,resources";
 
 export const listPublicModels = createServerFn({ method: "GET" }).handler(async () => {
   const supabase = publicClient();
