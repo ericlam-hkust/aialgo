@@ -17,8 +17,8 @@ import {
   Wallet,
 } from "lucide-react";
 import {
-  connectTradingAccount,
   createPaperAccount,
+  linkTradingAccount,
   getAccountDependencies,
   listTradingAccounts,
   removeTradingAccount,
@@ -28,8 +28,9 @@ import {
 } from "@/lib/trading-accounts.functions";
 import {
   ACCOUNT_PROVIDERS,
+  CREDENTIAL_FREE_NOTICE,
   PAPER_STARTING_BALANCE,
-  PERMISSION_CHECKLIST,
+  READ_ONLY_SCOPES,
   accountStatus,
   providerLabel,
   providerMeta,
@@ -37,7 +38,6 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -64,12 +64,12 @@ export const Route = createFileRoute("/_authenticated/dashboard/accounts")({
       {
         name: "description",
         content:
-          "Link Futu, Tiger, IBKR, Alpaca and exchange accounts, use them as backtest data sources, and disconnect them safely.",
+          "Link Futu, Tiger, IBKR, Alpaca and exchange accounts read-only. aiAlgo never stores broker credentials.",
       },
       { property: "og:title", content: "Trading Accounts — aiAlgo" },
       {
         property: "og:description",
-        content: "Link brokers with encrypted trade-only keys, monitor live connectivity, and disconnect safely.",
+        content: "Link brokers read-only, monitor connection health, and disconnect safely. No credentials stored.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -91,31 +91,28 @@ function AccountsPage() {
 
   const [provider, setProvider] = useState<string>("futu");
   const [nickname, setNickname] = useState("");
-  const [fields, setFields] = useState<Record<string, string>>({});
   const [ack, setAck] = useState(false);
   const [makeDefault, setMakeDefault] = useState(false);
   const [useForData, setUseForData] = useState(true);
   const [disconnectId, setDisconnectId] = useState<string | null>(null);
 
   const meta = useMemo(() => providerMeta(provider)!, [provider]);
-  const setField = (id: string, v: string) => setFields((f) => ({ ...f, [id]: v }));
 
   const connect = useMutation({
     mutationFn: () =>
-      connectTradingAccount({
+      linkTradingAccount({
         data: {
           provider,
           nickname,
           currency: meta.currency,
-          fields,
+          accountLabel: "",
           acknowledged: ack,
           makeDefault,
           useForData: useForData && meta.dataCapable,
         },
       }),
     onSuccess: () => {
-      toast.success(`${meta.label} account linked`);
-      setFields({});
+      toast.success(`${meta.label} account linked (read-only)`);
       setNickname("");
       setAck(false);
       invalidate();
@@ -165,8 +162,7 @@ function AccountsPage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Trading accounts</h1>
         <p className="text-sm text-muted-foreground">
-          Link the brokers and exchanges that hold your money. Credentials are encrypted before they are stored and are
-          never shown again. Many brokers can also feed historical data into backtests.
+          {CREDENTIAL_FREE_NOTICE}
         </p>
       </div>
 
@@ -201,10 +197,7 @@ function AccountsPage() {
                 <Label>Venue</Label>
                 <Select
                   value={provider}
-                  onValueChange={(v) => {
-                    setProvider(v);
-                    setFields({});
-                  }}
+                  onValueChange={setProvider}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -226,48 +219,15 @@ function AccountsPage() {
 
             <ConnectionGuide meta={meta} />
 
-            <div className="grid gap-3">
-
-              {meta.fields.map((f) => (
-                <div key={f.id} className="space-y-1.5">
-                  <Label>
-                    {f.label}
-                    {f.required ? <span className="text-loss"> *</span> : null}
-                  </Label>
-                  {f.kind === "textarea" ? (
-                    <Textarea
-                      className="mono min-h-24 text-xs"
-                      value={fields[f.id] ?? ""}
-                      onChange={(e) => setField(f.id, e.target.value)}
-                      placeholder={f.placeholder}
-                    />
-                  ) : (
-                    <Input
-                      className="mono"
-                      type={f.kind === "password" ? "password" : "text"}
-                      value={fields[f.id] ?? ""}
-                      onChange={(e) => setField(f.id, e.target.value)}
-                      placeholder={f.placeholder}
-                    />
-                  )}
-                  {f.help ? <p className="text-xs text-muted-foreground">{f.help}</p> : null}
-                </div>
-              ))}
-            </div>
-
             <Alert>
               <AlertTriangle className="h-4 w-4" aria-hidden />
-              <AlertTitle>Trade-only keys required</AlertTitle>
+              <AlertTitle>aiAlgo never asks for broker credentials</AlertTitle>
               <AlertDescription>
                 <ul className="mt-1 list-disc space-y-0.5 pl-4 text-xs">
-                  {PERMISSION_CHECKLIST.map((c) => (
+                  {READ_ONLY_SCOPES.map((c) => (
                     <li key={c}>{c}</li>
                   ))}
                 </ul>
-                <p className="mt-2 text-xs">
-                  Secrets are encrypted with AES-GCM before being written to the database and are only decrypted inside
-                  a signed request to your broker.
-                </p>
               </AlertDescription>
             </Alert>
 
@@ -282,7 +242,10 @@ function AccountsPage() {
             ) : null}
             <label className="flex items-center gap-2 text-sm">
               <Checkbox checked={ack} onCheckedChange={(v) => setAck(v === true)} />
-              <span>I confirm withdrawals are disabled on this key.</span>
+              <span>
+                I understand aiAlgo only receives read-only account data and that all order execution happens in my own
+                self-hosted runner package.
+              </span>
             </label>
             <label className="flex items-center gap-2 text-sm">
               <Checkbox checked={makeDefault} onCheckedChange={(v) => setMakeDefault(v === true)} />
@@ -424,7 +387,8 @@ function DisconnectDialog({ id, onClose, onDone }: { id: string | null; onClose:
         <DialogHeader>
           <DialogTitle>Disconnect this trading account?</DialogTitle>
           <DialogDescription>
-            Stored credentials are deleted immediately. You can relink the account later with fresh API keys.
+            The read-only link is removed immediately. Your broker credentials were never held by aiAlgo — they stay in
+            your self-hosted runner package.
           </DialogDescription>
         </DialogHeader>
 

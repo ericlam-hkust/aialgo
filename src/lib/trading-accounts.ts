@@ -1,25 +1,16 @@
+/**
+ * Read-only broker linking metadata.
+ *
+ * aiAlgo never collects a broker password or a trade-permission API key. Each
+ * provider is linked either through an official read-only OAuth program, a
+ * read-only aggregator (SnapTrade), or not at all — in which case the local
+ * agent running on the user's own machine is the only path.
+ */
+
 export type AccountProvider = "paper" | "binance" | "coinbase" | "alpaca" | "ibkr" | "futu" | "tiger";
 
-export type AccountFieldId =
-  | "apiKey"
-  | "apiSecret"
-  | "accountId"
-  | "gatewayUrl"
-  | "opendUrl"
-  | "tigerId"
-  | "privateKey"
-  | "unlockPassword";
-
-export type AccountField = {
-  id: AccountFieldId;
-  label: string;
-  /** secret fields are encrypted and never returned to the browser */
-  secret: boolean;
-  kind: "text" | "password" | "textarea";
-  placeholder?: string;
-  required?: boolean;
-  help?: string;
-};
+/** How aiAlgo may observe this account. Never includes credential entry. */
+export type LinkingMode = "oauth" | "aggregator" | "agent_only";
 
 export type AccountProviderMeta = {
   value: AccountProvider;
@@ -27,34 +18,40 @@ export type AccountProviderMeta = {
   kind: "crypto" | "stocks";
   region: string;
   currency: string;
+  /** how the read-only link is established */
+  linking: LinkingMode;
+  /** short description of the linking path */
   docs: string;
   setup: string;
-  /** official API documentation */
   docsUrl?: string;
-  /** page where the user creates keys / apps */
-  keysUrl?: string;
-  /** gateway or desktop software download, when the broker needs one */
+  /** gateway or desktop software the user runs themselves */
   downloadUrl?: string;
-  /** numbered steps to complete on the broker side before filling the form */
+  /** steps the user completes on their own machine or with the broker */
   steps: string[];
-  /** shown when the venue cannot restrict withdrawals on the key */
-  permissionNote?: string;
-  /** can route real orders through brokers.server */
-  tradable: boolean;
-  /** can serve historical bars for backtesting */
+  /** whether the local agent can source historical bars from this broker for backtests */
   dataCapable: boolean;
   dataNote?: string;
-  fields: AccountField[];
+  /** set until the partner / aggregator program terms are verified for this provider */
+  unverifiedProgram?: boolean;
 };
 
-const API_KEY: AccountField = {
-  id: "apiKey",
-  label: "API key",
-  secret: true,
-  kind: "password",
-  required: true,
+export const LINKING_MODES: Record<LinkingMode, { label: string; hint: string; tone: string }> = {
+  oauth: {
+    label: "Read-only OAuth",
+    hint: "You authorise aiAlgo at the broker. aiAlgo receives a revocable read token — never your password.",
+    tone: "border-primary/60 text-primary",
+  },
+  aggregator: {
+    label: "Read-only via SnapTrade",
+    hint: "Linked through the SnapTrade aggregator with a read-only scope. Revoke at any time from your broker or from here.",
+    tone: "border-primary/60 text-primary",
+  },
+  agent_only: {
+    label: "Local agent only",
+    hint: "No read-only program is available for this broker, so the package you run on your own machine is the only connection. Credentials stay in your local .env.",
+    tone: "border-muted-foreground/40 text-muted-foreground",
+  },
 };
-const API_SECRET: AccountField = { id: "apiSecret", label: "API secret", secret: true, kind: "password" };
 
 export const ACCOUNT_PROVIDERS: AccountProviderMeta[] = [
   {
@@ -63,48 +60,21 @@ export const ACCOUNT_PROVIDERS: AccountProviderMeta[] = [
     kind: "stocks",
     region: "Hong Kong",
     currency: "HKD",
-    docs: "OpenD gateway",
+    linking: "aggregator",
+    unverifiedProgram: true,
+    docs: "SnapTrade read-only (supported regions) or local agent",
     setup:
-      "Futu's API only accepts local connections, so run the OpenD daemon on your own machine or server and expose its HTTP bridge. Paste that address below.",
+      "In supported regions moomoo can be linked read-only through SnapTrade. Everywhere else, the OpenD daemon runs beside the aiAlgo package on your own machine and aiAlgo only sees what the agent reports.",
     docsUrl: "https://openapi.moomoo.com/moomoo-api-doc/en/",
-    keysUrl: "https://openapi.moomoo.com/moomoo-api-doc/en/qa/order.html",
     downloadUrl: "https://openapi.moomoo.com/moomoo-api-doc/en/opend/opend-cmd.html",
     steps: [
-      "Open a Futu or moomoo account and enable OpenAPI access from the trading app.",
-      "Download OpenD and run it on a machine or VPS that stays online — Futu's API only accepts local connections.",
-      "Log in to OpenD with your Futu ID and trade password so the session is authenticated.",
-      "Expose the OpenD HTTP bridge (default port 11111) over a URL aiAlgo can reach, ideally HTTPS behind your own firewall.",
-      "Paste the bridge URL and your Futu account number below; add the trade unlock password only if you want aiAlgo to place orders.",
+      "Enable OpenAPI access from the Futu / moomoo trading app.",
+      "Run OpenD on the same machine or VPS as the aiAlgo package — it only accepts local connections.",
+      "Put your Futu ID and trade unlock password in the package's local .env file. They never leave your machine.",
+      "Turn on the sync toggle if you also want read-only positions and fills mirrored to this dashboard.",
     ],
-    tradable: true,
     dataCapable: true,
-    dataNote: "HK and US candles straight from your Futu subscription.",
-    fields: [
-      {
-        id: "opendUrl",
-        label: "OpenD bridge URL",
-        secret: false,
-        kind: "text",
-        required: true,
-        placeholder: "https://your-host:11111",
-        help: "The address of the OpenD daemon you run — not a Futu-hosted URL.",
-      },
-      {
-        id: "accountId",
-        label: "Account number",
-        secret: false,
-        kind: "text",
-        placeholder: "e.g. 283xxxxx",
-        help: "Shown under Accounts in the Futu / moomoo app.",
-      },
-      {
-        id: "unlockPassword",
-        label: "Trade unlock password",
-        secret: true,
-        kind: "password",
-        help: "Needed only if you want aiAlgo to place orders. Stored encrypted.",
-      },
-    ],
+    dataNote: "The agent can pull HK and US candles from your Futu subscription for local backtests.",
   },
   {
     value: "ibkr",
@@ -112,48 +82,21 @@ export const ACCOUNT_PROVIDERS: AccountProviderMeta[] = [
     kind: "stocks",
     region: "Global",
     currency: "USD",
-    docs: "Client Portal gateway",
+    linking: "aggregator",
+    unverifiedProgram: true,
+    docs: "SnapTrade read-only or local Client Portal Gateway",
     setup:
-      "Run the IBKR Client Portal Gateway, log in once, and expose it over HTTPS. Paste the base URL (for example https://your-host:5000/v1/api).",
+      "IBKR can be linked read-only through SnapTrade in supported regions. Otherwise the Client Portal Gateway runs next to the aiAlgo package on your own host.",
     docsUrl: "https://www.interactivebrokers.com/campus/ibkr-api-page/web-api-trading/",
-    keysUrl: "https://www.interactivebrokers.com/en/trading/ib-api.php",
     downloadUrl: "https://www.interactivebrokers.com/en/trading/ib-api.php#client-portal-api",
     steps: [
-      "Make sure your IBKR account has the market-data subscriptions you plan to trade and backtest.",
-      "Download the Client Portal Gateway from IBKR and start it on a machine that stays online.",
-      "Open https://localhost:5000 in a browser and log in once — the gateway holds the authenticated session.",
-      "Keep the session alive (IBKR times out daily) and expose the gateway over HTTPS on a URL aiAlgo can reach.",
-      "Paste the base URL ending in /v1/api plus your U-number account ID below.",
+      "Download the Client Portal Gateway and start it on the machine that will run the aiAlgo package.",
+      "Open https://localhost:5000 once and log in — the session lives on your machine only.",
+      "Point the package at http://localhost:5000/v1/api in its local .env.",
+      "IBKR expires the session daily; keep the gateway logged in for uninterrupted execution.",
     ],
-    tradable: true,
     dataCapable: true,
-    dataNote: "Historical bars via the Client Portal market-data endpoints.",
-    fields: [
-      {
-        id: "gatewayUrl",
-        label: "Client Portal base URL",
-        secret: false,
-        kind: "text",
-        required: true,
-        placeholder: "https://your-host:5000/v1/api",
-        help: "Must end with /v1/api and point at your own running gateway.",
-      },
-      {
-        id: "accountId",
-        label: "Account ID",
-        secret: false,
-        kind: "text",
-        placeholder: "U1234567",
-        help: "Your IBKR account number, starting with U or DU for paper.",
-      },
-      {
-        id: "apiKey",
-        label: "Session token (optional)",
-        secret: true,
-        kind: "password",
-        help: "Only if you put your own auth proxy in front of the gateway.",
-      },
-    ],
+    dataNote: "The agent can source historical bars locally from the Client Portal endpoints.",
   },
   {
     value: "tiger",
@@ -161,79 +104,38 @@ export const ACCOUNT_PROVIDERS: AccountProviderMeta[] = [
     kind: "stocks",
     region: "Asia",
     currency: "USD",
-    docs: "Open API app",
+    linking: "agent_only",
+    docs: "Local agent only",
     setup:
-      "Create an Open API app in Tiger's developer console, then paste your Tiger ID, account number and the RSA private key used to sign requests.",
+      "Tiger has no read-only partner program aiAlgo can use, so the package on your own machine holds the Open API app key and signs its own requests.",
     docsUrl: "https://quant.itigerup.com/openapi/en/python/quickStart/prepare.html",
-    keysUrl: "https://www.itigerup.com/openapi",
     steps: [
-      "Log in to the Tiger Open Platform with your Tiger brokerage account and apply for Open API access.",
-      "Create an application in the developer console — this gives you your Tiger ID.",
-      "Generate an RSA key pair in PKCS8 format (2048-bit) on your own machine.",
-      "Upload the public key to your Tiger app and keep the private key private.",
-      "Copy your Tiger ID and account number from the console and paste them with the private key below.",
+      "Apply for Open API access on the Tiger Open Platform and create an application.",
+      "Generate a 2048-bit PKCS8 RSA key pair on the machine that will run the package.",
+      "Upload the public key to Tiger and keep the private key in the package's local .env.",
+      "Never paste the private key into aiAlgo — there is no field for it and there never will be.",
     ],
-    tradable: true,
     dataCapable: true,
-    dataNote: "Daily and intraday klines for HK, US and A-shares.",
-    fields: [
-      {
-        id: "tigerId",
-        label: "Tiger ID",
-        secret: false,
-        kind: "text",
-        required: true,
-        help: "Shown on your app page in the Tiger Open Platform console.",
-      },
-      {
-        id: "accountId",
-        label: "Account number",
-        secret: false,
-        kind: "text",
-        required: true,
-        help: "Your standard or paper trading account number from Tiger.",
-      },
-      {
-        id: "privateKey",
-        label: "RSA private key (PKCS8)",
-        secret: true,
-        kind: "textarea",
-        required: true,
-        help: "The private half of the key pair whose public key you uploaded to Tiger. Encrypted before it is stored and only decrypted inside a signed request.",
-      },
-    ],
+    dataNote: "The agent can pull HK, US and A-share klines locally.",
   },
   {
     value: "alpaca",
     label: "Alpaca",
     kind: "stocks",
     region: "US",
+    linking: "agent_only",
     currency: "USD",
-    docs: "Live or paper trading keys",
-    setup: "Generate trading API keys in the Alpaca dashboard. Use the paper endpoint while testing.",
+    docs: "Local agent only",
+    setup:
+      "Alpaca trading keys carry order permission, so they stay in the package's local .env on your machine and are never transmitted to aiAlgo.",
     docsUrl: "https://docs.alpaca.markets/us/docs/credential-management",
-    keysUrl: "https://app.alpaca.markets/",
     steps: [
-      "Create an Alpaca account and sign in to the dashboard.",
-      "Choose the environment first — paper or live — because keys are issued per environment.",
-      "Generate an API key pair under API Keys and copy the secret immediately; it is shown only once.",
-      "Paste the key and secret below, and set the base URL to https://paper-api.alpaca.markets while testing.",
+      "Create the key pair in the Alpaca dashboard for the environment you want (paper or live).",
+      "Paste the key and secret into the package's local .env on your own host.",
+      "Start with the paper endpoint until you are happy with the strategy.",
     ],
-    tradable: true,
     dataCapable: true,
-    dataNote: "US equity bars from the Alpaca market data API.",
-    fields: [
-      { ...API_KEY, help: "Starts with PK for paper keys and AK for live keys." },
-      { ...API_SECRET, required: true, help: "Shown only once when the key is generated." },
-      {
-        id: "gatewayUrl",
-        label: "API base URL",
-        secret: false,
-        kind: "text",
-        placeholder: "https://paper-api.alpaca.markets",
-        help: "Leave blank for live trading.",
-      },
-    ],
+    dataNote: "US equity bars from Alpaca's market data API, fetched by the agent.",
   },
   {
     value: "binance",
@@ -241,22 +143,16 @@ export const ACCOUNT_PROVIDERS: AccountProviderMeta[] = [
     kind: "crypto",
     region: "Global",
     currency: "USDT",
-    docs: "Spot & margin trading keys",
-    setup: "Create an API key with spot trading enabled and withdrawals disabled.",
+    linking: "agent_only",
+    docs: "Local agent only",
+    setup: "Create a spot-trading key with withdrawals disabled and keep it in the package's local .env.",
     docsUrl: "https://developers.binance.com/docs/binance-spot-api-docs",
-    keysUrl: "https://www.binance.com/en/support/faq/detail/360002502072",
     steps: [
-      "Complete identity verification on Binance — API keys require a verified account.",
-      "Go to Account → API Management and create a system-generated API key.",
-      "Enable spot trading only and leave withdrawals disabled.",
-      "Add an IP restriction if you can, then copy the key and secret before closing the page.",
+      "Create a system-generated API key under Account → API Management.",
+      "Enable spot trading only; leave withdrawals disabled.",
+      "Add an IP restriction for the host running the package, then store the key locally.",
     ],
-    tradable: false,
     dataCapable: false,
-    fields: [
-      { ...API_KEY, help: "From Binance API Management." },
-      { ...API_SECRET, required: true, help: "Displayed once at creation — regenerate the key if you lose it." },
-    ],
   },
   {
     value: "coinbase",
@@ -264,57 +160,60 @@ export const ACCOUNT_PROVIDERS: AccountProviderMeta[] = [
     kind: "crypto",
     region: "Global",
     currency: "USD",
-    docs: "Advanced Trade API keys",
-    setup: "Create an Advanced Trade API key with trade permission only.",
+    linking: "agent_only",
+    docs: "Local agent only",
+    setup: "Create an Advanced Trade key with trade permission only and keep the key file on your own machine.",
     docsUrl: "https://docs.cdp.coinbase.com/coinbase-app/docs/auth/api-key-authentication",
-    keysUrl: "https://portal.cdp.coinbase.com/access/api",
     steps: [
-      "Sign in to the Coinbase Developer Platform portal with the account that holds your funds.",
-      "Create an API key for Advanced Trade and grant trade permission only — no transfer or withdraw scope.",
-      "Download the generated key file; the private key cannot be retrieved later.",
-      "Paste the key name and the private key from that file below.",
+      "Create an Advanced Trade API key in the Coinbase Developer Platform portal.",
+      "Grant trade permission only — no transfer or withdraw scope.",
+      "Keep the downloaded key file on the host running the package.",
     ],
-    tradable: false,
     dataCapable: false,
-    fields: [
-      { ...API_KEY, label: "API key name", help: "The organizations/.../apiKeys/... value from the key file." },
-      { ...API_SECRET, required: true, help: "The private key from the downloaded key file." },
-    ],
   },
 ];
-
 
 export function providerMeta(value: string): AccountProviderMeta | undefined {
   return ACCOUNT_PROVIDERS.find((p) => p.value === value);
 }
-
-export const PERMISSION_CHECKLIST = [
-  "Enable spot / equities trading",
-  "Enable read-only account and balance access",
-  "Never enable withdrawals or transfers",
-  "Restrict the key to aiAlgo IPs where your venue supports it",
-];
-
-export const PAPER_STARTING_BALANCE = 100_000;
 
 export function providerLabel(value: string): string {
   if (value === "paper") return "aiAlgo Paper Account";
   return providerMeta(value)?.label ?? value;
 }
 
+export const PAPER_STARTING_BALANCE = 100_000;
+
+export const CREDENTIAL_FREE_NOTICE =
+  "aiAlgo no longer stores broker credentials of any kind. Previously stored secrets have been permanently purged. Live orders are generated and sent only by the package running on infrastructure you own.";
+
+export const READ_ONLY_SCOPES = [
+  "Account balances and buying power",
+  "Open positions",
+  "Order and fill history",
+];
+
 export type AccountStatusTone = "connected" | "simulated" | "error" | "idle";
 
 export function accountStatus(a: {
   status: string | null;
-  mode: string | null;
+  mode?: string | null;
+  auth_status?: string | null;
+  linking_mode?: string | null;
   last_error?: string | null;
   last_synced_at?: string | null;
 }): { tone: AccountStatusTone; label: string; detail: string } {
   if (a.status === "error" || a.last_error)
-    return { tone: "error", label: "Needs attention", detail: a.last_error ?? "Last connection attempt failed." };
+    return { tone: "error", label: "Needs attention", detail: a.last_error ?? "The last read-only sync failed." };
   if (a.mode === "simulation" || a.status === "simulated")
-    return { tone: "simulated", label: "Simulated", detail: "Paper account — no real orders are routed." };
+    return { tone: "simulated", label: "Simulated", detail: "Paper account — nothing is routed to a broker." };
+  if (a.linking_mode === "agent_only" && !a.last_synced_at)
+    return {
+      tone: "idle",
+      label: "Awaiting agent",
+      detail: "No telemetry received yet. Start the package on your machine with sync enabled.",
+    };
   if (!a.last_synced_at)
-    return { tone: "idle", label: "Never synced", detail: "Run a connection test to verify the credentials." };
-  return { tone: "connected", label: "Connected", detail: "Actively linked to the broker." };
+    return { tone: "idle", label: "Not yet synced", detail: "Authorise the read-only link to start receiving data." };
+  return { tone: "connected", label: "Linked (read-only)", detail: "Receiving read-only account data." };
 }

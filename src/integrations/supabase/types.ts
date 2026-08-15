@@ -697,7 +697,6 @@ export type Database = {
           buying_power: number
           config: Json
           created_at: string
-          credentials: Json | null
           currency: string
           id: string
           is_default: boolean
@@ -720,7 +719,6 @@ export type Database = {
           buying_power?: number
           config?: Json
           created_at?: string
-          credentials?: Json | null
           currency?: string
           id?: string
           is_default?: boolean
@@ -743,7 +741,6 @@ export type Database = {
           buying_power?: number
           config?: Json
           created_at?: string
-          credentials?: Json | null
           currency?: string
           id?: string
           is_default?: boolean
@@ -945,6 +942,53 @@ export type Database = {
           version?: string
         }
         Relationships: []
+      }
+      contributor_allocations: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          id: string
+          model_id: string | null
+          paid_at: string | null
+          period: string
+          share_pct: number
+          status: string
+          usage_points: number
+          user_id: string
+        }
+        Insert: {
+          amount_cents?: number
+          created_at?: string
+          id?: string
+          model_id?: string | null
+          paid_at?: string | null
+          period: string
+          share_pct?: number
+          status?: string
+          usage_points?: number
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          id?: string
+          model_id?: string | null
+          paid_at?: string | null
+          period?: string
+          share_pct?: number
+          status?: string
+          usage_points?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contributor_allocations_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "ai_models"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       contributor_profiles: {
         Row: {
@@ -2202,6 +2246,42 @@ export type Database = {
           signature?: string | null
           title?: string
           version?: string
+        }
+        Relationships: []
+      }
+      revenue_pool_periods: {
+        Row: {
+          closed_at: string | null
+          created_at: string
+          id: string
+          period: string
+          pool_cents: number
+          pool_share_pct: number
+          status: string
+          subscription_revenue_cents: number
+          total_usage_points: number
+        }
+        Insert: {
+          closed_at?: string | null
+          created_at?: string
+          id?: string
+          period: string
+          pool_cents?: number
+          pool_share_pct?: number
+          status?: string
+          subscription_revenue_cents?: number
+          total_usage_points?: number
+        }
+        Update: {
+          closed_at?: string | null
+          created_at?: string
+          id?: string
+          period?: string
+          pool_cents?: number
+          pool_share_pct?: number
+          status?: string
+          subscription_revenue_cents?: number
+          total_usage_points?: number
         }
         Relationships: []
       }
