@@ -70,11 +70,10 @@ export const connectTradingAccount = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => connectSchema.parse(input))
   .handler(async ({ data, context }) => {
     if (!data.acknowledged) throw new Error("Confirm the trade-only key checklist before connecting.");
-    const { meta, config, secretBlob } = splitFields(data.provider, data.fields);
+    const { meta, config } = splitFields(data.provider, data.fields);
 
-    const { encryptSecret } = await import("@/lib/crypto.server");
-    const encrypted = secretBlob ? await encryptSecret(secretBlob) : null;
-
+    // Hard constraint: aiAlgo never stores broker secrets. Only non-sensitive
+    // linkage metadata is persisted; credentials stay on the user's machine.
     const row: Record<string, unknown> = {
       user_id: context.userId,
       broker_name: data.provider,
@@ -87,7 +86,7 @@ export const connectTradingAccount = createServerFn({ method: "POST" })
       last_synced_at: null,
       last_error: null,
     };
-    if (encrypted) row["credentials_encrypted"] = encrypted;
+
 
     let id = data.accountId ?? null;
     if (id) {
