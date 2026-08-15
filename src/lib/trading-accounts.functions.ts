@@ -209,7 +209,7 @@ export const testTradingAccount = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: conn, error } = await context.supabase
       .from("broker_connections")
-      .select("id,broker_name,nickname,account_id,currency,account_balance,credentials_encrypted,mode,config")
+      .select("id,broker_name,nickname,account_id,currency,account_balance,mode,config")
       .eq("id", data.id)
       .single();
     if (error) throw new Error(error.message);
@@ -237,29 +237,10 @@ export const testTradingAccount = createServerFn({ method: "POST" })
 
     if (conn.mode === "simulation") return finish(true, "Paper account ready.");
 
-    const { isTradableBroker, fetchBrokerSnapshot } = await import("@/lib/brokers.server");
-    if (isTradableBroker(conn.broker_name) && conn.broker_name !== "alpaca") {
-      try {
-        const snap = await fetchBrokerSnapshot(
-          conn.broker_name as "ibkr" | "tiger" | "futu",
-          (conn.config ?? {}) as Record<string, unknown>,
-          conn.credentials_encrypted,
-        );
-        return finish(true, `Connected to ${label} — balance ${snap.account.balance} ${snap.account.currency}.`, {
-          account_id: snap.account.accountId,
-          currency: snap.account.currency,
-          account_balance: snap.account.balance,
-          buying_power: snap.account.buyingPower,
-        });
-      } catch (err) {
-        return finish(false, err instanceof Error ? err.message : String(err));
-      }
-    }
-
-    if (!conn.credentials_encrypted) {
-      return finish(false, "Missing API credentials — reconnect this account.");
-    }
-    return finish(true, "Credentials stored. Live balance sync runs from the trading desk.");
+    return finish(
+      true,
+      `${label} is linked in read-only monitoring mode. Live execution runs in your self-hosted runner package.`,
+    );
   });
 
 export const setDefaultTradingAccount = createServerFn({ method: "POST" })
