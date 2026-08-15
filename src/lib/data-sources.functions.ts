@@ -34,12 +34,30 @@ export const listDataSources = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("data_source_connections")
-      .select("id, provider, label, key_suffix, use_platform_key, priority, enabled, status, status_message, last_checked_at")
+      .select(
+        "id, provider, label, key_suffix, use_platform_key, priority, enabled, status, status_message, last_checked_at, broker_connection_id, broker:broker_connections(broker_name, nickname)",
+      )
       .order("priority", { ascending: true });
     if (error) throw new Error(error.message);
+    const rows = data ?? [];
+    const brokerSources = rows
+      .filter((r) => r.broker_connection_id)
+      .map((r) => {
+        const b = (Array.isArray(r.broker) ? r.broker[0] : r.broker) as
+          | { broker_name: string; nickname: string | null }
+          | null;
+        return {
+          id: r.id,
+          enabled: r.enabled,
+          priority: r.priority,
+          brokerName: b?.broker_name ?? "broker",
+          label: b?.nickname ?? b?.broker_name ?? "Broker account",
+        };
+      });
     const platformAvailable = PROVIDERS.filter((p) => platformKey(p.id) !== null).map((p) => p.id);
-    return { connections: data ?? [], platformAvailable };
+    return { connections: rows.filter((r) => !r.broker_connection_id), brokerSources, platformAvailable };
   });
+
 
 export const saveDataSource = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
