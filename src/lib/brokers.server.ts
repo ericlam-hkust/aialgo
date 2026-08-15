@@ -595,3 +595,160 @@ export async function fetchOpenOrders(
   }));
 }
 
+
+/* ========================= Historical market data ======================= */
+
+export type BrokerBar = {
+  ts: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+};
+
+export type BrokerDataBroker = TradableBroker;
+
+/** Brokers whose adapters can serve historical candles for backtesting. */
+export function brokerSupportsData(broker: string): broker is BrokerDataBroker {
+  return broker === "ibkr" || broker === "tiger" || broker === "futu" || broker === "alpaca";
+}
+
+const dayMs = 86_400_000;
+
+function isoDay(ts: number): string {
+  return new Date(ts).toISOString().slice(0, 10);
+}
+
+async function alpacaBars(
+  config: Record<string, unknown>,
+  secret: string | null,
+  symbol: string,
+  from: string,
+  to: string,
+  timeframe: string,
+): Promise<BrokerBar[]> {
+  const creds = alpacaCreds(secret);
+  const url = `https://data.alpaca.markets/v2/stocks/${encodeURIComponent(symbol)}/bars?timeframe=${encodeURIComponent(timeframe)}&start=${from}&end=${to}&limit=10000&adjustment=all&feed=iex`;
+  const body = await json(url, {
+    headers: { "APCA-API-KEY-ID": creds.key, "APCA-API-SECRET-KEY": creds.secret },
+  });
+  return (body?.bars ?? []).map((b: any) => ({
+    ts: timeframe === "1Day" ? String(b.t).slice(0, 10) : new Date(b.t).toISOString(),
+    open: num(b.o),
+    high: num(b.h),
+    low: num(b.l),
+    close: num(b.c),
+    volume: num(b.v),
+  }));
+}
+
+async function ibkrBars(
+  config: Record<string, unknown>,
+  secret: string | null,
+  symbol: string,
+  from: string,
+  to: string,
+  intraday: string | null,
+): Promise<BrokerBar[]> {
+  const base = String(config["gatewayUrl"] ?? "").replace(/\/+$/, "");
+  if (!base) throw new Error("Interactive Brokers needs the URL of your Client Portal Gateway.");
+  const headers: Record<string, string> = { Accept: "application/json" };
+  if (secret) headers["Authorization"] = `Bearer ${secret}`;
+
+  const found = await json(`${base}/v1/api/iserver/secdef/search?symbol=${encodeURIComponent(symbol)}`, { headers });
+  const conid = Array.isArray(found) ? found[0]?.conid : null;
+  if (!conid) throw new Error(`Interactive Brokers could not resolve ${symbol}.`);
+
+  const days = Math.max(1, Math.ceil((Date.parse(to) - Date.parse(from)) / dayMs));
+  const period = intraday ? `${Math.min(days, 30)}d` : days > 365 ? `${Math.ceil(days / 365)}y` : `${days}d`;
+  const bar = intraday ?? "1d";
+  const body = await json(
+    `${base}/v1/api/iserver/marketdata/history?conid=${conid}&period=${period}&bar=${bar}&outsideRth=false`,
+    { headers },
+  );
+  return (body?.data ?? []).map((b: any) => ({
+    ts: intraday ? new Date(num(b.t)).toISOString() : isoDay(num(b.t)),
+    open: num(b.o),
+    high: num(b.h),
+    low: num(b.l),
+    close: num(b.c),
+    volume: num(b.v),
+  }));
+}
+
+async function futuBars(
+  config: Record<string, unknown>,
+  secret: string | null,
+  symbol: string,
+  from: string,
+  to: string,
+  intraday: string | null,
+): Promise<BrokerBar[]> {
+  const base = String(config["opendUrl"] ?? "").replace(/\/+$/, "");
+  if (!base) throw new Error("Futu / moomoo needs a reachable OpenD gateway to serve historical data.");
+  const headers: Record<string, string> = { Accept: "application/json" };
+  if (secret) headers["Authorization"] = `Bearer ${secret}`;
+  const ktype = intraday ? `K_${intraday}` : "K_DAY";
+  const body = await json(
+    `${base}/api/candles?code=${encodeURIComponent(symbol)}&ktype=${ktype}&start=${from}&end=${to}`,
+    { headers },
+  );
+  const items = body?.data ?? body?.candles ?? body;
+  return (Array.isArray(items) ? items : []).map((b: any) => ({
+    ts: intraday ? new Date(b.time_key ?? b.ts).toISOString() : String(b.time_key ?? b.ts).slice(0, 10),
+    open: num(b.open),
+    high: num(b.high),
+    low: num(b.low),
+    close: num(b.close),
+    volume: num(b.volume),
+  }));
+}
+
+async function tigerBars(
+  config: Record<string, unknown>,
+  secret: string | null,
+  symbol: string,
+  from: string,
+  to: string,
+  intraday: string | null,
+): Promise<BrokerBar[]> {
+  const tigerId = String(config["tigerId"] ?? "");
+  if (!tigerId || !secret) throw new Error("Tiger Brokers needs a Tiger ID and RSA private key.");
+  const data = await tigerCall(tigerId, secret, "kline", {
+    symbols: [symbol],
+    period: intraday ?? "day",
+    begin_time: Date.parse(from),
+    end_time: Date.parse(to),
+    limit: 5000,
+  });
+  const items = Array.isArray(data) ? (data[0]?.items ?? []) : (data?.items ?? []);
+  return (Array.isArray(items) ? items : []).map((b: any) => ({
+    ts: intraday ? new Date(num(b.time)).toISOString() : isoDay(num(b.time)),
+    open: num(b.open),
+    high: num(b.high),
+    low: num(b.low),
+    close: num(b.close),
+    volume: num(b.volume),
+  }));
+}
+
+/** Historical candles from a user's own broker account. */
+export async function fetchBrokerBars(
+  broker: string,
+  config: Record<string, unknown>,
+  credentialsEncrypted: string | null,
+  opts: { symbol: string; from: string; to: string; interval?: string | null },
+): Promise<BrokerBar[]> {
+  if (!brokerSupportsData(broker)) throw new Error(`${broker} cannot serve historical data.`);
+  const secret = credentialsEncrypted ? await decryptSecret(credentialsEncrypted) : null;
+  const { symbol, from, to } = opts;
+  const interval = opts.interval ?? null;
+  if (broker === "alpaca") {
+    const tf = interval ? (interval.endsWith("min") ? `${parseInt(interval, 10)}Min` : interval) : "1Day";
+    return alpacaBars(config, secret, symbol, from, to, tf);
+  }
+  if (broker === "ibkr") return ibkrBars(config, secret, symbol, from, to, interval);
+  if (broker === "futu") return futuBars(config, secret, symbol, from, to, interval);
+  return tigerBars(config, secret, symbol, from, to, interval);
+}

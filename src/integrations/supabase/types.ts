@@ -1036,6 +1036,7 @@ export type Database = {
       data_source_connections: {
         Row: {
           api_key_encrypted: string | null
+          broker_connection_id: string | null
           created_at: string
           enabled: boolean
           id: string
@@ -1052,6 +1053,7 @@ export type Database = {
         }
         Insert: {
           api_key_encrypted?: string | null
+          broker_connection_id?: string | null
           created_at?: string
           enabled?: boolean
           id?: string
@@ -1068,6 +1070,7 @@ export type Database = {
         }
         Update: {
           api_key_encrypted?: string | null
+          broker_connection_id?: string | null
           created_at?: string
           enabled?: boolean
           id?: string
@@ -1082,7 +1085,15 @@ export type Database = {
           use_platform_key?: boolean
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "data_source_connections_broker_connection_id_fkey"
+            columns: ["broker_connection_id"]
+            isOneToOne: false
+            referencedRelation: "broker_connections"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       data_sync_runs: {
         Row: {

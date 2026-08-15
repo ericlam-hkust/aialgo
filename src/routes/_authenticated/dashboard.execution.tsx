@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
@@ -11,6 +11,7 @@ import {
   Loader2,
   Pause,
   Play,
+  Plus,
   RefreshCw,
   ShieldAlert,
   Wallet,
@@ -19,7 +20,7 @@ import {
 import { getExecutionOverview, tickExecution, triggerKillSwitch } from "@/lib/execution.functions";
 import { cancelDeskOrder, getDeskState, placeManualOrder, refreshOrderBook } from "@/lib/trading-desk.functions";
 import { resumeActivation } from "@/lib/activations.functions";
-import { providerLabel } from "@/lib/trading-accounts";
+import { accountStatus, providerLabel } from "@/lib/trading-accounts";
 import { SYMBOLS } from "@/lib/market";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -158,11 +159,26 @@ function TradingDesk() {
                 <SelectValue placeholder="Select account" />
               </SelectTrigger>
               <SelectContent>
-                {accounts.map((a) => (
-                  <SelectItem key={a.id} value={a.id}>
-                    {a.nickname || providerLabel(a.broker_name)} · {a.mode}
-                  </SelectItem>
-                ))}
+                {accounts.map((a) => {
+                  const st = accountStatus(a);
+                  return (
+                    <SelectItem key={a.id} value={a.id}>
+                      <span className="flex items-center gap-2">
+                        <span
+                          aria-hidden
+                          className={`inline-block h-2 w-2 rounded-full ${
+                            st.tone === "connected"
+                              ? "bg-profit"
+                              : st.tone === "error"
+                                ? "bg-loss"
+                                : "bg-muted-foreground"
+                          }`}
+                        />
+                        {a.nickname || providerLabel(a.broker_name)} · {st.label}
+                      </span>
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
             <Button variant="outline" onClick={() => sync.mutate()} disabled={sync.isPending || !account}>
@@ -173,8 +189,19 @@ function TradingDesk() {
               )}
               Sync now
             </Button>
+            <Button variant="ghost" asChild>
+              <Link to="/dashboard/accounts">
+                <Plus className="mr-2 h-4 w-4" aria-hidden /> Add trading account
+              </Link>
+            </Button>
           </div>
-        ) : null}
+        ) : (
+          <Button variant="outline" asChild>
+            <Link to="/dashboard/accounts">
+              <Plus className="mr-2 h-4 w-4" aria-hidden /> Add trading account
+            </Link>
+          </Button>
+        )}
       </div>
 
       {!account ? (
