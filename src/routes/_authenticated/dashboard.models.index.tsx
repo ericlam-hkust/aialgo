@@ -10,7 +10,6 @@ import {
   setModelStatus,
   publishModelVersion,
 } from "@/lib/contributor.functions";
-import { MetricCard } from "@/components/metric-card";
 import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,7 +24,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { setModelNamespace, setModelVisibility } from "@/lib/model-access.functions";
 import { listMyTeams } from "@/lib/teams.functions";
 import { VISIBILITY_OPTIONS, namespacedSlug, type ModelVisibility } from "@/lib/teams";
-import { fmtDate, fmtMoney } from "@/lib/format";
+import { fmtDate } from "@/lib/format";
 import { pricingLabel } from "@/lib/marketplace";
 
 export const Route = createFileRoute("/_authenticated/dashboard/models/")({
