@@ -2,8 +2,24 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { ADAPTERS, platformKey, type Bar, type NormalizedQuote } from "@/lib/market-providers.server";
 import { decryptSecret } from "@/lib/crypto.server";
 import { PROVIDERS, providerCoversSymbol, type ProviderId } from "@/lib/data-providers";
+import { brokerSupportsData, fetchBrokerBars } from "@/lib/brokers.server";
 
-export type ChainLink = { provider: ProviderId; key: string; source: "user" | "platform" };
+export type ProviderLink = { provider: ProviderId; key: string; source: "user" | "platform" };
+export type BrokerLink = {
+  provider: string;
+  key: string;
+  source: "broker";
+  broker: {
+    id: string;
+    connectionId: string;
+    label: string;
+    config: Record<string, unknown>;
+    credentialsEncrypted: string | null;
+  };
+};
+export type ChainLink = ProviderLink | BrokerLink;
+
+const isBroker = (link: ChainLink): link is BrokerLink => link.source === "broker";
 
 type ConnectionRow = {
   provider: string;
@@ -11,15 +27,26 @@ type ConnectionRow = {
   use_platform_key: boolean;
   priority: number;
   enabled: boolean;
+  broker_connection_id?: string | null;
+  broker?: {
+    id: string;
+    broker_name: string;
+    nickname: string | null;
+    config: Record<string, unknown> | null;
+    credentials_encrypted: string | null;
+    status: string | null;
+  } | null;
 };
 
 export async function loadConnections(supabase: SupabaseClient): Promise<ConnectionRow[]> {
   const { data, error } = await supabase
     .from("data_source_connections")
-    .select("provider, api_key_encrypted, use_platform_key, priority, enabled")
+    .select(
+      "provider, api_key_encrypted, use_platform_key, priority, enabled, broker_connection_id, broker:broker_connections(id, broker_name, nickname, config, credentials_encrypted, status)",
+    )
     .order("priority", { ascending: true });
   if (error) throw new Error(error.message);
-  return (data ?? []) as ConnectionRow[];
+  return (data ?? []) as unknown as ConnectionRow[];
 }
 
 /** Ordered list of usable (provider, key) pairs that can serve this symbol. */
@@ -28,8 +55,29 @@ export async function buildChain(rows: ConnectionRow[], symbol: string): Promise
   const seen = new Set<string>();
 
   for (const row of rows) {
+    if (!row.enabled) continue;
+
+    // Broker-backed data source: uses the account's own market data entitlement.
+    if (row.broker_connection_id && row.broker) {
+      const b = row.broker;
+      if (!brokerSupportsData(b.broker_name)) continue;
+      chain.push({
+        provider: `broker:${b.broker_name}`,
+        key: "",
+        source: "broker",
+        broker: {
+          id: b.broker_name,
+          connectionId: b.id,
+          label: b.nickname ?? b.broker_name,
+          config: (b.config ?? {}) as Record<string, unknown>,
+          credentialsEncrypted: b.credentials_encrypted,
+        },
+      });
+      continue;
+    }
+
     const provider = row.provider as ProviderId;
-    if (!row.enabled || !ADAPTERS[provider] || !providerCoversSymbol(provider, symbol)) continue;
+    if (!ADAPTERS[provider] || !providerCoversSymbol(provider, symbol)) continue;
     let key: string | null = null;
     if (row.use_platform_key) key = platformKey(provider);
     else if (row.api_key_encrypted) {
@@ -57,13 +105,14 @@ export async function buildChain(rows: ConnectionRow[], symbol: string): Promise
 
 export type QuoteResult = {
   quote: NormalizedQuote | null;
-  provider: ProviderId | null;
+  provider: string | null;
   error: string | null;
 };
 
 export async function quoteWithFallback(chain: ChainLink[], symbol: string): Promise<QuoteResult> {
   let lastError: string | null = chain.length === 0 ? "No data provider configured for this symbol" : null;
   for (const link of chain) {
+    if (isBroker(link)) continue; // brokers serve history, not streaming quotes
     try {
       const q = await ADAPTERS[link.provider].getQuote(symbol, link.key);
       if (q) return { quote: q, provider: link.provider, error: null };
@@ -80,11 +129,17 @@ export async function barsWithFallback(
   symbol: string,
   from: string,
   to: string,
-): Promise<{ bars: Bar[]; provider: ProviderId | null; error: string | null }> {
+): Promise<{ bars: Bar[]; provider: string | null; error: string | null }> {
   let lastError: string | null = chain.length === 0 ? "No data provider configured for this symbol" : null;
   for (const link of chain) {
     try {
-      const bars = await ADAPTERS[link.provider].getDailyBars(symbol, link.key, from, to);
+      const bars = isBroker(link)
+        ? await fetchBrokerBars(link.broker.id, link.broker.config, link.broker.credentialsEncrypted, {
+            symbol,
+            from,
+            to,
+          })
+        : await ADAPTERS[link.provider].getDailyBars(symbol, link.key, from, to);
       if (bars.length > 0) return { bars, provider: link.provider, error: null };
       lastError = `${link.provider} returned no bars for ${symbol}`;
     } catch (err) {
@@ -98,12 +153,25 @@ export async function intradayWithFallback(
   chain: ChainLink[],
   symbol: string,
   interval: string,
-): Promise<{ bars: Bar[]; provider: ProviderId | null; error: string | null }> {
+): Promise<{ bars: Bar[]; provider: string | null; error: string | null }> {
   let lastError: string | null = chain.length === 0 ? "No data provider configured for this symbol" : null;
+  const to = new Date().toISOString().slice(0, 10);
+  const from = new Date(Date.now() - 30 * 86_400_000).toISOString().slice(0, 10);
   for (const link of chain) {
-    const adapter = ADAPTERS[link.provider];
-    if (!adapter.getIntradayBars) continue;
     try {
+      if (isBroker(link)) {
+        const bars = await fetchBrokerBars(link.broker.id, link.broker.config, link.broker.credentialsEncrypted, {
+          symbol,
+          from,
+          to,
+          interval,
+        });
+        if (bars.length > 0) return { bars, provider: link.provider, error: null };
+        lastError = `${link.broker.label} returned no intraday bars for ${symbol}`;
+        continue;
+      }
+      const adapter = ADAPTERS[link.provider];
+      if (!adapter.getIntradayBars) continue;
       const bars = await adapter.getIntradayBars(symbol, link.key, interval);
       if (bars.length > 0) return { bars, provider: link.provider, error: null };
       lastError = `${link.provider} returned no intraday bars for ${symbol}`;
@@ -113,6 +181,7 @@ export async function intradayWithFallback(
   }
   return { bars: [], provider: null, error: lastError ?? "No configured provider supports intraday bars" };
 }
+
 
 export async function persistQuotes(rows: { symbol: string; quote: NormalizedQuote; provider: ProviderId }[]) {
   if (rows.length === 0) return;
