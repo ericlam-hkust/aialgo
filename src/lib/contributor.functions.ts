@@ -237,21 +237,7 @@ export const getPayoutOverview = createServerFn({ method: "GET" })
       .maybeSingle();
     if (!contributor) return null;
 
-    const [{ data: transactions }, { data: payouts }] = await Promise.all([
-      supabase
-        .from("model_transactions")
-        .select("id,model_id,model_name,gross_amount,commission_amount,net_amount,currency,kind,status,created_at")
-        .eq("contributor_id", contributor.id)
-        .order("created_at", { ascending: false })
-        .limit(1000),
-      supabase
-        .from("payout_batches")
-        .select("*")
-        .eq("contributor_id", contributor.id)
-        .order("period", { ascending: false }),
-    ]);
-
-    return { contributor, transactions: transactions ?? [], payouts: payouts ?? [] };
+    return { contributor };
   });
 
 export const setTaxFormStatus = createServerFn({ method: "POST" })
