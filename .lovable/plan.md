@@ -65,6 +65,8 @@ Mechanics:
 - **`src/routes/_authenticated/dashboard.execution.tsx`**: status dot reflects bridge health; a stale IBKR session shows "Re-login required" with a link.
 - **Health**: a `/api/public/bridge-heartbeat` route the host posts to (HMAC-signed), updating `bridge_last_heartbeat`; a stale bridge flips the account to "Needs attention" and notifies the user.
 - **Security**: broker credentials stay AES-GCM encrypted via `crypto.server`, decrypted only at provisioning/login time and never returned to the browser; bridge URLs and control tokens are server-only; logs redacted before display.
+- **Consent**: new `trading_consents` table (user_id, version, accepted_at, ip_hash) with owner-scoped RLS + GRANTs; consent text and current version in `src/lib/trading-consent.ts`; a shared `requireTradingConsent` server-side check called by `provisionBridge`, live activation and manual order server functions; new public route `src/routes/trading-disclaimer.tsx` with its own head metadata.
+
 
 ## Suggested sequencing
 
