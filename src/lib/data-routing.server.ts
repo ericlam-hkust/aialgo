@@ -136,17 +136,7 @@ export async function intradayWithFallback(
   const from = new Date(Date.now() - 30 * 86_400_000).toISOString().slice(0, 10);
   for (const link of chain) {
     try {
-      if (isBroker(link)) {
-        const bars = await fetchBrokerBars(link.broker.id, link.broker.config, link.broker.credentialsEncrypted, {
-          symbol,
-          from,
-          to,
-          interval,
-        });
-        if (bars.length > 0) return { bars, provider: link.provider, error: null };
-        lastError = `${link.broker.label} returned no intraday bars for ${symbol}`;
-        continue;
-      }
+
       const adapter = ADAPTERS[link.provider];
       if (!adapter.getIntradayBars) continue;
       const bars = await adapter.getIntradayBars(symbol, link.key, interval);
