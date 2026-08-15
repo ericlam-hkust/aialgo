@@ -135,3 +135,141 @@ export function suggestPricing(input: PricingInputs, currency = "HKD"): PricingS
 
 export const gradeTone = (grade: PricingSuggestion["grade"]) =>
   grade === "excellent" || grade === "strong" ? "profit" : grade === "fair" ? "warning" : "loss";
+
+/* ------------------------------------------------------------------ *
+ * Community-aware automatic pricing (platform-set mode)
+ *
+ * The performance engine above stays the baseline. On top of it we blend
+ * community demand (likes + comment sentiment + reviews), traction and
+ * freshness, then clamp movement so a like campaign can never distort a
+ * weak strategy into a premium price.
+ * ------------------------------------------------------------------ */
+
+export type DemandInputs = {
+  likes: number;
+  verifiedLikes: number;
+  commentCount: number;
+  /** Rolling average sentiment, -1 (negative) … 1 (positive). */
+  sentimentAvg: number;
+  rating: number; // 0-5
+  ratingCount: number;
+  activeUsers: number;
+  executions: number;
+  backtestRanAt?: string | null;
+  liveSince?: string | null;
+  overfittingRisk?: boolean;
+};
+
+export type AutoPriceGroup = {
+  key: string;
+  label: string;
+  weight: number;
+  score: number;
+  detail: string;
+};
+
+export type AutoPrice = {
+  price: number;
+  baseline: number;
+  score: number;
+  groups: AutoPriceGroup[];
+  capped: boolean;
+  summary: string;
+};
+
+/** Max move allowed per repricing cycle. */
+export const REPRICE_STEP_CAP = 0.15;
+
+const daysAgo = (iso?: string | null) => {
+  if (!iso) return Infinity;
+  return (Date.now() - new Date(iso).getTime()) / 86_400_000;
+};
+
+export function computeAutoPrice(
+  perf: PricingInputs,
+  demand: DemandInputs,
+  opts: { currentPrice?: number; currency?: string } = {},
+): AutoPrice {
+  const currency = opts.currency ?? "HKD";
+  const base = suggestPricing(perf, currency);
+
+  const weightedLikes = Number(demand.verifiedLikes || 0) * 3 + Math.max(0, Number(demand.likes || 0) - Number(demand.verifiedLikes || 0));
+  const likeScore = scale(weightedLikes, 0, 60);
+  const sentiment = clamp(((Number(demand.sentimentAvg) || 0) + 1) * 50);
+  const volumeWeight = clamp(scale(Number(demand.commentCount) || 0, 0, 25)) / 100;
+  const sentimentScore = 50 + (sentiment - 50) * volumeWeight;
+  const reviewScore = demand.ratingCount > 0 ? scale(Number(demand.rating) || 0, 2.5, 5) : 50;
+
+  const demandScore = clamp(likeScore * 0.4 + sentimentScore * 0.4 + reviewScore * 0.2);
+  const tractionScore = clamp(scale(Number(demand.activeUsers) || 0, 0, 250) * 0.6 + scale(Number(demand.executions) || 0, 0, 5000) * 0.4);
+
+  const btAge = daysAgo(demand.backtestRanAt);
+  const liveDays = demand.liveSince ? daysAgo(demand.liveSince) : 0;
+  let freshness = clamp(scale(120 - Math.min(btAge, 400), 0, 120) * 0.6 + scale(Math.min(liveDays, 365), 0, 180) * 0.4);
+  if (demand.overfittingRisk) freshness = clamp(freshness - 30);
+
+  const groups: AutoPriceGroup[] = [
+    {
+      key: "performance",
+      label: "Verified performance",
+      weight: 0.55,
+      score: base.score,
+      detail: `Backtest score ${base.score}/100 (${base.grade}) — Sharpe, drawdown, trade quality, consistency and sample size.`,
+    },
+    {
+      key: "demand",
+      label: "Community demand",
+      weight: 0.25,
+      score: demandScore,
+      detail: `${demand.likes} likes (${demand.verifiedLikes} from owners), ${demand.commentCount} comments, sentiment ${(Number(demand.sentimentAvg) || 0).toFixed(2)}, rating ${(Number(demand.rating) || 0).toFixed(1)}/5.`,
+    },
+    {
+      key: "traction",
+      label: "Traction",
+      weight: 0.15,
+      score: tractionScore,
+      detail: `${demand.activeUsers} active users and ${demand.executions} executions.`,
+    },
+    {
+      key: "freshness",
+      label: "Freshness & risk",
+      weight: 0.05,
+      score: freshness,
+      detail: Number.isFinite(btAge)
+        ? `Verified backtest ${Math.round(btAge)} days old${demand.overfittingRisk ? " · overfitting risk flagged" : ""}.`
+        : "No verified backtest on record.",
+    },
+  ];
+
+  const score = clamp(groups.reduce((acc, g) => acc + g.score * g.weight, 0));
+
+  // Community + traction can move the price up to ±50% around the performance baseline.
+  const nonPerf = clamp(demandScore * 0.55 + tractionScore * 0.35 + freshness * 0.1);
+  const multiplier = 0.7 + (nonPerf / 100) * 0.6; // 0.7 … 1.3
+  let target = base.suggested * multiplier;
+  target = Math.max(base.suggested * 0.5, Math.min(base.suggested * 2, target));
+
+  let capped = false;
+  const current = Number(opts.currentPrice) || 0;
+  if (current > 0) {
+    const hi = current * (1 + REPRICE_STEP_CAP);
+    const lo = current * (1 - REPRICE_STEP_CAP);
+    if (target > hi) { target = hi; capped = true; }
+    if (target < lo) { target = lo; capped = true; }
+  }
+
+  const price = Math.max(0, Math.round(target / 10) * 10);
+  const money = (v: number) =>
+    new Intl.NumberFormat("en-HK", { style: "currency", currency, maximumFractionDigits: 0 }).format(v);
+
+  return {
+    price,
+    baseline: base.suggested,
+    score: Math.round(score),
+    groups,
+    capped,
+    summary: `${money(price)} — combined score ${Math.round(score)}/100 from a ${money(base.suggested)} performance baseline${
+      capped ? ", limited to a 15% move this cycle" : ""
+    }.`,
+  };
+}
