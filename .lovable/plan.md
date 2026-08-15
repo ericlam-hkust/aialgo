@@ -1,75 +1,41 @@
-# Managed broker bridge (beta): aiAlgo hosts OpenD, IBKR gateway and Tiger setup
+# Credential-free brokerage: OAuth read-only linking + self-hosted execution
 
-Today users must run Futu's OpenD daemon or IBKR's Client Portal Gateway themselves and paste a URL into Trading accounts. This plan makes aiAlgo offer a **hosted bridge** instead: the user picks "Let aiAlgo host it", we provision a private per-user bridge, and the account connects with no local software.
+aiAlgo stops holding any brokerage credential. Two clean boundaries replace today's model:
 
-## Important constraint to accept up front
+- **Read (aiAlgo cloud)** — the user authorizes aiAlgo through the broker's own OAuth screen and grants a **read-only** scope. aiAlgo receives a revocable token (held by the aggregator/broker, not a password) and uses it for positions, balances, executions and — where the broker permits — historical bars.
+- **Write (user's own machine)** — order placement never touches aiAlgo. The platform emits a signed, downloadable **strategy package** the user runs on their own VPS with their own broker credentials, which never leave their infrastructure.
 
-The app backend runs in a serverless edge runtime — it cannot itself run OpenD or the IBKR gateway (native binaries, long-lived sessions). A managed bridge needs a **separate container host** (a VPS or container platform you control) running one small container per user. This plan covers the aiAlgo side end to end and defines the exact contract that host must implement; the container host itself is infrastructure you provision, not something the app can create.
+This removes the regulatory exposure of custodying trading credentials and matches how portfolio trackers (Sharesight, and moomoo's US/Canada linking via SnapTrade) already work.
 
-Also flag for your decision (business, not code): hosting OpenD means aiAlgo holds each user's Futu login and trade-unlock password, and IBKR requires an interactive daily login. Futu's OpenAPI terms should be reviewed before opening the beta beyond invited users.
+## What changes for the user
 
-## What the user sees
+1. **Trading accounts page becomes "Linked accounts (read-only)".** Each broker card shows an "Authorize with <broker>" button that opens the broker's own consent screen in a popup. No API key, secret, private key, gateway URL or unlock password fields anywhere.
+2. **Existing stored credentials are purged.** On the first deploy every encrypted credential blob is deleted and affected accounts move to a `needs_reauth` state with a banner explaining the regulatory change and a one-click re-link.
+3. **Trading Desk loses manual order entry against aiAlgo-held credentials.** It becomes a live *monitoring* desk: positions, balances, and executions streamed read-only from the linked account, with the existing origin badges (Manual / Algo / AI / Broker) preserved because executions still carry their tagging from the runner.
+4. **Deploy replaces "go live".** From a verified strategy the user clicks **Download runner package** — a zip with the compiled strategy, a `docker-compose.yml`, an `.env.example` for *their* broker keys, and a runbook. The runner executes locally and reports fills back to aiAlgo over a scoped, user-issued API token so the desk, blotter and performance-fee accounting keep working.
+5. **Data sources**: broker-backed market data continues, but only through the read-only OAuth token, and only for brokers whose data scope allows it. Where it doesn't, the account is listed as "positions only" and backtests fall back to aiAlgo's own market data providers.
 
-### 1. Hosting choice in the connect form
-For Futu, IBKR and Tiger the form gains a two-option selector at the top:
-- **aiAlgo hosted (beta)** — no downloads. Fields reduce to what the broker login needs (Futu ID + trade password; IBKR account + a login step; Tiger keys, which need no daemon).
-- **Self-hosted** — the current flow with the bridge URL and the numbered guide.
+## Broker coverage (to be confirmed against each program during build)
 
-Hosted is default where available; the existing connection guide stays for self-host.
+| Broker | Read-only linking path |
+| --- | --- |
+| moomoo / Futu | Aggregator OAuth (SnapTrade) where available by region; otherwise self-host only |
+| Interactive Brokers | IBKR OAuth / third-party program, or aggregator |
+| Tiger | No public OAuth today — self-host runner only |
+| Alpaca | Native OAuth with read-only scopes |
+| Binance / Coinbase | Coinbase OAuth (read scopes); Binance = self-host only |
 
-### 2. Provisioning flow
-On save with hosted selected, the account row is created in a `provisioning` state and the page shows a live status card: Provisioning → Awaiting broker login → Running → Error, with elapsed time and a retry.
+Every provider entry gains a `linking` mode of `oauth`, `aggregator` or `self_host_only`, so unsupported brokers degrade honestly instead of asking for keys. Nothing is claimed as supported until its program terms are verified.
 
-- **Futu**: after the container starts, aiAlgo logs OpenD in with the stored Futu credentials; if Futu sends an SMS/app 2FA challenge, the card prompts for the code and forwards it once.
-- **IBKR**: the card shows a **Log in to IBKR** button opening the hosted gateway's login page in a new tab (IBKR requires the user to type their own credentials). A daily re-auth reminder appears when the session ages out, with a notification.
-- **Tiger**: no daemon needed — "hosted" just means aiAlgo signs requests server-side; the account goes straight to Running once the RSA key validates.
+## Trading authorisation and consent (carried over, now simpler)
 
-### 3. Managing a hosted bridge
-Each hosted account card gains: region, uptime, last heartbeat, **Restart bridge**, **View logs** (last 100 lines, secrets redacted), and **Switch to self-hosted**. Disconnect keeps the existing active-strategy warning and additionally destroys the container and wipes its credentials.
-
-### 4. Beta gating and cost
-Hosted bridges are limited: one per broker per user, invite/entitlement gated (`managed_bridge` entitlement), with a clear beta notice that sessions may restart and that self-hosting remains the most private option.
-
-### 5. Trading authorisation consent (required before any hosted bridge or live routing)
-
-Because aiAlgo is not a broker, adviser or asset manager and has no discretionary authority, a hosted bridge can only be provisioned after the user accepts an explicit **Trading Authorisation & Disclaimer**. It appears as a scroll-to-end dialog with individually ticked statements, not a single blanket checkbox:
-
-- aiAlgo is a software tool. It does not provide investment advice, recommendations or discretionary management, and holds no licence to trade on your behalf.
-- Every order is placed under **your** authority, using the broker account and credentials **you** supply, executing the strategy **you** selected, configured and enabled. aiAlgo never selects a strategy or initiates a trade on its own.
-- Signals produced by any Algo or AI model are informational outputs of your chosen strategy. Acting on them — including running a strategy in automated mode — is your own decision and remains your responsibility.
-- Enabling automated routing is an instruction *from you* to transmit orders that your selected strategy generates, within the limits you set. You may pause, disable or disconnect at any time, and you remain responsible for monitoring open positions.
-- Past and backtested performance does not predict future results. Trading involves risk of loss, including total loss of capital.
-- You confirm you are permitted to trade these markets and that using automated order routing complies with your broker agreement and local law.
-- A hosted bridge means aiAlgo operates infrastructure that relays your instructions to your broker; aiAlgo does not hold your assets and exercises no discretion over them.
-
-Mechanics:
-- Acceptance is versioned and recorded (user, version, timestamp, IP hash) and re-prompted when the text version changes.
-- Provisioning a bridge, enabling live routing on a strategy activation, and placing a manual live order are all blocked server-side until the current version is accepted — not just hidden in the UI.
-- A short standing reminder line sits on the Trading Desk and on each hosted account card: "Orders are sent on your instruction, from your strategy selection. aiAlgo has no discretionary authority."
-- The full text also lives on a public, owner-authored `/trading-disclaimer` page linked from the dialog, the Trading Desk and the accounts page.
-- Every order stored keeps its decision origin (Manual / Algo / AI, with the strategy and version) as it already does — this is the audit trail showing which of *your* strategies authorised each trade, and it is surfaced in the blotter and any exported statement.
-
-
+aiAlgo is a software tool with **no** discretionary authority, and after this change it is also technically incapable of placing an order. The consent dialog is retained and reworded to say exactly that: read-only access on aiAlgo's side, all execution performed by software the user runs under their own control, every strategy selected and enabled by the user, past performance no guarantee. Acceptance stays versioned and is required before a link or a package download.
 
 ## Technical notes
 
-- **Migration**: add to `broker_connections` — `hosting_mode` (`self` | `managed`), `bridge_id`, `bridge_status`, `bridge_region`, `bridge_last_heartbeat`, `bridge_last_error`. New `managed_bridges` table (id, user_id, broker, container_ref, internal_url, status, created_at, expires_at) with owner-scoped RLS and the standard GRANT block; internal URL and control token never leave the server.
-- **Bridge host contract**: the container host exposes an admin API that aiAlgo calls server-side with a control token —
-  `POST /bridges` (broker, region) → `{ bridgeId, url, token }`, `POST /bridges/:id/login`, `POST /bridges/:id/restart`, `GET /bridges/:id/status`, `GET /bridges/:id/logs`, `DELETE /bridges/:id`. Base URL + control token stored as secrets (`BRIDGE_HOST_URL`, `BRIDGE_HOST_TOKEN`).
-- **New `src/lib/managed-bridge.server.ts`**: typed client for that contract, plus status normalisation and log redaction. Called only from server functions.
-- **New `src/lib/managed-bridge.functions.ts`**: `provisionBridge`, `submitBridgeChallenge`, `bridgeStatus`, `restartBridge`, `bridgeLogs`, `destroyBridge` — all `requireSupabaseAuth`, all verifying the bridge belongs to the caller.
-- **`src/lib/trading-accounts.ts`**: add `managedHosting: boolean` + hosted-mode field subset per provider so the form can switch schemas.
-- **`src/lib/trading-accounts.functions.ts`**: `connectTradingAccount` branches on `hostingMode`; for managed it encrypts broker login secrets, provisions a bridge, and stores the returned internal URL server-side instead of a user-supplied `opendUrl`/`gatewayUrl`. `removeTradingAccount` destroys the bridge first.
-- **`src/lib/brokers.server.ts`**: resolve the effective base URL from the managed bridge when `hosting_mode = 'managed'`, so snapshots, orders and `fetchBrokerBars` work unchanged for both modes.
-- **`src/routes/_authenticated/dashboard.accounts.tsx`**: hosting selector, provisioning status card with polling, 2FA/IBKR-login prompts, restart/logs controls.
-- **`src/routes/_authenticated/dashboard.execution.tsx`**: status dot reflects bridge health; a stale IBKR session shows "Re-login required" with a link.
-- **Health**: a `/api/public/bridge-heartbeat` route the host posts to (HMAC-signed), updating `bridge_last_heartbeat`; a stale bridge flips the account to "Needs attention" and notifies the user.
-- **Security**: broker credentials stay AES-GCM encrypted via `crypto.server`, decrypted only at provisioning/login time and never returned to the browser; bridge URLs and control tokens are server-only; logs redacted before display.
-- **Consent**: new `trading_consents` table (user_id, version, accepted_at, ip_hash) with owner-scoped RLS + GRANTs; consent text and current version in `src/lib/trading-consent.ts`; a shared `requireTradingConsent` server-side check called by `provisionBridge`, live activation and manual order server functions; new public route `src/routes/trading-disclaimer.tsx` with its own head metadata.
-
-
-## Suggested sequencing
-
-1. Schema + `managed_bridges` + hosting-mode plumbing, with Tiger (no container) as the first hosted broker.
-2. Bridge host contract client + provisioning UI + Futu OpenD.
-3. IBKR with interactive login and daily re-auth reminders.
+- **Schema**: drop `credentials_encrypted` and secret-bearing keys from `broker_connections`; add `linking_mode`, `auth_status`, `scope`, `aggregator_user_id`, `token_ref`, `last_read_at`. New `runner_deployments` (package version, machine label, heartbeat, scoped token hash) and `runner_events` (fills/heartbeats posted by the runner). New `trading_consents`. All with owner-scoped RLS plus explicit GRANTs.
+- **OAuth**: aggregator/broker client secrets stay platform-side in Lovable Cloud secrets. Start and callback handled by server functions plus a public callback route; access tokens are stored server-side only (encrypted at rest, never returned to the browser) or held by the aggregator behind a user reference, depending on the program.
+- **Read path**: `brokers.server.ts` is rewritten to read-only calls (accounts, positions, activities, optional candles). `data-routing.server.ts` swaps `credentialsEncrypted` for the token reference and skips brokers whose scope excludes market data. All order-placement code paths in `execution.server.ts` / `trading-desk.functions.ts` are removed or converted to ingesting runner reports.
+- **Runner package**: generated server-side from the existing Python codegen (`strategy-codegen.ts`), zipped with compose + runbook, signed, and downloaded through an authenticated server function. Reporting endpoint lives under `src/routes/api/public/runner/*` with token verification in the handler.
+- **Removed**: managed OpenD/IBKR bridge concept, all credential input forms, `crypto.server` usage for broker secrets (kept for any remaining platform-side token encryption).
+- **Docs**: connection guides rewritten from "create an API key" to "authorize aiAlgo" for OAuth brokers, and to "install the runner" for self-host-only brokers. A public `/trading-disclaimer` page states the read-only, non-discretionary posture.
