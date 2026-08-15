@@ -1,6 +1,7 @@
-import { BookOpen, Download, ExternalLink, KeyRound } from "lucide-react";
-import type { AccountProviderMeta } from "@/lib/trading-accounts";
+import { BookOpen, Download, ExternalLink } from "lucide-react";
+import { LINKING_MODES, type AccountProviderMeta } from "@/lib/trading-accounts";
 import { cn } from "@/lib/utils";
+
 
 type Props = { meta: AccountProviderMeta; className?: string };
 
