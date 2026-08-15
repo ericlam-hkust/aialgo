@@ -669,7 +669,7 @@ function PricingStep({ listing, strategyId, onSaved }: { listing: Listing; strat
           </Field>
           <div className="space-y-1.5">
             <Label htmlFor="price">Price ({listing.currency ?? "HKD"})</Label>
-            <Input id="price" type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} />
+            <Input id="price" type="number" min={0} value={price} disabled={mode === "platform"} onChange={(e) => setPrice(e.target.value)} />
             <p className="text-xs text-muted-foreground">
               Suggested range {suggestion.min}–{suggestion.max}. Tap to use {suggestion.suggested}.
             </p>
