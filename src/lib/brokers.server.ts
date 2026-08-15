@@ -323,3 +323,275 @@ export async function fetchBrokerSnapshot(
   if (broker === "futu") return futuSnapshot(config, secret);
   throw new Error(`Unsupported broker: ${broker}`);
 }
+
+/* ============================ Order routing ============================ */
+
+export type TradableBroker = BrokerId | "alpaca";
+
+export type PlaceOrderRequest = {
+  symbol: string;
+  side: "buy" | "sell";
+  quantity: number;
+  orderType: "market" | "limit";
+  limitPrice?: number | null;
+  timeInForce: "day" | "gtc";
+  clientOrderId: string;
+};
+
+export type PlacedOrder = {
+  brokerOrderId: string;
+  status: string;
+  filledQuantity: number;
+  avgFillPrice: number | null;
+  placedAt: string;
+};
+
+export function isTradableBroker(broker: string): broker is TradableBroker {
+  return broker === "ibkr" || broker === "tiger" || broker === "futu" || broker === "alpaca";
+}
+
+function alpacaCreds(secret: string | null): { key: string; secret: string } {
+  const [key = "", rest = ""] = (secret ?? "").split("::");
+  if (!key) throw new Error("Alpaca needs an API key and secret — reconnect this account.");
+  return { key, secret: rest };
+}
+
+function alpacaBase(config: Record<string, unknown>): string {
+  const custom = String(config["gatewayUrl"] ?? "").replace(/\/+$/, "");
+  return custom || "https://api.alpaca.markets";
+}
+
+/* ------------------------------- place -------------------------------- */
+
+async function ibkrPlace(
+  config: Record<string, unknown>,
+  secret: string | null,
+  req: PlaceOrderRequest,
+): Promise<PlacedOrder> {
+  const base = String(config["gatewayUrl"] ?? "").replace(/\/+$/, "");
+  if (!base) throw new Error("Interactive Brokers needs the URL of your Client Portal Gateway.");
+  const accountId = String(config["accountId"] ?? "");
+  if (!accountId) throw new Error("Set the IBKR account number on this connection before trading.");
+  const headers: Record<string, string> = { "Content-Type": "application/json", Accept: "application/json" };
+  if (secret) headers["Authorization"] = `Bearer ${secret}`;
+
+  const body = {
+    orders: [
+      {
+        cOID: req.clientOrderId,
+        ticker: req.symbol,
+        secType: "STK",
+        orderType: req.orderType === "limit" ? "LMT" : "MKT",
+        side: req.side.toUpperCase(),
+        quantity: req.quantity,
+        tif: req.timeInForce.toUpperCase(),
+        ...(req.orderType === "limit" ? { price: req.limitPrice } : {}),
+      },
+    ],
+  };
+
+  const res = await json(`${base}/v1/api/iserver/account/${encodeURIComponent(accountId)}/orders`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+  });
+  const first = Array.isArray(res) ? res[0] : res;
+  const id = String(first?.order_id ?? first?.orderId ?? first?.id ?? req.clientOrderId);
+  return {
+    brokerOrderId: id,
+    status: String(first?.order_status ?? "submitted").toLowerCase(),
+    filledQuantity: 0,
+    avgFillPrice: null,
+    placedAt: new Date().toISOString(),
+  };
+}
+
+async function tigerPlace(
+  config: Record<string, unknown>,
+  secret: string | null,
+  req: PlaceOrderRequest,
+): Promise<PlacedOrder> {
+  const tigerId = String(config["tigerId"] ?? "");
+  const accountId = String(config["accountId"] ?? "");
+  if (!tigerId || !accountId) throw new Error("Tiger needs both a Tiger ID and an account number.");
+  if (!secret) throw new Error("Tiger needs your RSA private key.");
+
+  const data = await tigerCall(tigerId, secret, "place_order", {
+    account: accountId,
+    symbol: req.symbol,
+    sec_type: "STK",
+    action: req.side.toUpperCase(),
+    order_type: req.orderType === "limit" ? "LMT" : "MKT",
+    total_quantity: req.quantity,
+    time_in_force: req.timeInForce.toUpperCase(),
+    ...(req.orderType === "limit" ? { limit_price: req.limitPrice } : {}),
+  });
+  return {
+    brokerOrderId: String(data?.id ?? data?.order_id ?? req.clientOrderId),
+    status: String(data?.status ?? "submitted").toLowerCase(),
+    filledQuantity: num(data?.filled_quantity),
+    avgFillPrice: data?.avg_fill_price ? num(data.avg_fill_price) : null,
+    placedAt: new Date().toISOString(),
+  };
+}
+
+async function futuPlace(
+  config: Record<string, unknown>,
+  secret: string | null,
+  req: PlaceOrderRequest,
+): Promise<PlacedOrder> {
+  const base = String(config["opendUrl"] ?? "").replace(/\/+$/, "");
+  if (!base) throw new Error("Futu / moomoo requires a reachable OpenD gateway before you can trade.");
+  const headers: Record<string, string> = { "Content-Type": "application/json", Accept: "application/json" };
+  if (secret) headers["Authorization"] = `Bearer ${secret}`;
+
+  const data = await json(`${base}/api/place_order`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      acc_id: String(config["accountId"] ?? ""),
+      code: req.symbol,
+      trd_side: req.side.toUpperCase(),
+      order_type: req.orderType === "limit" ? "NORMAL" : "MARKET",
+      qty: req.quantity,
+      price: req.orderType === "limit" ? req.limitPrice : undefined,
+      remark: req.clientOrderId,
+    }),
+  });
+  const row = data?.data ?? data;
+  return {
+    brokerOrderId: String(row?.order_id ?? req.clientOrderId),
+    status: String(row?.order_status ?? "submitted").toLowerCase(),
+    filledQuantity: num(row?.dealt_qty),
+    avgFillPrice: row?.dealt_avg_price ? num(row.dealt_avg_price) : null,
+    placedAt: new Date().toISOString(),
+  };
+}
+
+async function alpacaPlace(
+  config: Record<string, unknown>,
+  secret: string | null,
+  req: PlaceOrderRequest,
+): Promise<PlacedOrder> {
+  const creds = alpacaCreds(secret);
+  const data = await json(`${alpacaBase(config)}/v2/orders`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "APCA-API-KEY-ID": creds.key,
+      "APCA-API-SECRET-KEY": creds.secret,
+    },
+    body: JSON.stringify({
+      symbol: req.symbol,
+      qty: String(req.quantity),
+      side: req.side,
+      type: req.orderType,
+      time_in_force: req.timeInForce,
+      client_order_id: req.clientOrderId,
+      ...(req.orderType === "limit" ? { limit_price: String(req.limitPrice ?? 0) } : {}),
+    }),
+  });
+  return {
+    brokerOrderId: String(data?.id ?? req.clientOrderId),
+    status: String(data?.status ?? "submitted").toLowerCase(),
+    filledQuantity: num(data?.filled_qty),
+    avgFillPrice: data?.filled_avg_price ? num(data.filled_avg_price) : null,
+    placedAt: String(data?.submitted_at ?? new Date().toISOString()),
+  };
+}
+
+export async function placeBrokerOrder(
+  broker: TradableBroker,
+  config: Record<string, unknown>,
+  credentialsEncrypted: string | null,
+  req: PlaceOrderRequest,
+): Promise<PlacedOrder> {
+  const secret = credentialsEncrypted ? await decryptSecret(credentialsEncrypted) : null;
+  if (broker === "ibkr") return ibkrPlace(config, secret, req);
+  if (broker === "tiger") return tigerPlace(config, secret, req);
+  if (broker === "futu") return futuPlace(config, secret, req);
+  return alpacaPlace(config, secret, req);
+}
+
+/* ------------------------------- cancel -------------------------------- */
+
+export async function cancelBrokerOrder(
+  broker: TradableBroker,
+  config: Record<string, unknown>,
+  credentialsEncrypted: string | null,
+  brokerOrderId: string,
+): Promise<void> {
+  const secret = credentialsEncrypted ? await decryptSecret(credentialsEncrypted) : null;
+
+  if (broker === "ibkr") {
+    const base = String(config["gatewayUrl"] ?? "").replace(/\/+$/, "");
+    const accountId = String(config["accountId"] ?? "");
+    const headers: Record<string, string> = { Accept: "application/json" };
+    if (secret) headers["Authorization"] = `Bearer ${secret}`;
+    await json(`${base}/v1/api/iserver/account/${encodeURIComponent(accountId)}/order/${encodeURIComponent(brokerOrderId)}`, {
+      method: "DELETE",
+      headers,
+    });
+    return;
+  }
+
+  if (broker === "tiger") {
+    const tigerId = String(config["tigerId"] ?? "");
+    if (!secret) throw new Error("Tiger needs your RSA private key.");
+    await tigerCall(tigerId, secret, "cancel_order", {
+      account: String(config["accountId"] ?? ""),
+      id: brokerOrderId,
+    });
+    return;
+  }
+
+  if (broker === "futu") {
+    const base = String(config["opendUrl"] ?? "").replace(/\/+$/, "");
+    const headers: Record<string, string> = { "Content-Type": "application/json", Accept: "application/json" };
+    if (secret) headers["Authorization"] = `Bearer ${secret}`;
+    await json(`${base}/api/cancel_order`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ acc_id: String(config["accountId"] ?? ""), order_id: brokerOrderId }),
+    });
+    return;
+  }
+
+  const creds = alpacaCreds(secret);
+  await fetch(`${alpacaBase(config)}/v2/orders/${encodeURIComponent(brokerOrderId)}`, {
+    method: "DELETE",
+    headers: { "APCA-API-KEY-ID": creds.key, "APCA-API-SECRET-KEY": creds.secret },
+  });
+}
+
+/* ----------------------------- open orders ----------------------------- */
+
+export async function fetchOpenOrders(
+  broker: TradableBroker,
+  config: Record<string, unknown>,
+  credentialsEncrypted: string | null,
+): Promise<BrokerOrder[]> {
+  if (broker !== "alpaca") {
+    const snapshot = await fetchBrokerSnapshot(broker, config, credentialsEncrypted);
+    return snapshot.orders;
+  }
+  const secret = credentialsEncrypted ? await decryptSecret(credentialsEncrypted) : null;
+  const creds = alpacaCreds(secret);
+  const rows = await json(`${alpacaBase(config)}/v2/orders?status=all&limit=100`, {
+    headers: { "APCA-API-KEY-ID": creds.key, "APCA-API-SECRET-KEY": creds.secret },
+  });
+  return (Array.isArray(rows) ? rows : []).map((o: any) => ({
+    accountId: String(config["accountId"] ?? ""),
+    orderId: String(o?.id),
+    symbol: String(o?.symbol ?? "?"),
+    side: String(o?.side ?? "").toLowerCase() || "unknown",
+    orderType: o?.type ? String(o.type) : null,
+    quantity: num(o?.qty),
+    filledQuantity: num(o?.filled_qty),
+    limitPrice: o?.limit_price ? num(o.limit_price) : null,
+    avgFillPrice: o?.filled_avg_price ? num(o.filled_avg_price) : null,
+    status: String(o?.status ?? "unknown"),
+    placedAt: o?.submitted_at ? String(o.submitted_at) : null,
+  }));
+}
+
