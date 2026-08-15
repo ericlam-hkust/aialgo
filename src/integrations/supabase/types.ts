@@ -28,6 +28,7 @@ export type Database = {
           base_model_id: string | null
           base_version: string | null
           cagr: number
+          comments_count: number
           consistency_score: number
           contributor_id: string
           created_at: string
@@ -36,6 +37,7 @@ export type Database = {
           data_source_kind: string
           data_source_label: string | null
           declared_frequency: Database["public"]["Enums"]["frequency_class"]
+          demand_score: number
           description: string
           divergence_flagged: boolean
           executions: number
@@ -46,6 +48,7 @@ export type Database = {
           id: string
           interface_manifest: Json
           last_validated_at: string | null
+          likes_count: number
           listed_at: string | null
           listing_kind: Database["public"]["Enums"]["listing_kind"]
           live_return_30d: number
@@ -65,6 +68,9 @@ export type Database = {
           performance_fee_pct: number
           pipeline: Json | null
           price: number
+          price_set_at: string
+          price_source_note: string | null
+          pricing_mode: Database["public"]["Enums"]["pricing_mode"]
           pricing_model: Database["public"]["Enums"]["model_pricing_model"]
           pricing_score: number | null
           profit_factor: number
@@ -75,6 +81,7 @@ export type Database = {
           risk_disclosure: string | null
           risk_level: Database["public"]["Enums"]["model_risk_level"]
           sandbox_runs_used: number
+          sentiment_avg: number
           sharpe: number
           slug: string
           status: Database["public"]["Enums"]["model_listing_status"]
@@ -107,6 +114,7 @@ export type Database = {
           base_model_id?: string | null
           base_version?: string | null
           cagr?: number
+          comments_count?: number
           consistency_score?: number
           contributor_id: string
           created_at?: string
@@ -115,6 +123,7 @@ export type Database = {
           data_source_kind?: string
           data_source_label?: string | null
           declared_frequency?: Database["public"]["Enums"]["frequency_class"]
+          demand_score?: number
           description?: string
           divergence_flagged?: boolean
           executions?: number
@@ -125,6 +134,7 @@ export type Database = {
           id?: string
           interface_manifest?: Json
           last_validated_at?: string | null
+          likes_count?: number
           listed_at?: string | null
           listing_kind?: Database["public"]["Enums"]["listing_kind"]
           live_return_30d?: number
@@ -144,6 +154,9 @@ export type Database = {
           performance_fee_pct?: number
           pipeline?: Json | null
           price?: number
+          price_set_at?: string
+          price_source_note?: string | null
+          pricing_mode?: Database["public"]["Enums"]["pricing_mode"]
           pricing_model?: Database["public"]["Enums"]["model_pricing_model"]
           pricing_score?: number | null
           profit_factor?: number
@@ -154,6 +167,7 @@ export type Database = {
           risk_disclosure?: string | null
           risk_level?: Database["public"]["Enums"]["model_risk_level"]
           sandbox_runs_used?: number
+          sentiment_avg?: number
           sharpe?: number
           slug: string
           status?: Database["public"]["Enums"]["model_listing_status"]
@@ -186,6 +200,7 @@ export type Database = {
           base_model_id?: string | null
           base_version?: string | null
           cagr?: number
+          comments_count?: number
           consistency_score?: number
           contributor_id?: string
           created_at?: string
@@ -194,6 +209,7 @@ export type Database = {
           data_source_kind?: string
           data_source_label?: string | null
           declared_frequency?: Database["public"]["Enums"]["frequency_class"]
+          demand_score?: number
           description?: string
           divergence_flagged?: boolean
           executions?: number
@@ -204,6 +220,7 @@ export type Database = {
           id?: string
           interface_manifest?: Json
           last_validated_at?: string | null
+          likes_count?: number
           listed_at?: string | null
           listing_kind?: Database["public"]["Enums"]["listing_kind"]
           live_return_30d?: number
@@ -223,6 +240,9 @@ export type Database = {
           performance_fee_pct?: number
           pipeline?: Json | null
           price?: number
+          price_set_at?: string
+          price_source_note?: string | null
+          pricing_mode?: Database["public"]["Enums"]["pricing_mode"]
           pricing_model?: Database["public"]["Enums"]["model_pricing_model"]
           pricing_score?: number | null
           profit_factor?: number
@@ -233,6 +253,7 @@ export type Database = {
           risk_disclosure?: string | null
           risk_level?: Database["public"]["Enums"]["model_risk_level"]
           sandbox_runs_used?: number
+          sentiment_avg?: number
           sharpe?: number
           slug?: string
           status?: Database["public"]["Enums"]["model_listing_status"]
@@ -1793,6 +1814,88 @@ export type Database = {
           },
         ]
       }
+      model_comments: {
+        Row: {
+          author_name: string
+          body: string
+          created_at: string
+          hidden: boolean
+          id: string
+          model_id: string
+          sentiment: string
+          sentiment_score: number
+          updated_at: string
+          user_id: string
+          verified_owner: boolean
+        }
+        Insert: {
+          author_name?: string
+          body: string
+          created_at?: string
+          hidden?: boolean
+          id?: string
+          model_id: string
+          sentiment?: string
+          sentiment_score?: number
+          updated_at?: string
+          user_id: string
+          verified_owner?: boolean
+        }
+        Update: {
+          author_name?: string
+          body?: string
+          created_at?: string
+          hidden?: boolean
+          id?: string
+          model_id?: string
+          sentiment?: string
+          sentiment_score?: number
+          updated_at?: string
+          user_id?: string
+          verified_owner?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "model_comments_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "ai_models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      model_likes: {
+        Row: {
+          created_at: string
+          id: string
+          model_id: string
+          user_id: string
+          verified_owner: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          model_id: string
+          user_id: string
+          verified_owner?: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          model_id?: string
+          user_id?: string
+          verified_owner?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "model_likes_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "ai_models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       model_metrics: {
         Row: {
           created_at: string
@@ -1824,6 +1927,47 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "model_metrics_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "ai_models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      model_price_history: {
+        Row: {
+          created_at: string
+          factors: Json
+          id: string
+          mode: Database["public"]["Enums"]["pricing_mode"]
+          model_id: string
+          previous_price: number | null
+          price: number
+          reason: string | null
+        }
+        Insert: {
+          created_at?: string
+          factors?: Json
+          id?: string
+          mode: Database["public"]["Enums"]["pricing_mode"]
+          model_id: string
+          previous_price?: number | null
+          price: number
+          reason?: string | null
+        }
+        Update: {
+          created_at?: string
+          factors?: Json
+          id?: string
+          mode?: Database["public"]["Enums"]["pricing_mode"]
+          model_id?: string
+          previous_price?: number | null
+          price?: number
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "model_price_history_model_id_fkey"
             columns: ["model_id"]
             isOneToOne: false
             referencedRelation: "ai_models"
@@ -1912,6 +2056,69 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "model_submissions_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "ai_models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      model_transactions: {
+        Row: {
+          buyer_id: string | null
+          commission_amount: number
+          commission_rate: number
+          contributor_id: string | null
+          created_at: string
+          currency: string
+          gross_amount: number
+          id: string
+          kind: string
+          model_id: string | null
+          model_name: string
+          net_amount: number
+          status: string
+        }
+        Insert: {
+          buyer_id?: string | null
+          commission_amount?: number
+          commission_rate?: number
+          contributor_id?: string | null
+          created_at?: string
+          currency?: string
+          gross_amount?: number
+          id?: string
+          kind?: string
+          model_id?: string | null
+          model_name: string
+          net_amount?: number
+          status?: string
+        }
+        Update: {
+          buyer_id?: string | null
+          commission_amount?: number
+          commission_rate?: number
+          contributor_id?: string | null
+          created_at?: string
+          currency?: string
+          gross_amount?: number
+          id?: string
+          kind?: string
+          model_id?: string | null
+          model_name?: string
+          net_amount?: number
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "model_transactions_contributor_id_fkey"
+            columns: ["contributor_id"]
+            isOneToOne: false
+            referencedRelation: "contributor_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "model_transactions_model_id_fkey"
             columns: ["model_id"]
             isOneToOne: false
             referencedRelation: "ai_models"
@@ -2822,6 +3029,7 @@ export type Database = {
       model_visibility: "public" | "unlisted" | "private"
       payout_status: "pending" | "processing" | "paid" | "failed"
       plan_tier: "free" | "pro" | "elite"
+      pricing_mode: "builder" | "platform"
       risk_tolerance: "conservative" | "moderate" | "aggressive"
       team_role: "owner" | "maintainer" | "viewer"
       trust_tier: "platform_verified" | "live_verified" | "unproven"
@@ -2978,6 +3186,7 @@ export const Constants = {
       model_visibility: ["public", "unlisted", "private"],
       payout_status: ["pending", "processing", "paid", "failed"],
       plan_tier: ["free", "pro", "elite"],
+      pricing_mode: ["builder", "platform"],
       risk_tolerance: ["conservative", "moderate", "aggressive"],
       team_role: ["owner", "maintainer", "viewer"],
       trust_tier: ["platform_verified", "live_verified", "unproven"],
