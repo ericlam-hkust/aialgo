@@ -4,6 +4,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   AlertTriangle,
+  BookOpen,
+
   CheckCircle2,
   Database,
   Loader2,
@@ -358,9 +360,17 @@ function AccountsPage() {
                           <Star className="mr-1.5 h-3.5 w-3.5" aria-hidden /> Make default
                         </Button>
                       ) : null}
+                      {pm?.docsUrl ? (
+                        <Button size="sm" variant="ghost" asChild>
+                          <a href={pm.docsUrl} target="_blank" rel="noopener noreferrer">
+                            <BookOpen className="mr-1.5 h-3.5 w-3.5" aria-hidden /> Setup guide
+                          </a>
+                        </Button>
+                      ) : null}
                       <Button size="sm" variant="ghost" onClick={() => setDisconnectId(a.id)}>
                         <Unplug className="mr-1.5 h-3.5 w-3.5" aria-hidden /> Disconnect
                       </Button>
+
                     </div>
                   </div>
                 );
