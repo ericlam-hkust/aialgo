@@ -57,36 +57,24 @@ export const listMyModels = createServerFn({ method: "GET" })
       .select("id,handle,display_name,payout_status,stripe_account_id")
       .eq("user_id", userId)
       .maybeSingle();
-    if (!contributor) return { contributor: null, models: [], transactions: [], payouts: [], submissions: [] };
+    if (!contributor) return { contributor: null, models: [], submissions: [] };
 
-    const [{ data: models }, { data: transactions }, { data: payouts }, { data: submissions }] = await Promise.all([
+    const [{ data: models }, { data: submissions }] = await Promise.all([
       supabase
         .from("ai_models")
         .select("*")
         .eq("contributor_id", contributor.id)
         .order("created_at", { ascending: false }),
-      supabase
-        .from("model_transactions")
-        .select("*")
-        .eq("contributor_id", contributor.id)
-        .order("created_at", { ascending: false })
-        .limit(300),
-      supabase
-        .from("payout_batches")
-        .select("*")
-        .eq("contributor_id", contributor.id)
-        .order("period", { ascending: false }),
       supabase.from("model_submissions").select("*").eq("user_id", userId).order("created_at", { ascending: false }),
     ]);
 
     return {
       contributor,
       models: models ?? [],
-      transactions: transactions ?? [],
-      payouts: payouts ?? [],
       submissions: submissions ?? [],
     };
   });
+
 
 export type ModelDraft = {
   name: string;
