@@ -1,38 +1,31 @@
-import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Check, Gift, ShieldCheck, TrendingUp } from "lucide-react";
+import { Check, Download, ServerCog, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
-  BASE_COMMISSION,
-  BATCH_RULE_COPY,
   CONSUMER_PLANS,
   CONTRIBUTOR_PROMISE,
-  FEE_DISCLOSURE,
-  MICRO_PROFIT_THRESHOLD,
+  NO_COMMISSION_PROMISE,
   PLATFORM_DISCLAIMER,
   RISK_DISCLOSURE,
-  WATERMARK_EXAMPLE,
-  computeFee,
-  usd,
+  SELF_HOSTED_PROMISE,
+  UPDATE_CONSENT_PROMISE,
 } from "@/lib/monetization";
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
-      { title: "Pricing — $12/mo to trade live, fees only on winning trades" },
+      { title: "Pricing — subscription only, no commissions | aiAlgo" },
       {
         name: "description",
         content:
-          "aiAlgo is free to browse and paper trade. Live execution is $12/month, plus a performance fee charged only on profitable closed trades.",
+          "aiAlgo pricing: Starter free, Pro $29/month, Elite/Team $99/month. Subscriptions only — no commissions, per-trade charges or performance fees.",
       },
       { property: "og:title", content: "Pricing — aiAlgo" },
       {
         property: "og:description",
-        content: "Free forever for creators. $12/month for live execution plus per-trade performance fees on wins only.",
+        content: "Starter free, Pro $29/mo, Elite/Team $99/mo. Strategy-building software you run on your own infrastructure.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -41,154 +34,97 @@ export const Route = createFileRoute("/pricing")({
   component: PricingPage,
 });
 
-function PricingPage() {
-  const [profit, setProfit] = useState(50);
-  const [feePct, setFeePct] = useState(15);
-  const [cumulative, setCumulative] = useState(0);
-  const outcome = computeFee({ netProfit: profit, feePct, cumulativePnlBefore: cumulative });
+const GUARANTEES = [
+  { icon: ShieldCheck, title: "No commissions, ever", body: NO_COMMISSION_PROMISE },
+  { icon: ServerCog, title: "You own the execution", body: SELF_HOSTED_PROMISE },
+  { icon: Download, title: "Updates on your terms", body: UPDATE_CONSENT_PROMISE },
+];
 
+function PricingPage() {
   return (
     <main className="mx-auto max-w-6xl px-4 py-12">
       <header className="max-w-2xl">
         <Badge variant="secondary">Pricing</Badge>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-          Free to build. $12 to go live. Fees only when you win.
+          Subscription only. No commissions, no per-trade fees.
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Contributors are never charged. Traders pay a low monthly subscription for live execution, plus a
-          performance fee on each profitable closed trade — never on losses.
+          aiAlgo is strategy-building software. You pay for the builder, the backtesting data and the release pipeline —
+          never for the trades your own deployment places.
         </p>
       </header>
 
-      <section className="mt-10 grid gap-6 md:grid-cols-2">
+      <section className="mt-10 grid gap-6 lg:grid-cols-3">
         {CONSUMER_PLANS.map((plan) => (
-          <Card key={plan.key} className={plan.key === "basic" ? "border-primary/60" : undefined}>
+          <Card key={plan.key} className={plan.key === "pro" ? "border-primary/60 shadow-[var(--shadow-glow)]" : undefined}>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>{plan.name}</CardTitle>
-                {plan.key === "basic" ? <Badge>Live execution</Badge> : <Badge variant="secondary">Always free</Badge>}
+                {plan.key === "pro" ? (
+                  <Badge>Most popular</Badge>
+                ) : plan.key === "free" ? (
+                  <Badge variant="secondary">Always free</Badge>
+                ) : (
+                  <Badge variant="outline">Teams</Badge>
+                )}
               </div>
               <CardDescription>{plan.blurb}</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="mono text-3xl font-semibold">
-                {plan.monthly === 0 ? "$0" : `$${plan.monthly}`}
+                ${plan.monthly}
                 <span className="ml-1 text-sm font-normal text-muted-foreground">/ month</span>
               </p>
               {plan.annual > 0 ? (
                 <p className="mt-1 text-xs text-muted-foreground">or ${plan.annual}/year — two months free</p>
-              ) : null}
-              <ul className="mt-4 space-y-2 text-sm">
+              ) : (
+                <p className="mt-1 text-xs text-muted-foreground">No card required</p>
+              )}
+              <ul className="mt-5 space-y-2 text-sm">
                 {plan.features.map((f) => (
                   <li key={f} className="flex items-start gap-2">
                     <Check className="mt-0.5 h-4 w-4 shrink-0 text-profit" aria-hidden />
-                    {f}
+                    <span>{f}</span>
                   </li>
                 ))}
               </ul>
-              <Button asChild className="mt-5 w-full" variant={plan.key === "basic" ? "default" : "outline"}>
-                <Link to="/dashboard/billing">{plan.key === "basic" ? "Go live for $12" : "Start free"}</Link>
+              <Button asChild className="mt-6 w-full" variant={plan.key === "pro" ? "default" : "outline"}>
+                <Link to="/auth/register">{plan.key === "free" ? "Start free" : `Choose ${plan.name}`}</Link>
               </Button>
             </CardContent>
           </Card>
         ))}
       </section>
 
-      <section className="mt-12">
-        <h2 className="text-xl font-semibold tracking-tight">Performance fees, explained</h2>
-        <div className="mt-4 grid gap-4 md:grid-cols-3">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Only on winning trades</CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm text-muted-foreground">
-              Each creator sets a 5–25% fee on the profit of a closed trade. Losing trades cost nothing. Profits under
-              ${MICRO_PROFIT_THRESHOLD} are always exempt.
+      <section className="mt-12 grid gap-4 md:grid-cols-3">
+        {GUARANTEES.map((g) => (
+          <Card key={g.title} className="border-border/70 bg-card/70">
+            <CardContent className="p-5">
+              <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-md bg-primary/10 text-primary">
+                <g.icon className="h-4 w-4" aria-hidden />
+              </div>
+              <h2 className="text-sm font-semibold">{g.title}</h2>
+              <p className="mt-1.5 text-sm text-muted-foreground">{g.body}</p>
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Cumulative watermark</CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm text-muted-foreground">{WATERMARK_EXAMPLE}</CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Batched charges</CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm text-muted-foreground">{BATCH_RULE_COPY}</CardContent>
-          </Card>
-        </div>
-
-        <Card className="mt-4">
-          <CardHeader>
-            <CardTitle className="text-base">Fee calculator</CardTitle>
-            <CardDescription>See exactly what a trade would cost you.</CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-4 sm:grid-cols-4">
-            <div>
-              <Label htmlFor="profit">Trade profit ($)</Label>
-              <Input id="profit" type="number" value={profit} onChange={(e) => setProfit(Number(e.target.value))} />
-            </div>
-            <div>
-              <Label htmlFor="fee">Creator fee (%)</Label>
-              <Input id="fee" type="number" value={feePct} onChange={(e) => setFeePct(Number(e.target.value))} />
-            </div>
-            <div>
-              <Label htmlFor="cum">Cumulative P&amp;L before ($)</Label>
-              <Input id="cum" type="number" value={cumulative} onChange={(e) => setCumulative(Number(e.target.value))} />
-            </div>
-            <div className="rounded-md border border-border/60 bg-muted/30 p-3">
-              <div className="text-xs text-muted-foreground">You pay</div>
-              <div className="mono text-2xl font-semibold">{usd(outcome.fee)}</div>
-              <div className="mt-1 text-xs text-muted-foreground">
-                {outcome.feeable
-                  ? `Creator ${usd(outcome.contributor)} · platform ${usd(outcome.platform)}`
-                  : outcome.exemptReason}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        ))}
       </section>
 
-      <section className="mt-12 grid gap-4 md:grid-cols-2">
-        <Card className="border-profit/40">
+      <section className="mt-12">
+        <Card className="border-border/70">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Gift className="h-4 w-4 text-profit" aria-hidden /> Free for creators, forever
-            </CardTitle>
-            <CardDescription>{CONTRIBUTOR_PROMISE}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild variant="outline">
-              <Link to="/creators">See creator economics</Link>
-            </Button>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <TrendingUp className="h-4 w-4 text-primary" aria-hidden /> How we make money
-            </CardTitle>
+            <CardTitle className="text-base">What happens if I cancel?</CardTitle>
             <CardDescription>
-              $12/month for live execution plus {Math.round(BASE_COMMISSION * 100)}% of the per-trade fees. If models
-              and algos don&apos;t win trades, we earn nothing from fees.
+              Your deployed package keeps running its current version on your own infrastructure — it is yours. Updates,
+              new templates, cloud deploy and monitoring pause until you renew.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <Button asChild variant="outline">
-              <Link to="/how-we-make-money">Read the full breakdown</Link>
-            </Button>
+          <CardContent className="space-y-2 text-xs text-muted-foreground">
+            <p>{CONTRIBUTOR_PROMISE}</p>
+            <p>{PLATFORM_DISCLAIMER}</p>
+            <p>{RISK_DISCLOSURE}</p>
           </CardContent>
         </Card>
-      </section>
-
-      <section className="mt-12 space-y-2 rounded-lg border border-border/60 bg-muted/20 p-5 text-xs text-muted-foreground">
-        <p className="flex items-start gap-2">
-          <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" aria-hidden /> {FEE_DISCLOSURE}
-        </p>
-        <p>{RISK_DISCLOSURE}</p>
-        <p>{PLATFORM_DISCLAIMER}</p>
       </section>
     </main>
   );
