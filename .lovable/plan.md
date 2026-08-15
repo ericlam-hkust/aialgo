@@ -1,41 +1,57 @@
-# Credential-free brokerage: OAuth read-only linking + self-hosted execution
+# aiAlgo pivot: self-hosted execution, subscription-only
 
-aiAlgo stops holding any brokerage credential. Two clean boundaries replace today's model:
+aiAlgo becomes a **strategy builder and software vendor**. All live execution runs on infrastructure the user owns. The platform never holds broker credentials, never transmits an order, and never connects inbound to user machines. Revenue is 100% subscription — every commission, per-trade and performance fee is removed.
 
-- **Read (aiAlgo cloud)** — the user authorizes aiAlgo through the broker's own OAuth screen and grants a **read-only** scope. aiAlgo receives a revocable token (held by the aggregator/broker, not a password) and uses it for positions, balances, executions and — where the broker permits — historical bars.
-- **Write (user's own machine)** — order placement never touches aiAlgo. The platform emits a signed, downloadable **strategy package** the user runs on their own VPS with their own broker credentials, which never leave their infrastructure.
+## Hard constraints (enforced in code, not just copy)
 
-This removes the regulatory exposure of custodying trading credentials and matches how portfolio trackers (Sharesight, and moomoo's US/Canada linking via SnapTrade) already work.
+- No platform code path may transmit an order or trade instruction.
+- No broker password or trade-permission key is ever stored or even collectable — those form fields are deleted, the encrypted credential columns are dropped, and existing blobs are purged.
+- No inbound connection to user infrastructure. Everything is pull-based over HTTPS from the agent.
+- Strategy logic changes require explicit user approval before going live.
+- No commission, per-trade or performance fee anywhere in pricing, code, or copy.
+- No performance or return claims in marketing copy.
 
-## What changes for the user
+## Business model
 
-1. **Trading accounts page becomes "Linked accounts (read-only)".** Each broker card shows an "Authorize with <broker>" button that opens the broker's own consent screen in a popup. No API key, secret, private key, gateway URL or unlock password fields anywhere.
-2. **Existing stored credentials are purged.** On the first deploy every encrypted credential blob is deleted and affected accounts move to a `needs_reauth` state with a banner explaining the regulatory change and a one-click re-link.
-3. **Trading Desk loses manual order entry against aiAlgo-held credentials.** It becomes a live *monitoring* desk: positions, balances, and executions streamed read-only from the linked account, with the existing origin badges (Manual / Algo / AI / Broker) preserved because executions still carry their tagging from the runner.
-4. **Deploy replaces "go live".** From a verified strategy the user clicks **Download runner package** — a zip with the compiled strategy, a `docker-compose.yml`, an `.env.example` for *their* broker keys, and a runbook. The runner executes locally and reports fills back to aiAlgo over a scoped, user-issued API token so the desk, blotter and performance-fee accounting keep working.
-5. **Data sources**: broker-backed market data continues, but only through the read-only OAuth token, and only for brokers whose data scope allows it. Where it doesn't, the account is listed as "positions only" and backtests fall back to aiAlgo's own market data providers.
+| Tier | Price | Includes |
+| --- | --- | --- |
+| Free / Starter | $0 | Builder with basic indicators, 1 year of backtest history, full package download, manual updates, community templates |
+| Pro | monthly / annual | Full builder + code editor, full history and walk-forward, one-click deploy to the user's own cloud, automatic pull updates, read-only live monitoring, agent data sync |
+| Elite / Team | monthly / annual | Everything in Pro, multiple concurrent deployments, paper-run + canary + auto-rollback pipeline, priority templates and early access, team collaboration |
 
-## Broker coverage (to be confirmed against each program during build)
+Lapsed subscription: the already-deployed package keeps running its current version (the user owns the box). Updates, new templates and cloud features pause until renewal — enforced at the agent's entitlement check, not by disabling anything on the user's machine.
 
-| Broker | Read-only linking path |
-| --- | --- |
-| moomoo / Futu | Aggregator OAuth (SnapTrade) where available by region; otherwise self-host only |
-| Interactive Brokers | IBKR OAuth / third-party program, or aggregator |
-| Tiger | No public OAuth today — self-host runner only |
-| Alpaca | Native OAuth with read-only scopes |
-| Binance / Coinbase | Coinbase OAuth (read scopes); Binance = self-host only |
+## Architecture
 
-Every provider entry gains a `linking` mode of `oauth`, `aggregator` or `self_host_only`, so unsupported brokers degrade honestly instead of asking for keys. Nothing is claimed as supported until its program terms are verified.
+**Platform (aiAlgo cloud)** — builder, backtester on platform-licensed market data, versioned template library, read-only monitoring dashboard fed by the agent, a **release registry** of signed packages with version metadata, changelogs and diffs, subscription billing with tier gating, and an audit log of every deployment and approval.
 
-## Trading authorisation and consent (carried over, now simpler)
+**Local package (user's machine or VPS)** — one-command Docker Compose bundle containing the execution engine, broker gateway connector and update agent. It talks to the user's broker gateway (e.g. Futu OpenD) over localhost only, generates and places orders locally, takes broker credentials from a local `.env` the user fills in, and syncs positions/order history back to aiAlgo read-only, only with an explicit consent toggle the user can flip off at any time.
 
-aiAlgo is a software tool with **no** discretionary authority, and after this change it is also technically incapable of placing an order. The consent dialog is retained and reworded to say exactly that: read-only access on aiAlgo's side, all execution performed by software the user runs under their own control, every strategy selected and enabled by the user, past performance no guarantee. Acceptance stays versioned and is required before a link or a package download.
+**Deploy options** — (a) manual download plus setup docs, any machine the user wants; (b) one-click deploy to the user's *own* cloud (AWS / DigitalOcean / generic VPS), where the deployer provisions, installs, then destroys its credentials and retains no SSH key or management channel. The dashboard states plainly that access was relinquished.
+
+**Pull-based updates** — the agent authenticates with the user's *platform* account token, checks tier entitlement, and pulls from the release registry. Update policy is set once at onboarding: infra/security patches auto-apply; parameter changes within user-set bounds auto-apply or notify-only; strategy logic changes always require one-tap approval. Every release is signed and the agent verifies signature and hash before applying. Pipeline: validate → optional paper-run → canary → live, with automatic rollback to last-known-good, one-click revert and version pinning in the dashboard, and a pre-deployment diff view.
+
+## Broker linking
+
+Read-only OAuth where the broker or an aggregator (e.g. SnapTrade for moomoo in supported regions) offers it — aiAlgo receives a revocable read token, never a password. Everywhere else, the local agent is the only path and the UI says so. Each provider gets a `linking` mode of `oauth`, `aggregator` or `agent_only`; nothing is claimed supported until its program terms are verified. No broker credential form remains anywhere in the app.
+
+## What changes in the product
+
+1. **Landing page** rewritten around "build it here, run it yourself": self-hosted, credential-free, subscription-only. All "pay only when you win" / performance-fee messaging is removed, as is `/how-we-make-money` in its current form (replaced by a plain "how pricing works" section). No return claims.
+2. **New pricing page** with the three tiers, monthly/annual toggle, and an explicit "no commissions, no per-trade fees" line.
+3. **Onboarding** gains two steps after tier selection: update policy (three categories) and data-sync consent.
+4. **Trading accounts** becomes "Linked accounts (read-only)" — OAuth buttons or "install the agent", plus a banner explaining the regulatory change and the purge of stored credentials.
+5. **Trading Desk** becomes read-only monitoring: positions, PnL, deployment status and a blotter of fills reported by the agent, keeping the Manual / Algo / AI origin badges. Manual order entry and all order-placement UI are removed.
+6. **New Deployments page**: package downloads, one-click cloud deploy, agent health/heartbeat, version pinning, rollback, pending-approval cards with the diff view, and the deployment audit log.
+7. **Billing** drops fee accrual, watermarks and batch charging; it becomes plan management plus invoices.
+8. **Marketplace / contributor earnings**: the 80/20 commission split and payout machinery are removed. Templates and models become part of the subscription-gated library. Contributor recognition stays; monetary earnings, Stripe Connect payouts and fee dashboards are retired. *This is the largest deletion in the plan — confirm before build if contributors should instead be paid from a subscription revenue pool rather than not at all.*
+9. **Backtesting** is gated by tier: 1 year on Free, full history and walk-forward on Pro and above.
 
 ## Technical notes
 
-- **Schema**: drop `credentials_encrypted` and secret-bearing keys from `broker_connections`; add `linking_mode`, `auth_status`, `scope`, `aggregator_user_id`, `token_ref`, `last_read_at`. New `runner_deployments` (package version, machine label, heartbeat, scoped token hash) and `runner_events` (fills/heartbeats posted by the runner). New `trading_consents`. All with owner-scoped RLS plus explicit GRANTs.
-- **OAuth**: aggregator/broker client secrets stay platform-side in Lovable Cloud secrets. Start and callback handled by server functions plus a public callback route; access tokens are stored server-side only (encrypted at rest, never returned to the browser) or held by the aggregator behind a user reference, depending on the program.
-- **Read path**: `brokers.server.ts` is rewritten to read-only calls (accounts, positions, activities, optional candles). `data-routing.server.ts` swaps `credentialsEncrypted` for the token reference and skips brokers whose scope excludes market data. All order-placement code paths in `execution.server.ts` / `trading-desk.functions.ts` are removed or converted to ingesting runner reports.
-- **Runner package**: generated server-side from the existing Python codegen (`strategy-codegen.ts`), zipped with compose + runbook, signed, and downloaded through an authenticated server function. Reporting endpoint lives under `src/routes/api/public/runner/*` with token verification in the handler.
-- **Removed**: managed OpenD/IBKR bridge concept, all credential input forms, `crypto.server` usage for broker secrets (kept for any remaining platform-side token encryption).
-- **Docs**: connection guides rewritten from "create an API key" to "authorize aiAlgo" for OAuth brokers, and to "install the runner" for self-host-only brokers. A public `/trading-disclaimer` page states the read-only, non-discretionary posture.
+- **Schema**: drop `credentials_encrypted` and secret fields from `broker_connections`; add `linking_mode`, `auth_status`, `scope`, `token_ref`. New `releases` (version, kind, signature, hash, changelog, min tier), `deployments` (machine label, package version, channel, status, heartbeat, agent token hash), `deployment_events` (validate/paper/canary/live/rollback), `update_policies`, `approvals`, `sync_consents`. Drop or archive fee/commission tables (`fee_accruals`, payout tables, Connect account refs) after confirming step 8. All new tables with owner-scoped RLS and explicit GRANTs.
+- **Agent API** lives under `src/routes/api/public/agent/*`: `GET /manifest` (entitlement-checked release list), `GET /package/:version` (signed artifact URL), `POST /telemetry` (positions, fills, heartbeat), `POST /events`. Every handler verifies a hashed agent token bound to a user and deployment, and rate-limits. No endpoint accepts or emits an order instruction.
+- **Package generation** reuses `strategy-codegen.ts`, zipped with `docker-compose.yml`, `.env.example`, runbook and a detached signature; served through an authenticated server function.
+- **Removals**: `execution.server.ts` order paths, `trading-desk.functions.ts` order placement, broker write adapters in `brokers.server.ts`, `credentialsEncrypted` handling in `data-routing.server.ts`, the managed-bridge concept, and the performance-fee logic in `monetization.ts`.
+- **Entitlements**: `PLAN_LIMITS` reshaped to free / pro / elite with `backtestYears`, `maxDeployments`, `autoUpdates`, `oneClickDeploy`, `liveMonitoring`, `advancedPipeline`, `teamSeats`; `marketplaceFeeRate` deleted. New Stripe products/prices for pro and elite, monthly and annual.
+- **Legal**: `/trading-disclaimer` states aiAlgo is software tooling with no discretionary authority, is not a broker or adviser, and that the user operates the execution software and bears responsibility for every order it places. Consent is versioned and required before a package download or cloud deploy.
