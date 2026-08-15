@@ -4,7 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { PAPER_STARTING_BALANCE, providerMeta } from "@/lib/trading-accounts";
 
 const ACCOUNT_COLUMNS =
-  "id,broker_name,nickname,status,mode,account_id,currency,account_balance,buying_power,is_default,last_synced_at,last_error,created_at,config";
+  "id,broker_name,nickname,status,mode,account_id,currency,account_balance,buying_power,is_default,last_synced_at,last_error,created_at,config,linking_mode,auth_status,scope";
 
 export const listTradingAccounts = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -28,65 +28,47 @@ export const listTradingAccounts = createServerFn({ method: "GET" })
 
 export type TradingAccount = Awaited<ReturnType<typeof listTradingAccounts>>[number];
 
-const connectSchema = z.object({
+const linkSchema = z.object({
   provider: z.string().min(1).max(24),
   nickname: z.string().trim().max(60).default(""),
   currency: z.string().trim().max(8).default("USD"),
-  fields: z.record(z.string(), z.string().trim().max(8000)).default({}),
+  accountLabel: z.string().trim().max(60).default(""),
   acknowledged: z.boolean(),
   makeDefault: z.boolean().default(false),
   useForData: z.boolean().default(false),
   accountId: z.string().uuid().nullable().optional(),
 });
 
-/** Build the encrypted secret blob and the non-secret config for a provider. */
-function splitFields(provider: string, fields: Record<string, string>) {
-  const meta = providerMeta(provider);
-  if (!meta) throw new Error(`Unsupported venue: ${provider}`);
-  const config: Record<string, string> = {};
-  const secrets: Record<string, string> = {};
-  for (const field of meta.fields) {
-    const value = (fields[field.id] ?? "").trim();
-    if (field.required && !value) throw new Error(`${field.label} is required for ${meta.label}.`);
-    if (!value) continue;
-    if (field.secret) secrets[field.id] = value;
-    else config[field.id] = value;
-  }
-  let secretBlob: string | null = null;
-  if (provider === "alpaca" || provider === "binance" || provider === "coinbase") {
-    if (secrets["apiKey"]) secretBlob = `${secrets["apiKey"]}::${secrets["apiSecret"] ?? ""}`;
-  } else if (provider === "tiger") {
-    secretBlob = secrets["privateKey"] ?? null;
-  } else if (provider === "futu") {
-    secretBlob = secrets["unlockPassword"] ?? null;
-  } else if (provider === "ibkr") {
-    secretBlob = secrets["apiKey"] ?? null;
-  }
-  return { meta, config, secretBlob };
-}
-
-export const connectTradingAccount = createServerFn({ method: "POST" })
+/**
+ * Registers a read-only linked account. No credential is accepted here — the
+ * platform stores only the linking mode, scope and (for OAuth/aggregator
+ * providers) an opaque token reference held by the provider.
+ */
+export const linkTradingAccount = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => connectSchema.parse(input))
+  .inputValidator((input: unknown) => linkSchema.parse(input))
   .handler(async ({ data, context }) => {
-    if (!data.acknowledged) throw new Error("Confirm the trade-only key checklist before connecting.");
-    const { meta, config } = splitFields(data.provider, data.fields);
+    if (!data.acknowledged) {
+      throw new Error("Confirm you understand aiAlgo only ever receives read-only account data.");
+    }
+    const meta = providerMeta(data.provider);
+    if (!meta) throw new Error(`Unsupported venue: ${data.provider}`);
 
-    // Hard constraint: aiAlgo never stores broker secrets. Only non-sensitive
-    // linkage metadata is persisted; credentials stay on the user's machine.
     const row: Record<string, unknown> = {
       user_id: context.userId,
       broker_name: data.provider,
       nickname: data.nickname || meta.label,
       mode: "live",
-      status: "connected",
+      status: meta.linking === "agent_only" ? "pending_agent" : "pending_auth",
+      linking_mode: meta.linking,
+      auth_status: meta.linking === "agent_only" ? "agent_only" : "pending",
+      scope: "read_only",
+      token_ref: null,
       currency: data.currency || meta.currency,
-      account_id: config["accountId"] ?? null,
-      config,
-      last_synced_at: null,
+      account_id: data.accountLabel || null,
+      config: { linking: meta.linking },
       last_error: null,
     };
-
 
     let id = data.accountId ?? null;
     if (id) {
@@ -111,7 +93,40 @@ export const connectTradingAccount = createServerFn({ method: "POST" })
       await setBrokerDataSource(context.supabase, context.userId, id!, data.provider, true);
     }
 
-    return { id: id!, dataCapable: meta.dataCapable };
+    return { id: id!, linking: meta.linking, dataCapable: meta.dataCapable };
+  });
+
+/**
+ * SnapTrade aggregator handshake (stub).
+ *
+ * Enabled only when SNAPTRADE_CLIENT_ID / SNAPTRADE_CONSUMER_KEY are configured
+ * AND the provider's program terms have been verified. Until then this returns
+ * a clear "not available yet" result rather than pretending support exists.
+ */
+export const startAggregatorLink = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { data: conn, error } = await context.supabase
+      .from("broker_connections")
+      .select("id,broker_name,linking_mode")
+      .eq("id", data.id)
+      .single();
+    if (error) throw new Error(error.message);
+
+    const meta = providerMeta(conn.broker_name);
+    const configured = Boolean(process.env["SNAPTRADE_CLIENT_ID"] && process.env["SNAPTRADE_CONSUMER_KEY"]);
+    if (!configured || meta?.unverifiedProgram) {
+      return {
+        available: false as const,
+        message:
+          "Read-only aggregator linking for this broker is not live yet — its partner program terms are still being verified. Use the local agent in the meantime; it never sends credentials to aiAlgo.",
+      };
+    }
+    // Real implementation exchanges a SnapTrade user secret for a connection
+    // portal URL with a read-only scope, then stores only the returned
+    // authorization id in token_ref.
+    return { available: false as const, message: "Aggregator linking is being enabled for your region." };
   });
 
 /** Create or remove the data_source_connections row backed by a broker account. */
@@ -139,13 +154,13 @@ async function setBrokerDataSource(
   await supabase.from("data_source_connections").insert({
     user_id: userId,
     provider: `broker:${provider}`,
-    label: `${provider} account data`,
+    label: `${provider} account data (via agent)`,
     broker_connection_id: connectionId,
     use_platform_key: false,
     priority: 10,
     enabled: true,
     status: "connected",
-    status_message: "Uses your broker's own market data entitlement.",
+    status_message: "Historical bars are fetched locally by your agent using your own broker entitlement.",
     last_checked_at: new Date().toISOString(),
   });
 }
